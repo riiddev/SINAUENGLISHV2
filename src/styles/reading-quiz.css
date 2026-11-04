@@ -269,3 +269,21 @@
   cursor: default;
 }
 
+@media (max-width: 640px) {
+  .reading-quiz-modal {
+    padding: 0;
+  }
+  .reading-quiz-card {
+    border-radius: 0;
+    max-height: 100vh;
+    height: 100vh;
+    border: none;
+  }
+  .reading-quiz-header {
+    padding: var(--space-3) var(--space-4);
+  }
+  .reading-quiz-body {
+    padding: var(--space-4);
+  }
+}
+

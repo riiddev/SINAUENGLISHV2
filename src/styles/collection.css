@@ -287,3 +287,24 @@
   }
 }
 
+@media (max-width: 640px) {
+  .collection-header-card {
+    padding: var(--space-4);
+  }
+  .preview-stage-card {
+    padding: var(--space-4);
+    gap: var(--space-4);
+  }
+  .economy-stats-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .level-progress-box {
+    min-width: 100%;
+    max-width: 100%;
+  }
+  .catalog-card {
+    padding: var(--space-4);
+  }
+}
+

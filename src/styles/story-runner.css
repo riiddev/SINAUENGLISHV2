@@ -225,3 +225,24 @@
   color: var(--color-accent-navy);
 }
 
+@media (max-width: 640px) {
+  .story-runner-modal {
+    padding: 0;
+  }
+  .story-runner-card {
+    border-radius: 0;
+    max-height: 100vh;
+    height: 100vh;
+    border: none;
+  }
+  .story-runner-header {
+    padding: var(--space-3) var(--space-4);
+  }
+  .story-runner-body {
+    padding: var(--space-4);
+  }
+  .vocab-spotlight-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

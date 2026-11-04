@@ -83,7 +83,7 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
 
           {/* Story Hero Banner */}
           <div
-            className="card card-tint-slate"
+            className="card card-tint-slate story-hero-banner"
             style={{
               padding: "var(--space-6) var(--space-8)",
               marginBottom: "var(--space-6)",
@@ -95,6 +95,7 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
           >
             {getAssetUrl("stories", selectedStory.coverAssetKey) && (
               <div
+                className="story-hero-cover-wrap"
                 style={{
                   width: "220px",
                   height: "148px",
@@ -224,7 +225,7 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
           </div>
 
           {/* User Progress Stats Row */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-4)", marginBottom: "var(--space-6)" }}>
+          <div className="adventure-stats-row">
             <div className="card stat-card">
               <span className="stat-label">Cerita Terbuka</span>
               <span className="stat-value" id="stat-stories-unlocked">

@@ -79,3 +79,64 @@
   background-color: #FFFDF0;
 }
 
+/* Adventure Stats Row */
+.adventure-stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+@media (max-width: 640px) {
+  .adventure-stats-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .adventure-stats-row .stat-card {
+    padding: 8px 10px;
+    box-shadow: 2px 2px 0 var(--border-color);
+  }
+
+  .adventure-stats-row .stat-label {
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+
+  .adventure-stats-row .stat-value {
+    font-size: var(--text-base);
+  }
+
+  .adventure-stats-row .stat-desc {
+    display: none;
+  }
+
+  .story-card-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .story-hub-card {
+    padding: var(--space-4);
+    box-shadow: 2px 2px 0 var(--border-color);
+  }
+
+  .story-hero-banner {
+    padding: var(--space-4) !important;
+    gap: var(--space-4) !important;
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .story-hero-cover-wrap {
+    width: 100% !important;
+    height: 160px !important;
+  }
+
+  .episode-roadmap-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+}
+

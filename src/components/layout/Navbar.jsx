@@ -34,12 +34,12 @@ export function Navbar() {
             </Link>
           ) : (
             <Link to="/login" className="btn btn-secondary btn-sm">
-              Masuk Akun
+              Masuk
             </Link>
           )}
 
           <Link className="btn btn-primary btn-sm" to="/belajar">
-            Masuk Ruang Belajar ↗
+            Ruang Belajar ↗
           </Link>
         </div>
       </div>

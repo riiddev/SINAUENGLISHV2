@@ -54,8 +54,8 @@ export function LandingPage() {
 
       <main id="main-content">
         {/* Hero Section */}
-        <section className="container" id="hero-section" style={{ paddingTop: "var(--space-12)", paddingBottom: "var(--space-16)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "var(--space-10)", alignItems: "center" }}>
+        <section className="container" id="hero-section" style={{ paddingTop: "var(--space-8)", paddingBottom: "var(--space-12)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-6)", alignItems: "center" }}>
             <div>
               <h1 style={{ fontSize: "clamp(2.5rem, 5.5vw, 3.8rem)", lineHeight: 1.08, letterSpacing: "-0.025em", marginBottom: "var(--space-4)" }}>
                 Kata baru<br />
