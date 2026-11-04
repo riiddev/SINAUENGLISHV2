@@ -3,13 +3,15 @@ import { Badge } from "../../components/common/Badge.jsx";
 import { Button } from "../../components/common/Button.jsx";
 import { STORIES_CATALOG } from "../../data/stories/storiesCatalog.js";
 import story01Data from "../../data/stories/story-01.json";
+import story02Data from "../../data/stories/story-02.json";
 import { StoryRunner } from "./StoryRunner.jsx";
 import { api } from "../../services/api.js";
 import "../../styles/adventure.css";
 
 // Map of available story content bundles
 const STORIES_CONTENT_MAP = {
-  "story-01": story01Data
+  "story-01": story01Data,
+  "story-02": story02Data
 };
 
 export function AdventureHub({ userProfileHook, onRecordWordReview }) {
@@ -18,7 +20,7 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
   const [storyProgressData, setStoryProgressData] = useState({ progress: {}, hasUnlockedNewEpisodeToday: false });
   const [isLoadingProgress, setIsLoadingProgress] = useState(true);
 
-  const userLevel = userProfileHook?.profile?.level || 1;
+  const userLevel = userProfileHook?.calculatedLevel || userProfileHook?.profile?.level || 1;
 
   // Fetch story progress from cloud
   const refreshProgress = async () => {
@@ -38,7 +40,8 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
     refreshProgress();
   }, []);
 
-  const completedStory01Episodes = storyProgressData.progress?.["story-01"] || [];
+  const completedEpisodes = selectedStory ? (storyProgressData.progress?.[selectedStory.id] || []) : [];
+  const totalCompletedEpisodes = Object.values(storyProgressData.progress || {}).reduce((sum, list) => sum + (Array.isArray(list) ? list.length : 0), 0);
 
   return (
     <div className="adventure-hub-container" id="adventure-hub-view">
@@ -115,9 +118,9 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
 
           <div className="episode-roadmap-grid">
             {(STORIES_CONTENT_MAP[selectedStory.id]?.episodes || []).map((ep, idx) => {
-              const isCompleted = completedStory01Episodes.includes(ep.id);
+              const isCompleted = completedEpisodes.includes(ep.id);
               // An episode is unlocked if it is Episode 1, OR if the previous episode is completed
-              const isPrevCompleted = ep.id === 1 || completedStory01Episodes.includes(ep.id - 1);
+              const isPrevCompleted = ep.id === 1 || completedEpisodes.includes(ep.id - 1);
               const isLocked = !isCompleted && !isPrevCompleted;
               const isCurrent = !isCompleted && isPrevCompleted;
 
@@ -185,7 +188,7 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
             <div className="card stat-card">
               <span className="stat-label">Episode Selesai</span>
               <span className="stat-value" id="stat-episodes-completed">
-                {completedStory01Episodes.length} / 100
+                {totalCompletedEpisodes} / 100
               </span>
               <span className="stat-desc">+50 EXP & +30 Koin per episode</span>
             </div>
