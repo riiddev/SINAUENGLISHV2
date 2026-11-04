@@ -10,6 +10,7 @@ import story05Data from "../../data/stories/story-05.json";
 import story06Data from "../../data/stories/story-06.json";
 import story07Data from "../../data/stories/story-07.json";
 import story08Data from "../../data/stories/story-08.json";
+import story09Data from "../../data/stories/story-09.json";
 import { StoryRunner } from "./StoryRunner.jsx";
 import { api } from "../../services/api.js";
 import "../../styles/adventure.css";
@@ -23,7 +24,8 @@ const STORIES_CONTENT_MAP = {
   "story-05": story05Data,
   "story-06": story06Data,
   "story-07": story07Data,
-  "story-08": story08Data
+  "story-08": story08Data,
+  "story-09": story09Data
 };
 
 export function AdventureHub({ userProfileHook, onRecordWordReview }) {
