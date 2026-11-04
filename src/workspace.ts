@@ -1082,3 +1082,4 @@ window.addEventListener("DOMContentLoaded", () => {
   (window as any).sinauApp = app;
   app.init();
 });
+
