@@ -361,13 +361,23 @@ function handleDevFallback(action, payload, token) {
   }
 
   if (action === "grantReward") {
+    let earnedXp = 0;
+    let earnedCoins = 0;
+    if (payload.source === "article_quiz") {
+      const scorePct = Number(payload.meta?.scorePct) || 0;
+      if (scorePct >= 80) earnedXp = 30;
+      if (scorePct >= 100) earnedCoins = 20;
+    } else {
+      earnedXp = payload.meta?.difficulty === 2 ? 40 : 30;
+      earnedCoins = payload.meta?.difficulty === 2 ? 20 : 15;
+    }
     return {
       success: true,
       data: {
-        earnedXp: payload.meta?.difficulty === 2 ? 40 : 30,
-        earnedCoins: payload.meta?.difficulty === 2 ? 20 : 15,
-        totalXp: 150,
-        totalCoins: 80,
+        earnedXp,
+        earnedCoins,
+        totalXp: 180,
+        totalCoins: 100,
         level: 4,
         isLevelUp: false
       }

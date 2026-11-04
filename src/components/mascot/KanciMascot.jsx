@@ -334,3 +334,4 @@ function KanciOutfitSvgFallback({ outfit, size = 96 }) {
 
   return null;
 }
+

@@ -180,3 +180,4 @@ export function getXpProgressForLevel(xp = 0) {
     percentage
   };
 }
+

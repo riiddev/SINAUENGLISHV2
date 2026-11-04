@@ -309,7 +309,11 @@ export function WorkspacePage() {
           {/* VIEW 6: READING */}
           {currentView === "reading" && (
             <section className="view-section is-active" id="view-reading">
-              <ReadingLibrary passages={habitPassages} />
+              <ReadingLibrary
+                passages={habitPassages}
+                onRecordWordReview={recordWordReview}
+                userProfileHook={userProfile}
+              />
             </section>
           )}
 
