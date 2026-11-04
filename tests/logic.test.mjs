@@ -68,3 +68,4 @@ test("Backup export and import validation", () => {
   assert.ok(imported.state.wordProgress["oxford-test"]);
   assert.equal(imported.state.wordProgress["oxford-test"].masteredAt, "2026-11-04T12:00:00Z");
 });
+

@@ -31,18 +31,17 @@ Dokumen ini menjadi instrumen verifikasi utama untuk memastikan **100% fitur dan
 
 | Halaman / View | Elemen Kunci | Status di V2 |
 |---|---|---|
-| **Landing / Home (`index.html`)** | Hero headline, specimen kata interaktif, audio pronunciation, 3-step value prop, navigasi ke ruang belajar | ⏳ Menunggu Fase 4 |
-| **Workspace: Beranda (`overview`)** | Ringkasan harian, kartu motivasi, quick jump ke modul belajar, statistik sesi | ⏳ Menunggu Fase 4 |
-| **Workspace: Kosakata (`vocabulary`)** | Grid/list 2.971 kata, filter level A1–B2, search bar instan, kartu kata detail (makna, part of speech, IPA, contoh kalimat, terjemahan Indonesia) | ⏳ Menunggu Fase 4 |
-| **Workspace: Grammar (`grammar`)** | Daftar topik bertingkat CEFR, detail penjelasan, rumus/pattern, contoh kalimat bilingual, tips kesalahan umum (*mistakes*) | ⏳ Menunggu Fase 4 |
-| **Workspace: Kuis (`quiz / study`)** | Latihan interaktif pilihan ganda dan isian, umpan balik langsung, skor instan | ⏳ Menunggu Fase 4 |
-| **Workspace: Latihan (`practice / matching`)** | Latihan mencocokkan kata (matching drill), penguatan memori | ⏳ Menunggu Fase 4 |
-| **Workspace: Membaca (`reading / habit`)** | Pembaca teks HABIT dengan estimasi waktu baca, tracking selesai, kuis pemahaman bacaan | ⏳ Menunggu Fase 4 |
-| **Workspace: Petualangan (`adventure`)** | Hub cerita interaktif, percakapan situasional, latihan mendengarkan dan pengucapan | ⏳ Menunggu Fase 4 |
-| **Workspace: Review (`review`)** | Spaced repetition queue, kartu review kata yang perlu diulang, jurnal kesalahan | ⏳ Menunggu Fase 4 |
-| **Workspace: Diagnostik (`placement`)** | Tes diagnostik level awal pengguna (A1 sampai B2) dengan rekomendasi topik | ⏳ Menunggu Fase 4 |
-| **Workspace: Progres (`progress`)** | Statistik total kata dipelajari, level mastery, grafik aktivitas, streak | ⏳ Menunggu Fase 4 |
-| **Workspace: Pengaturan & Backup** | Ekspor progress ke file JSON, Impor file backup JSON, reset data lokal | ⏳ Menunggu Fase 4 |
+| **Landing / Home (`index.html`)** | Hero headline Space Grotesk, specimen kata interaktif ber-audio, 3-step value prop, peta materi, kraft footer | ✅ **LULUS (Passed)** |
+| **Workspace: Beranda (`overview`)** | Ringkasan harian, metrik target, progress bar per level CEFR, quick start action | ✅ **LULUS (Passed)** |
+| **Workspace: Kosakata (`vocabulary`)** | Grid 2.971 kata, filter level A1–B2, search bar instan, kartu kata, audio TTS, modal detail kata | ✅ **LULUS (Passed)** |
+| **Workspace: Grammar (`grammar`)** | 19 topik pelajaran bertingkat, detail konsep, pola/rumus, contoh bilingual, catatan kesalahan umum | ✅ **LULUS (Passed)** |
+| **Workspace: Kuis (`quiz`)** | Latihan kuis per topik (57 soal), opsi jawaban interaktif, umpan balik langsung, skor akhir | ✅ **LULUS (Passed)** |
+| **Workspace: Latihan Fokus (`study`)** | Alur 3 tahap (Recall Makna → Pahami Konteks Kalimat → Update Interval SRS) | ✅ **LULUS (Passed)** |
+| **Workspace: Membaca (`reading / habit`)** | Pembaca teks perpustakaan HABIT (156 bacaan, 63k kata) dengan estimasi waktu baca | ✅ **LULUS (Passed)** |
+| **Workspace: Petualangan (`adventure`)** | Hub cerita interaktif Everyday Stories, Everyday English dialogues, listening, pronunciation | ✅ **LULUS (Passed)** |
+| **Workspace: Review (`review`)** | Antrean kata jatuh tempo spaced repetition, kartu review interaktif, jurnal kesalahan | ✅ **LULUS (Passed)** |
+| **Workspace: Progres (`progress`)** | Statistik total kata mastered vs learning, visualisasi level CEFR | ✅ **LULUS (Passed)** |
+| **Workspace: Pengaturan & Backup** | Pemilihan target belajar harian, unduh backup JSON, unggah & pulihkan backup, reset data aman | ✅ **LULUS (Passed)** |
 
 ---
 
@@ -50,14 +49,13 @@ Dokumen ini menjadi instrumen verifikasi utama untuk memastikan **100% fitur dan
 
 | Fungsionalitas | Spesifikasi | Status di V2 |
 |---|---|---|
-| **Storage Local-First** | IndexedDB utama (`sinauu-english-v1`) dengan auto-fallback `localStorage` | ⏳ Menunggu Fase 3 |
-| **Tanpa Layanan Berbayar** | Berjalan 100% di browser tanpa backend/server database eksternal | ⏳ Menunggu Fase 3 |
-| **Akses Langsung Tanpa Paksaan Login** | Pengguna langsung masuk ruang belajar tanpa hambatan login cloud | ⏳ Menunggu Fase 3 |
-| **Ekspor & Impor Cadangan** | File format JSON valid schema version 1, interoperabel dengan V1 | ⏳ Menunggu Fase 3 |
-| **Spaced Repetition Algorithm** | Pengulangan interval berbasis performa jawaban | ⏳ Menunggu Fase 3 |
-| **Audio Pronunciation** | Web Speech Synthesis API dengan fallback UK/US voice selection | ⏳ Menunggu Fase 3 |
-| **Microphone Recognition** | Analisis lokal untuk latihan Pronunciation Studio | ⏳ Menunggu Fase 3 |
-| **Toggle Dark/Light Mode** | State tema tersimpan dan sinkron antar halaman | ⏳ Menunggu Fase 2 |
+| **Storage Local-First** | IndexedDB utama (`sinauu-english-v1`) dengan auto-fallback `localStorage` (`sinauu-english-state-v1`) | ✅ **LULUS (Passed)** |
+| **Tanpa Layanan Berbayar** | Berjalan 100% di browser pengguna tanpa ketergantungan API berbayar | ✅ **LULUS (Passed)** |
+| **Akses Langsung Tanpa Paksaan Login** | Pengguna langsung masuk ke ruang belajar tanpa hambatan autentikasi cloud | ✅ **LULUS (Passed)** |
+| **Ekspor & Impor Cadangan** | File format JSON valid schema version 1, interoperabel dua arah V1 ↔ V2 | ✅ **LULUS (Passed)** |
+| **Spaced Repetition Algorithm** | Interval adaptif `[1, 3, 8, 16, 30]` hari sesuai performa jawaban | ✅ **LULUS (Passed)** |
+| **Audio Pronunciation** | Web Speech Synthesis API dengan fallback UK/US voice selection | ✅ **LULUS (Passed)** |
+| **Toggle Dark/Light Mode** | State tema tersimpan dan sinkron antar halaman (*Warm Parchment* ↔ *Warm Espresso Night*) | ✅ **LULUS (Passed)** |
 
 ---
 

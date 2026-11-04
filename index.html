@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F4F0E8">
+  <meta name="description" content="SinauEnglish V2 — Belajar kosakata dan grammar bahasa Inggris melalui makna, konteks nyata, dan ingatan jangka panjang. 100% gratis dan local-first.">
+  <link rel="icon" type="image/svg+xml" href="/public/assets/sinauu-mark.svg">
+  <title>SinauEnglish V2 — Belajar Sampai Kepakai</title>
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Lewati ke konten utama</a>
+
+  <!-- Navigation Bar -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="/" aria-label="SinauEnglish V2 Beranda">
+        <span class="brand-badge">S</span>
+        <span class="brand-text">sinauu<span>english</span></span>
+      </a>
+      <nav class="nav-menu" aria-label="Navigasi Utama">
+        <a class="nav-link" href="#pendekatan">Pendekatan</a>
+        <a class="nav-link" href="#materi">Peta Materi</a>
+        <a class="nav-link" href="/design-system.html">Design Tokens</a>
+        <a class="nav-link is-active" href="/belajar.html">Ruang Belajar ↗</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Ganti mode gelap/terang" title="Ganti mode tampilan">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        </button>
+        <a class="btn btn-primary btn-sm" href="/belajar.html">Masuk Ruang Belajar ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- Hero Section -->
+    <section class="container" style="padding-top: var(--space-12); padding-bottom: var(--space-16);">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-10); align-items: center;">
+        <div>
+          <span class="section-eyebrow">SinauEnglish V2 · Metode Belajar Berjeda</span>
+          <h1 style="font-size: clamp(2.5rem, 5.5vw, 3.8rem); line-height: 1.06; letter-spacing: -0.025em; margin-bottom: var(--space-4);">
+            Kata baru<br>belum jadi<br><em style="font-family: var(--font-editorial); font-style: italic; color: var(--color-accent-gold);">milikmu.</em>
+          </h1>
+          <p style="font-size: var(--text-md); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--space-6); max-width: 520px;">
+            Mengetahui arti terjemahan belum tentu tahu cara memakainya. Amati kata dalam kalimat nyata, bedakan nuansanya, dan kunci ingatanmu dengan spaced repetition.
+          </p>
+          <div style="display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; margin-bottom: var(--space-6);">
+            <a class="btn btn-primary btn-lg" href="/belajar.html">Mulai Belajar Sekarang ↗</a>
+            <a class="btn btn-secondary btn-lg" href="#materi">Lihat Peta Materi</a>
+          </div>
+          <p style="font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 600;">
+            ✓ 100% Gratis &nbsp;·&nbsp; ✓ Tanpa Akun Wajib &nbsp;·&nbsp; ✓ Tersimpan di Perangkatmu
+          </p>
+        </div>
+
+        <!-- Interactive Specimen Card -->
+        <div>
+          <div class="card card-tint-sand" id="specimen-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); border-bottom: 1px dashed var(--color-border); padding-bottom: var(--space-2);">
+              <span class="badge badge-gold" id="specimen-level">VERB · LEVEL A2</span>
+              <span style="font-family: var(--font-heading); font-size: var(--text-xs); font-weight: 700; color: var(--color-text-secondary);">SPECIMEN KATA</span>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2);">
+              <h2 id="specimen-word" style="font-size: var(--text-4xl); letter-spacing: -0.02em;">notice<span style="color: var(--color-accent-gold);">.</span></h2>
+              <button class="btn btn-secondary btn-icon" id="specimen-audio-btn" type="button" aria-label="Dengarkan pengucapan" title="Dengarkan pengucapan audio">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              </button>
+            </div>
+            
+            <p id="specimen-ipa" style="font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-text-secondary); margin-bottom: var(--space-4);">/ˈnoʊ.t̬ɪs/ · US English</p>
+            
+            <div style="background-color: var(--color-bg-surface); border: var(--border-sm); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-4);">
+              <span style="font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-secondary);">Makna Bahasa Indonesia</span>
+              <p id="specimen-meaning" style="font-size: var(--text-base); font-weight: 700; color: var(--color-text-primary); margin-top: 4px; margin-bottom: 0;">melihat, memperhatikan, menyadari</p>
+            </div>
+
+            <div style="background-color: var(--color-bg-surface); border: var(--border-sm); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-5);">
+              <span style="font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-secondary);">Contoh dalam Kalimat</span>
+              <p id="specimen-en" style="font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); margin-top: 4px; margin-bottom: 2px;">Did you notice anything unusual about him today?</p>
+              <p id="specimen-id" style="font-size: var(--text-xs); color: var(--color-text-secondary); margin-bottom: 0; font-style: italic;">Apakah kamu memperhatikan sesuatu yang aneh tentangnya hari ini?</p>
+            </div>
+
+            <div style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+              <button class="btn btn-secondary btn-sm" id="specimen-next-btn" type="button">Ganti Contoh Kata ↺</button>
+              <a class="btn btn-primary btn-sm" href="/belajar.html">Coba Latihan</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3-Step Methodology Section -->
+    <section class="container" id="pendekatan" style="padding-top: var(--space-12); padding-bottom: var(--space-16);">
+      <div class="section-header" style="text-align: center; max-width: 680px; margin-left: auto; margin-right: auto;">
+        <span class="section-eyebrow">Alur Belajar 3 Tahap</span>
+        <h2 class="section-title">Dari sekadar tahu arti, jadi reflek bicara.</h2>
+        <p class="section-desc" style="margin-left: auto; margin-right: auto;">Metode belajar terarah yang memastikan setiap kata yang kamu pelajari tidak lekas menguap.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-6);">
+        <div class="card card-tint-sand">
+          <span class="badge badge-gold" style="margin-bottom: var(--space-3);">01 · Makna Utuh</span>
+          <h3 style="font-size: var(--text-xl); margin-bottom: var(--space-2);">Pahami Arti Tepat</h3>
+          <p style="color: var(--color-text-secondary); font-size: var(--text-sm);">Bukan sekadar hafalan kamus 1-kata. Pelajari batasan makna kata dan bagian tutur kata (noun, verb, adj) dengan definisi kontekstual.</p>
+        </div>
+
+        <div class="card card-tint-sage">
+          <span class="badge badge-sage" style="margin-bottom: var(--space-3);">02 · Konteks Nyata</span>
+          <h3 style="font-size: var(--text-xl); margin-bottom: var(--space-2);">Amati dalam Kalimat</h3>
+          <p style="color: var(--color-text-secondary); font-size: var(--text-sm);">Lihat bagaimana penutur asli memakai kata tersebut dalam kalimat sehari-hari, cerita interaktif, dan materi bacaan HABIT.</p>
+        </div>
+
+        <div class="card card-tint-slate">
+          <span class="badge badge-navy" style="margin-bottom: var(--space-3);">03 · Ingatan Bertahan</span>
+          <h3 style="font-size: var(--text-xl); margin-bottom: var(--space-2);">Spaced Repetition (SRS)</h3>
+          <p style="color: var(--color-text-secondary); font-size: var(--text-sm);">Sistem menjadwalkan review pada interval 1, 3, 8, 16, hingga 30 hari tepat sebelum kamu lupa, mengunci kata ke memori jangka panjang.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Material Map Section -->
+    <section class="container" id="materi" style="padding-top: var(--space-8); padding-bottom: var(--space-16);">
+      <div class="section-header">
+        <span class="section-eyebrow">Kurikulum Komprehensif</span>
+        <h2 class="section-title">Peta Materi Belajar</h2>
+        <p class="section-desc">Semua materi tersusun bertingkat sesuai standar CEFR (A1 Pemula hingga C1 Mahir).</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-6);">
+        <div class="card card-interactive">
+          <span class="badge badge-gold" style="margin-bottom: var(--space-3);">2.971 KATA</span>
+          <h3 style="font-size: var(--text-xl); margin-bottom: var(--space-2);">Oxford 3000 Corpus</h3>
+          <p style="color: var(--color-text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-4);">Kosakata American English terpenting level A1, A2, B1, dan B2 lengkap dengan audio dan contoh.</p>
+          <a class="btn btn-secondary btn-sm" href="/belajar.html#vocabulary">Buka Kosakata ↗</a>
+        </div>
+
+        <div class="card card-interactive">
+          <span class="badge badge-navy" style="margin-bottom: var(--space-3);">19 TOPIK</span>
+          <h3 style="font-size: var(--text-xl); margin-bottom: var(--space-2);">Kurikulum Grammar</h3>
+          <p style="color: var(--color-text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-4);">Pola kalimat tenses, modal verbs, passive voice, hingga conditional sentences dengan 57 kuis interaktif.</p>
+          <a class="btn btn-secondary btn-sm" href="/belajar.html#grammar">Buka Grammar ↗</a>
+        </div>
+
+        <div class="card card-interactive">
+          <span class="badge badge-sage" style="margin-bottom: var(--space-3);">156 BACAAN</span>
+          <h3 style="font-size: var(--text-xl); margin-bottom: var(--space-2);">HABIT Reading Library</h3>
+          <p style="color: var(--color-text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-4);">63.309 kata bacaan berbobot untuk membangun intuisi membaca cepat dan melatih fokus pemahaman.</p>
+          <a class="btn btn-secondary btn-sm" href="/belajar.html#reading">Buka Bacaan ↗</a>
+        </div>
+
+        <div class="card card-interactive">
+          <span class="badge badge-rose" style="margin-bottom: var(--space-3);">PETUALANGAN</span>
+          <h3 style="font-size: var(--text-xl); margin-bottom: var(--space-2);">Everyday Adventure</h3>
+          <p style="color: var(--color-text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-4);">Everyday Stories, roleplay percakapan, Listening Lab, serta Pronunciation Studio dengan feedback lokal.</p>
+          <a class="btn btn-secondary btn-sm" href="/belajar.html#adventure">Mulai Petualangan ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom CTA Banner -->
+    <section class="container" style="padding-bottom: var(--space-20);">
+      <div class="card card-tint-sand" style="text-align: center; padding: var(--space-12) var(--space-6);">
+        <h2 style="font-size: clamp(2rem, 4vw, var(--text-4xl)); margin-bottom: var(--space-3);">Mulai Belajar Hari Ini</h2>
+        <p style="color: var(--color-text-secondary); font-size: var(--text-md); max-width: 560px; margin: 0 auto var(--space-6);">
+          Tidak perlu pendaftaran akun rumit. Langsung buka ruang belajar dan lanjutkan kemajuanmu kapan saja.
+        </p>
+        <a class="btn btn-primary btn-lg" href="/belajar.html">Buka Ruang Belajar Sekarang ↗</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="/">
+            <span class="brand-badge">S</span>
+            <span class="brand-text">sinauu<span>english</span></span>
+          </a>
+          <p>Belajar kosakata dan grammar bahasa Inggris secara terstruktur dengan metode spaced repetition dan materi kontekstual.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Belajar</h4>
+          <ul class="footer-links">
+            <li><a href="/belajar.html#vocabulary">Oxford 3000</a></li>
+            <li><a href="/belajar.html#grammar">Kurikulum Grammar</a></li>
+            <li><a href="/belajar.html#reading">HABIT Reading</a></li>
+            <li><a href="/belajar.html#adventure">Everyday Adventure</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Fitur</h4>
+          <ul class="footer-links">
+            <li><a href="/belajar.html#review">Spaced Repetition</a></li>
+            <li><a href="/belajar.html#progress">Grafik Progres</a></li>
+            <li><a href="/belajar.html#settings">Cadangkan Data (JSON)</a></li>
+            <li><a href="/design-system.html">Design Tokens</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Atribusi</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/riiddev/SINAUENGLISHV2" target="_blank" rel="noopener">GitHub Repo</a></li>
+            <li><a href="/data/oxford3000/ATTRIBUTION.md">Atribusi Oxford 3000</a></li>
+            <li><a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">Lisensi CC-BY-SA-4.0</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 SINAUENGLISH V2 — Bebas biaya & local-first.</span>
+        <span>Terinspirasi dari estetika visual themainideas.com</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { speechService } from "/src/lib/speech.ts";
+
+    // Theme toggle
+    const toggle = document.getElementById("theme-toggle");
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem("sinauu-theme") || "light";
+    root.dataset.theme = savedTheme;
+
+    toggle?.addEventListener("click", () => {
+      const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+      root.dataset.theme = nextTheme;
+      localStorage.setItem("sinauu-theme", nextTheme);
+    });
+
+    // Interactive Specimen Card
+    const specimens = [
+      {
+        word: "notice",
+        ipa: "/ˈnoʊ.t̬ɪs/ · US English",
+        level: "VERB · LEVEL A2",
+        meaning: "melihat, memperhatikan, menyadari",
+        en: "Did you notice anything unusual about him today?",
+        id: "Apakah kamu memperhatikan sesuatu yang aneh tentangnya hari ini?"
+      },
+      {
+        word: "appreciate",
+        ipa: "/əˈpriː.ʃi.eɪt/ · US English",
+        level: "VERB · LEVEL B1",
+        meaning: "menghargai, berterima kasih atas",
+        en: "I really appreciate all the support you gave me.",
+        id: "Aku sangat menghargai semua dukungan yang kamu berikan padaku."
+      },
+      {
+        word: "determine",
+        ipa: "/dɪˈtɝː.mɪn/ · US English",
+        level: "VERB · LEVEL B1",
+        meaning: "menentukan, memutuskan dengan pasti",
+        en: "Your daily habits will determine your future success.",
+        id: "Kebiasaan harianmu akan menentukan kesuksesan masa depanmu."
+      },
+      {
+        word: "achievement",
+        ipa: "/əˈtʃiːv.mənt/ · US English",
+        level: "NOUN · LEVEL B1",
+        meaning: "prestasi, pencapaian luar biasa",
+        en: "Passing the exam with top marks was a huge achievement.",
+        id: "Lulus ujian dengan nilai tertinggi adalah sebuah pencapaian besar."
+      }
+    ];
+
+    let currentSpecimenIndex = 0;
+    const wordEl = document.getElementById("specimen-word");
+    const ipaEl = document.getElementById("specimen-ipa");
+    const levelEl = document.getElementById("specimen-level");
+    const meaningEl = document.getElementById("specimen-meaning");
+    const enEl = document.getElementById("specimen-en");
+    const idEl = document.getElementById("specimen-id");
+    const audioBtn = document.getElementById("specimen-audio-btn");
+    const nextBtn = document.getElementById("specimen-next-btn");
+
+    function renderSpecimen(s) {
+      if (wordEl) wordEl.innerHTML = s.word + '<span style="color: var(--color-accent-gold);">.</span>';
+      if (ipaEl) ipaEl.textContent = s.ipa;
+      if (levelEl) levelEl.textContent = s.level;
+      if (meaningEl) meaningEl.textContent = s.meaning;
+      if (enEl) enEl.textContent = s.en;
+      if (idEl) idEl.textContent = s.id;
+    }
+
+    nextBtn?.addEventListener("click", () => {
+      currentSpecimenIndex = (currentSpecimenIndex + 1) % specimens.length;
+      renderSpecimen(specimens[currentSpecimenIndex]);
+    });
+
+    audioBtn?.addEventListener("click", () => {
+      const s = specimens[currentSpecimenIndex];
+      speechService.speak(s.word);
+    });
+  </script>
+</body>
+</html>
