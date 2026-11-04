@@ -1,11 +1,10 @@
 import React, { useState, useMemo } from "react";
 import { VocabCard } from "./VocabCard.jsx";
 import { VocabModal } from "./VocabModal.jsx";
-import { Button } from "../../components/common/Button.jsx";
 import { useSpeech } from "../../hooks/useSpeech.js";
 import { useNavigate } from "react-router-dom";
 
-const PAGE_SIZE = 48;
+const PAGE_SIZE = 60;
 
 export function VocabGrid({ vocabulary = [], progressMap = {}, onStartStudy }) {
   const [levelFilter, setLevelFilter] = useState("all");
@@ -43,84 +42,49 @@ export function VocabGrid({ vocabulary = [], progressMap = {}, onStartStudy }) {
 
   return (
     <div>
-      {/* Search & Level Filters Bar */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "var(--space-4)",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "var(--space-6)"
-        }}
-      >
-        <div style={{ flex: "1 1 280px", maxWidth: "420px" }}>
-          <input
-            type="search"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setVisibleCount(PAGE_SIZE);
-            }}
-            placeholder="Cari kosakata Inggris atau arti Indonesia..."
-            className="form-input"
-            style={{ borderRadius: "var(--radius-full)" }}
-            aria-label="Cari kosakata"
-          />
-        </div>
+      <div className="vocab-controls">
+        <input
+          className="form-control form-search"
+          id="vocab-search"
+          type="search"
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setVisibleCount(PAGE_SIZE);
+          }}
+          placeholder="Cari kata Inggris atau arti bahasa Indonesia..."
+          aria-label="Cari kata"
+        />
 
-        {/* Filter chips */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
+        <div className="filter-chips">
           {[
-            { id: "all", label: "Semua (2.971)" },
+            { id: "all", label: "Semua Kata (2.971)" },
             { id: "A1", label: "Level A1 (892)" },
             { id: "A2", label: "Level A2 (792)" },
             { id: "B1", label: "Level B1 (689)" },
             { id: "B2", label: "Level B2 (597)" }
-          ].map((chip) => {
-            const active = levelFilter === chip.id;
-            return (
-              <button
-                key={chip.id}
-                type="button"
-                onClick={() => {
-                  setLevelFilter(chip.id);
-                  setVisibleCount(PAGE_SIZE);
-                }}
-                style={{
-                  fontFamily: "var(--font-heading)",
-                  fontSize: "var(--text-xs)",
-                  fontWeight: 700,
-                  padding: "var(--space-2) var(--space-4)",
-                  borderRadius: "var(--radius-full)",
-                  border: "var(--border-sm)",
-                  backgroundColor: active ? "var(--color-accent-navy)" : "var(--color-bg-surface)",
-                  color: active ? "var(--color-text-inverse)" : "var(--color-text-primary)",
-                  boxShadow: active ? "var(--shadow-flat)" : "none",
-                  cursor: "pointer",
-                  transition: "all var(--duration-fast) var(--ease-editorial)"
-                }}
-              >
-                {chip.label}
-              </button>
-            );
-          })}
+          ].map((chip) => (
+            <button
+              key={chip.id}
+              className={`chip ${levelFilter === chip.id ? "is-active" : ""}`}
+              data-level={chip.id}
+              type="button"
+              onClick={() => {
+                setLevelFilter(chip.id);
+                setVisibleCount(PAGE_SIZE);
+              }}
+            >
+              {chip.label}
+            </button>
+          ))}
         </div>
+
+        <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", fontWeight: 700 }} id="vocab-total-count">
+          Menampilkan {displayedWords.length} dari {filteredWords.length} kata
+        </span>
       </div>
 
-      {/* Counter bar */}
-      <div style={{ marginBottom: "var(--space-4)", fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", fontWeight: 700 }}>
-        Menampilkan {displayedWords.length} dari {filteredWords.length} kata
-      </div>
-
-      {/* Grid of Cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-          gap: "var(--space-4)"
-        }}
-      >
+      <div className="vocab-grid" id="vocab-list">
         {displayedWords.map((word) => {
           const itemProgress = progressMap[word.id];
           const status = itemProgress?.masteryStage || "fresh";
@@ -136,28 +100,29 @@ export function VocabGrid({ vocabulary = [], progressMap = {}, onStartStudy }) {
         })}
       </div>
 
-      {/* Load More Button */}
       {visibleCount < filteredWords.length && (
         <div style={{ textAlign: "center", marginTop: "var(--space-8)" }}>
-          <Button
-            variant="secondary"
-            size="lg"
+          <button
+            className="btn btn-secondary btn-lg"
+            id="vocab-load-more"
+            type="button"
             onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
           >
             Muat Lebih Banyak Kata ↺
-          </Button>
+          </button>
         </div>
       )}
 
-      {/* Detail Modal */}
-      <VocabModal
-        word={selectedWord}
-        isOpen={Boolean(selectedWord)}
-        onClose={() => setSelectedWord(null)}
-        onStartStudy={handleStudy}
-        onAudio={speak}
-      />
+      {selectedWord && (
+        <VocabModal
+          word={selectedWord}
+          status={progressMap[selectedWord.id]?.masteryStage || "fresh"}
+          isOpen={Boolean(selectedWord)}
+          onClose={() => setSelectedWord(null)}
+          onStartStudy={handleStudy}
+          onAudio={speak}
+        />
+      )}
     </div>
   );
 }
-

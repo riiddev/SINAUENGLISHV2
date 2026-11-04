@@ -2,27 +2,13 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth.jsx";
 
-const NAV_ITEMS = [
-  { id: "overview", label: "Beranda", icon: "⌂", path: "/belajar" },
-  { id: "vocabulary", label: "Kosakata", icon: "📖", count: "2.971", path: "/belajar/vocabulary" },
-  { id: "study", label: "Latihan Fokus", icon: "⚡", path: "/belajar/study" },
-  { id: "grammar", label: "Grammar", icon: "✏️", count: "19", path: "/belajar/grammar" },
-  { id: "reading", label: "HABIT Reading", icon: "📚", count: "156", path: "/belajar/reading" },
-  { id: "adventure", label: "Petualangan", icon: "🧭", path: "/belajar/adventure" },
-  { id: "review", label: "Review (SRS)", icon: "🔄", path: "/belajar/review" },
-  { id: "progress", label: "Progres", icon: "📊", path: "/belajar/progress" },
-  { id: "settings", label: "Pengaturan & Akun", icon: "⚙️", path: "/belajar/settings" }
-];
-
 export function AppSidebar({ isOpen, onClose }) {
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
 
-  const isItemActive = (item) => {
-    if (item.id === "overview") {
-      return location.pathname === "/belajar" || location.pathname === "/belajar/";
-    }
-    return location.pathname.startsWith(item.path);
+  const isView = (v) => {
+    if (v === "overview") return location.pathname === "/belajar" || location.pathname === "/belajar/";
+    return location.pathname === `/belajar/${v}`;
   };
 
   return (
@@ -30,176 +16,126 @@ export function AppSidebar({ isOpen, onClose }) {
       {/* Mobile Backdrop */}
       {isOpen && (
         <div
+          className="modal-overlay is-open"
+          style={{ zIndex: 95 }}
           onClick={onClose}
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.4)",
-            zIndex: 900
-          }}
         />
       )}
 
-      <aside
-        style={{
-          width: "var(--sidebar-width)",
-          backgroundColor: "var(--color-bg-nav)",
-          borderRight: "var(--border-sm)",
-          display: "flex",
-          flexDirection: "column",
-          height: "100vh",
-          position: "sticky",
-          top: 0,
-          zIndex: 950,
-          transition: "transform var(--duration-base) var(--ease-editorial)",
-          transform: isOpen ? "translateX(0)" : undefined
-        }}
-        className={`app-sidebar ${isOpen ? "is-open" : ""}`}
-      >
-        {/* Brand */}
-        <div
-          style={{
-            padding: "var(--space-6) var(--space-5)",
-            borderBottom: "var(--border-sm)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between"
-          }}
-        >
-          <Link
-            to="/"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "var(--space-2)",
-              fontFamily: "var(--font-heading)",
-              fontSize: "var(--text-md)",
-              fontWeight: 700
-            }}
-          >
-            <span
-              style={{
-                display: "grid",
-                placeItems: "center",
-                width: "28px",
-                height: "28px",
-                backgroundColor: "var(--color-accent-gold)",
-                color: "#1A1A1A",
-                borderRadius: "var(--radius-sm)",
-                border: "var(--border-sm)"
-              }}
-            >
-              S
-            </span>
-            <span>sinauuenglish</span>
+      <aside className={`app-sidebar ${isOpen ? "mobile-open" : ""}`} id="app-sidebar" aria-label="Navigasi Ruang Belajar">
+        <div className="sidebar-header">
+          <Link className="brand" to="/" aria-label="SinauEnglish V2 Beranda">
+            <span className="brand-badge">S</span>
+            <span className="brand-text">sinauu<span>english</span></span>
           </Link>
-
-          {/* Close button on mobile */}
-          <button
-            type="button"
-            onClick={onClose}
-            className="mobile-only-close"
-            style={{
-              display: "none",
-              padding: "4px 8px",
-              fontWeight: 700
-            }}
-            aria-label="Tutup navigasi"
-          >
-            ✕
-          </button>
         </div>
 
-        {/* Navigation items */}
-        <nav
-          style={{
-            padding: "var(--space-4) var(--space-3)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--space-1)",
-            overflowY: "auto",
-            flex: 1
-          }}
-        >
-          {NAV_ITEMS.map((item) => {
-            const active = isItemActive(item);
-            return (
-              <Link
-                key={item.id}
-                to={item.path}
-                onClick={onClose}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "var(--space-3)",
-                  padding: "var(--space-3) var(--space-4)",
-                  borderRadius: "var(--radius-full)",
-                  fontWeight: 700,
-                  fontSize: "var(--text-sm)",
-                  color: active ? "var(--color-text-primary)" : "var(--color-text-secondary)",
-                  backgroundColor: active ? "var(--color-bg-base)" : "transparent",
-                  border: active ? "var(--border-sm)" : "1px solid transparent",
-                  boxShadow: active ? "var(--shadow-flat)" : "none",
-                  transition: "all var(--duration-fast) var(--ease-editorial)"
-                }}
-              >
-                <span>{item.icon}</span>
-                <span style={{ flex: 1 }}>{item.label}</span>
-                {item.count && (
-                  <span
-                    style={{
-                      fontSize: "var(--text-xs)",
-                      fontFamily: "var(--font-mono)",
-                      padding: "1px 6px",
-                      borderRadius: "var(--radius-full)",
-                      backgroundColor: "var(--color-bg-surface)",
-                      border: "var(--border-sm)"
-                    }}
-                  >
-                    {item.count}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+        <nav className="sidebar-nav">
+          <Link
+            to="/belajar"
+            onClick={onClose}
+            className={`sidebar-link ${isView("overview") ? "is-active" : ""}`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Beranda</span>
+          </Link>
+
+          <Link
+            to="/belajar/vocabulary"
+            onClick={onClose}
+            className={`sidebar-link ${isView("vocabulary") ? "is-active" : ""}`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+            <span>Kosakata</span>
+            <span className="sidebar-count" id="sidebar-vocab-count">2.971</span>
+          </Link>
+
+          <Link
+            to="/belajar/study"
+            onClick={onClose}
+            className={`sidebar-link ${isView("study") ? "is-active" : ""}`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            <span>Latihan Fokus</span>
+          </Link>
+
+          <Link
+            to="/belajar/grammar"
+            onClick={onClose}
+            className={`sidebar-link ${isView("grammar") ? "is-active" : ""}`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
+            <span>Grammar</span>
+            <span className="sidebar-count" id="sidebar-grammar-count">19</span>
+          </Link>
+
+          <Link
+            to="/belajar/reading"
+            onClick={onClose}
+            className={`sidebar-link ${isView("reading") ? "is-active" : ""}`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <span>HABIT Reading</span>
+            <span className="sidebar-count" id="sidebar-reading-count">156</span>
+          </Link>
+
+          <Link
+            to="/belajar/adventure"
+            onClick={onClose}
+            className={`sidebar-link ${isView("adventure") ? "is-active" : ""}`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+            <span>Petualangan</span>
+          </Link>
+
+          <Link
+            to="/belajar/review"
+            onClick={onClose}
+            className={`sidebar-link ${isView("review") ? "is-active" : ""}`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+            <span>Review (SRS)</span>
+          </Link>
+
+          <Link
+            to="/belajar/progress"
+            onClick={onClose}
+            className={`sidebar-link ${isView("progress") ? "is-active" : ""}`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            <span>Progres</span>
+          </Link>
+
+          <Link
+            to="/belajar/settings"
+            onClick={onClose}
+            className={`sidebar-link ${isView("settings") ? "is-active" : ""}`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Pengaturan</span>
+          </Link>
         </nav>
 
-        {/* Account Status Footer */}
-        <div
-          style={{
-            padding: "var(--space-4) var(--space-5)",
-            borderTop: "var(--border-sm)",
-            backgroundColor: "var(--color-bg-subtle)"
-          }}
-        >
+        <div className="sidebar-footer">
           {isAuthenticated ? (
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "4px" }}>
-                <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "var(--color-success)" }} />
-                <strong style={{ fontSize: "var(--text-xs)", color: "var(--color-text-primary)" }}>
-                  {user.displayName}
-                </strong>
-              </div>
-              <span style={{ fontSize: "11px", color: "var(--color-text-secondary)", display: "block" }}>
-                Tersambung ke Spreadsheet
-              </span>
+              <strong style={{ display: "block", color: "var(--color-text-primary)", marginBottom: "2px" }}>
+                {user.displayName}
+              </strong>
+              <p style={{ margin: 0, fontSize: "var(--text-xs)", color: "var(--color-success)" }}>
+                ✓ Tersimpan di Google Spreadsheet
+              </p>
             </div>
           ) : (
             <div>
-              <strong style={{ fontSize: "var(--text-xs)", display: "block", marginBottom: "4px" }}>
-                Mode Tamu (Belum Masuk)
+              <strong style={{ display: "block", color: "var(--color-text-primary)", marginBottom: "2px" }}>
+                Mode Tamu
               </strong>
-              <Link
-                to="/login"
-                style={{
-                  fontSize: "var(--text-xs)",
-                  color: "var(--color-accent-navy)",
-                  fontWeight: 700,
-                  textDecoration: "underline"
-                }}
-              >
-                Masuk untuk simpan progres ↗
-              </Link>
+              <p style={{ margin: 0 }}>
+                <Link to="/login" style={{ color: "var(--color-accent-navy)", fontWeight: 700, textDecoration: "underline" }}>
+                  Masuk Akun Spreadsheet ↗
+                </Link>
+              </p>
             </div>
           )}
         </div>
@@ -207,4 +143,3 @@ export function AppSidebar({ isOpen, onClose }) {
     </>
   );
 }
-

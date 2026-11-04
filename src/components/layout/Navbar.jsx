@@ -2,7 +2,6 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "../../hooks/useTheme.js";
 import { useAuth } from "../../hooks/useAuth.jsx";
-import { Button } from "../common/Button.jsx";
 
 export function Navbar() {
   const { isDark, toggleTheme } = useTheme();
@@ -10,157 +9,59 @@ export function Navbar() {
   const location = useLocation();
 
   return (
-    <header
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        backgroundColor: "var(--color-bg-nav)",
-        borderBottom: "var(--border-sm)",
-        transition: "background-color var(--duration-base) var(--ease-editorial)"
-      }}
-    >
-      <div
-        className="container"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          height: "var(--header-height)"
-        }}
-      >
-        {/* Brand */}
-        <Link
-          to="/"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "var(--space-3)",
-            fontFamily: "var(--font-heading)",
-            fontSize: "var(--text-lg)",
-            fontWeight: 700
-          }}
-        >
-          <span
-            style={{
-              display: "grid",
-              placeItems: "center",
-              width: "32px",
-              height: "32px",
-              backgroundColor: "var(--color-accent-gold)",
-              color: "#1A1A1A",
-              borderRadius: "var(--radius-sm)",
-              border: "var(--border-sm)",
-              fontWeight: 700
-            }}
-          >
-            S
-          </span>
-          <span>
-            sinauu<span style={{ color: "var(--color-accent-navy)" }}>english</span>
-          </span>
+    <header className="site-header">
+      <div className="container nav-wrap">
+        <Link className="brand" to="/" aria-label="SinauEnglish V2 Beranda">
+          <span className="brand-badge">S</span>
+          <span className="brand-text">sinauu<span>english</span></span>
         </Link>
 
-        {/* Navigation links */}
-        <nav
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "var(--space-6)"
-          }}
-        >
+        <nav className="nav-menu" aria-label="Navigasi Utama">
+          <a className="nav-link" href="/#pendekatan">Pendekatan</a>
+          <a className="nav-link" href="/#materi">Peta Materi</a>
           <Link
-            to="/#pendekatan"
-            style={{
-              fontWeight: 600,
-              fontSize: "var(--text-sm)",
-              color: "var(--color-text-secondary)"
-            }}
-          >
-            Pendekatan
-          </Link>
-          <Link
-            to="/#materi"
-            style={{
-              fontWeight: 600,
-              fontSize: "var(--text-sm)",
-              color: "var(--color-text-secondary)"
-            }}
-          >
-            Peta Materi
-          </Link>
-          <Link
+            className={`nav-link ${location.pathname.startsWith("/belajar") ? "is-active" : ""}`}
             to="/belajar"
-            style={{
-              fontWeight: 700,
-              fontSize: "var(--text-sm)",
-              color: location.pathname.startsWith("/belajar")
-                ? "var(--color-accent-gold)"
-                : "var(--color-text-primary)"
-            }}
           >
             Ruang Belajar ↗
           </Link>
         </nav>
 
-        {/* Actions */}
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
-          {/* Theme Toggle Button */}
+        <div className="nav-actions">
           <button
+            className="theme-toggle"
+            id="theme-toggle"
             type="button"
             onClick={toggleTheme}
             aria-label="Ganti mode gelap/terang"
             title="Ganti mode tampilan"
-            style={{
-              display: "grid",
-              placeItems: "center",
-              width: "40px",
-              height: "40px",
-              borderRadius: "var(--radius-full)",
-              border: "var(--border-sm)",
-              backgroundColor: "var(--color-bg-surface)",
-              boxShadow: "var(--shadow-button)"
-            }}
           >
-            {isDark ? "☀️" : "🌙"}
+            {isDark ? (
+              <svg className="icon-sun" style={{ display: "block" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+              </svg>
+            ) : (
+              <svg className="icon-moon" style={{ display: "block" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+              </svg>
+            )}
           </button>
 
-          {/* Auth State Button */}
           {isAuthenticated ? (
-            <Link to="/belajar/settings">
-              <span
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "var(--space-2)",
-                  fontFamily: "var(--font-heading)",
-                  fontSize: "var(--text-xs)",
-                  fontWeight: 700,
-                  padding: "var(--space-2) var(--space-4)",
-                  borderRadius: "var(--radius-full)",
-                  border: "var(--border-sm)",
-                  backgroundColor: "var(--color-bg-surface)"
-                }}
-              >
-                👤 {user.displayName}
-              </span>
+            <Link to="/belajar/settings" className="btn btn-secondary btn-sm">
+              👤 {user.displayName}
             </Link>
           ) : (
-            <Link to="/login">
-              <Button size="sm" variant="secondary">
-                Masuk Akun
-              </Button>
+            <Link to="/login" className="btn btn-secondary btn-sm">
+              Masuk Akun
             </Link>
           )}
 
-          <Link to="/belajar">
-            <Button size="sm" variant="primary">
-              Mulai Belajar ↗
-            </Button>
+          <Link className="btn btn-primary btn-sm" to="/belajar">
+            Masuk Ruang Belajar ↗
           </Link>
         </div>
       </div>
     </header>
   );
 }
-

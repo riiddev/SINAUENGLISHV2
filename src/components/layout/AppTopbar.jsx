@@ -2,109 +2,75 @@ import React from "react";
 import { useTheme } from "../../hooks/useTheme.js";
 import { useAuth } from "../../hooks/useAuth.jsx";
 
-export function AppTopbar({ title = "Ruang Belajar", onToggleSidebar, isSyncing = false, syncError = null }) {
+export function AppTopbar({ title = "Beranda Belajar", onToggleSidebar, isSyncing = false, syncError = null }) {
   const { isDark, toggleTheme } = useTheme();
   const { isAuthenticated } = useAuth();
 
   return (
-    <header
-      style={{
-        height: "var(--header-height)",
-        backgroundColor: "var(--color-bg-surface)",
-        borderBottom: "var(--border-sm)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingInline: "var(--space-6)",
-        position: "sticky",
-        top: 0,
-        zIndex: 50
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
-        {/* Mobile menu button */}
+    <header className="app-topbar">
+      <div className="topbar-title-wrap">
         <button
+          className="mobile-menu-btn"
+          id="mobile-menu-btn"
           type="button"
           onClick={onToggleSidebar}
           aria-label="Buka menu samping"
-          style={{
-            display: "grid",
-            placeItems: "center",
-            width: "36px",
-            height: "36px",
-            borderRadius: "var(--radius-sm)",
-            border: "var(--border-sm)",
-            backgroundColor: "var(--color-bg-base)"
-          }}
+          style={{ display: "inline-flex" }}
         >
-          ☰
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
         </button>
-
-        <h1 style={{ fontSize: "var(--text-xl)", margin: 0 }}>
+        <h1 className="topbar-title" id="topbar-title">
           {title}
         </h1>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
-        {/* Cloud Sync Status Indicator */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "var(--space-2)",
-            padding: "var(--space-2) var(--space-4)",
-            borderRadius: "var(--radius-full)",
-            border: "var(--border-sm)",
-            backgroundColor: "var(--color-bg-base)",
-            fontSize: "var(--text-xs)",
-            fontWeight: 700
-          }}
-        >
+      <div className="topbar-actions">
+        <div className="storage-pill">
           <span
+            className="storage-dot"
             style={{
-              width: "8px",
-              height: "8px",
-              borderRadius: "50%",
               backgroundColor: isSyncing
                 ? "var(--color-accent-gold)"
                 : syncError
                 ? "var(--color-danger)"
                 : isAuthenticated
                 ? "var(--color-success)"
-                : "var(--color-text-muted)"
+                : "var(--color-accent-gold)"
             }}
           />
-          <span>
+          <span id="storage-status-text">
             {isSyncing
-              ? "Menyinkronkan..."
+              ? "Menyinkronkan ke Spreadsheet..."
               : syncError
               ? "Sinkron tertunda"
               : isAuthenticated
               ? "Tersimpan di Spreadsheet"
-              : "Mode Tamu (Sesi)"}
+              : "Mode Tamu"}
           </span>
         </div>
 
-        {/* Theme Toggle */}
         <button
+          className="theme-toggle"
+          id="theme-toggle"
           type="button"
           onClick={toggleTheme}
           aria-label="Ganti mode gelap/terang"
-          style={{
-            display: "grid",
-            placeItems: "center",
-            width: "36px",
-            height: "36px",
-            borderRadius: "var(--radius-full)",
-            border: "var(--border-sm)",
-            backgroundColor: "var(--color-bg-base)",
-            boxShadow: "var(--shadow-button)"
-          }}
         >
-          {isDark ? "☀️" : "🌙"}
+          {isDark ? (
+            <svg className="icon-sun" style={{ display: "block" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+              <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+            </svg>
+          ) : (
+            <svg className="icon-moon" style={{ display: "block" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+            </svg>
+          )}
         </button>
       </div>
     </header>
   );
 }
-

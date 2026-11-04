@@ -1,5 +1,4 @@
 import React from "react";
-import { Badge } from "../../components/common/Badge.jsx";
 import { STATUS_META } from "../../hooks/useSpacedRepetition.js";
 
 export function VocabCard({ word, status = "fresh", onSelect, onAudio }) {
@@ -13,54 +12,53 @@ export function VocabCard({ word, status = "fresh", onSelect, onAudio }) {
   return (
     <div
       onClick={() => onSelect(word)}
-      className="card card-interactive vocab-card"
+      className="card card-tint-sand card-interactive vocab-card word-card"
       style={{
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        minHeight: "150px",
+        padding: "var(--space-4)",
         cursor: "pointer"
       }}
     >
       <div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-2)" }}>
-          <Badge variant="navy">{word.level}</Badge>
-          <span className={`badge ${meta.className}`}>{meta.label}</span>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "4px" }}>
-          <h3 style={{ fontSize: "var(--text-lg)", margin: 0 }}>{word.word}</h3>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-2)" }}>
+          <div style={{ display: "flex", gap: "var(--space-1)" }}>
+            <span className="badge badge-cefr">{word.level}</span>
+            <span className={`badge ${meta.className}`}>{meta.label}</span>
+          </div>
           <button
+            className="btn btn-secondary btn-icon btn-sm"
             type="button"
             onClick={handleAudio}
-            aria-label={`Dengarkan pengucapan ${word.word}`}
-            style={{
-              padding: "2px 6px",
-              fontSize: "var(--text-xs)",
-              borderRadius: "var(--radius-sm)",
-              backgroundColor: "var(--color-bg-base)",
-              border: "var(--border-sm)"
-            }}
+            aria-label="Audio"
+            style={{ width: "28px", height: "28px", padding: 0, borderRadius: "var(--radius-pill)" }}
           >
-            🔊
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            </svg>
           </button>
         </div>
 
-        <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-muted)", fontStyle: "italic", display: "block", marginBottom: "var(--space-2)" }}>
+        <h3 style={{ fontSize: "var(--text-lg)", marginBottom: "2px" }}>
+          {word.word}
+        </h3>
+
+        <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", fontStyle: "italic", display: "block", marginBottom: "var(--space-2)" }}>
           {word.partOfSpeech || "kata"}
         </span>
 
-        <p style={{ fontSize: "var(--text-sm)", color: "var(--color-text-secondary)", lineHeight: 1.4, margin: 0 }}>
+        <p style={{ fontSize: "var(--text-sm)", color: "var(--color-text-primary)", fontWeight: 600, margin: 0, lineHeight: 1.4 }}>
           {word.meaning}
         </p>
       </div>
 
       <div style={{ marginTop: "var(--space-3)", textAlign: "right" }}>
-        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent-navy)" }}>
-          Latih Kata ↗
+        <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", fontWeight: 700 }}>
+          Detail Kata ↗
         </span>
       </div>
     </div>
   );
 }
-
