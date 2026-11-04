@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "../components/layout/Navbar.jsx";
 import { Footer } from "../components/layout/Footer.jsx";
+import { useAuth } from "../hooks/useAuth.jsx";
 
 const SPECIMENS = [
   {
@@ -31,6 +32,7 @@ const SPECIMENS = [
 ];
 
 export function LandingPage() {
+  const { isAuthenticated } = useAuth();
   const [specimenIndex, setSpecimenIndex] = useState(0);
   const currentSpecimen = SPECIMENS[specimenIndex];
 
@@ -73,9 +75,15 @@ export function LandingPage() {
               </p>
 
               <div id="hero-cta-group" style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-3)", alignItems: "center", marginBottom: "var(--space-6)" }}>
-                <Link className="btn btn-primary btn-lg" to="/belajar" style={{ minHeight: "44px" }}>
-                  Mulai Belajar Sekarang ↗
-                </Link>
+                {isAuthenticated ? (
+                  <Link className="btn btn-primary btn-lg" to="/belajar" style={{ minHeight: "44px" }}>
+                    Lanjut ke Ruang Belajar ↗
+                  </Link>
+                ) : (
+                  <Link className="btn btn-primary btn-lg" to="/daftar" style={{ minHeight: "44px" }}>
+                    Buat Akun & Mulai Belajar ↗
+                  </Link>
+                )}
                 <a className="btn btn-secondary btn-lg" href="#materi" style={{ minHeight: "44px" }}>
                   Lihat Peta Materi
                 </a>
@@ -100,9 +108,8 @@ export function LandingPage() {
                     className="btn btn-secondary btn-icon"
                     type="button"
                     onClick={() => speak(currentSpecimen.word)}
-                    aria-label="Dengarkan pengucapan audio"
-                    title="Dengarkan pengucapan audio"
-                    style={{ width: "44px", height: "44px", borderRadius: "var(--radius-pill)" }}
+                    aria-label={`Dengarkan pelafalan ${currentSpecimen.word}`}
+                    style={{ minWidth: "44px", minHeight: "44px" }}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
@@ -115,68 +122,71 @@ export function LandingPage() {
                   {currentSpecimen.ipa}
                 </p>
 
-                <div style={{ backgroundColor: "var(--color-bg-surface)", border: "var(--border-sm)", borderRadius: "var(--radius-md)", padding: "var(--space-4)", marginBottom: "var(--space-4)" }}>
-                  <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-text-secondary)" }}>
-                    Makna Bahasa Indonesia
-                  </span>
-                  <p style={{ fontSize: "var(--text-base)", fontWeight: 700, color: "var(--color-text-primary)", marginTop: "4px", marginBottom: 0 }}>
-                    {currentSpecimen.meaning}
-                  </p>
-                </div>
+                <p style={{ fontSize: "var(--text-md)", fontWeight: 600, marginBottom: "var(--space-5)" }}>
+                  {currentSpecimen.meaning}
+                </p>
 
-                <div style={{ backgroundColor: "var(--color-bg-surface)", border: "var(--border-sm)", borderRadius: "var(--radius-md)", padding: "var(--space-4)", marginBottom: "var(--space-5)" }}>
-                  <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-text-secondary)" }}>
-                    Contoh dalam Kalimat
-                  </span>
-                  <p style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--color-text-primary)", marginTop: "4px", marginBottom: "2px" }}>
-                    {currentSpecimen.exampleEn}
+                <div className="card" style={{ padding: "var(--space-4)", backgroundColor: "var(--color-bg-surface)", marginBottom: "var(--space-5)" }}>
+                  <p style={{ fontSize: "var(--text-sm)", fontStyle: "italic", marginBottom: "var(--space-2)", lineHeight: 1.5 }}>
+                    "{currentSpecimen.exampleEn}"
                   </p>
-                  <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginBottom: 0, fontStyle: "italic" }}>
+                  <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", margin: 0 }}>
                     {currentSpecimen.exampleId}
                   </p>
                 </div>
 
-                <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
-                  <button className="btn btn-outline btn-sm" type="button" onClick={cycleSpecimen} style={{ minHeight: "44px" }}>
+                <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    type="button"
+                    onClick={cycleSpecimen}
+                    style={{ flex: 1, minHeight: "44px" }}
+                  >
                     Ganti Contoh Kata ↻
                   </button>
-                  <Link className="btn btn-primary btn-sm" to="/belajar/vocabulary" style={{ minHeight: "44px" }}>
-                    Coba Latihan ↗
-                  </Link>
+                  {isAuthenticated ? (
+                    <Link className="btn btn-primary btn-sm" to="/belajar/vocabulary" style={{ minHeight: "44px" }}>
+                      Pelajari di Workspace ↗
+                    </Link>
+                  ) : (
+                    <Link className="btn btn-primary btn-sm" to="/daftar" style={{ minHeight: "44px" }}>
+                      Daftar Akun ↗
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 3-Step Methodology Section */}
-        <section className="container" id="pendekatan" style={{ paddingTop: "var(--space-12)", paddingBottom: "var(--space-16)" }}>
-          <div className="section-header" style={{ textAlign: "center", maxWidth: "680px", marginLeft: "auto", marginRight: "auto", marginBottom: "var(--space-8)" }}>
-            <h2 className="section-title">Dari sekadar tahu arti, jadi reflek bicara.</h2>
-            <p className="section-desc" style={{ marginLeft: "auto", marginRight: "auto" }}>
-              Metode belajar 3 tahap yang memastikan setiap kata yang kamu pelajari melekat dalam memori jangka panjang.
+        {/* Methodology Section */}
+        <section className="container" id="pendekatan" style={{ paddingTop: "var(--space-8)", paddingBottom: "var(--space-12)" }}>
+          <div className="section-header" style={{ marginBottom: "var(--space-8)" }}>
+            <h2 className="section-title">Kenapa Metode Biasa Selalu Lupa?</h2>
+            <p className="section-desc">
+              Menghafal daftar terjemahan kata per kata membuat otak pasif. SinauEnglish menerapkan metode belajar 3 tahap agar setiap kata melekat dalam memori aktifmu.
             </p>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-6)" }}>
             <div className="card card-tint-sand">
-              <span className="badge badge-gold" style={{ marginBottom: "var(--space-3)" }}>01 · Makna Utuh</span>
-              <h3 style={{ fontSize: "var(--text-xl)", marginBottom: "var(--space-2)" }}>Pahami Arti Tepat</h3>
+              <span className="badge badge-navy" style={{ marginBottom: "var(--space-3)" }}>TAHAP 1</span>
+              <h3 style={{ fontSize: "var(--text-xl)", marginBottom: "var(--space-2)" }}>Konteks Kalimat Nyata</h3>
               <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-sm)", lineHeight: 1.6 }}>
-                Bukan sekadar hafalan kamus 1-kata. Pelajari batasan makna kata dan bagian tutur kata (noun, verb, adj) dengan definisi kontekstual yang jelas.
+                Setiap kata dipelajari di dalam habitat aslinya: kalimat lengkap, situasi autentik, dan pelafalan penutur asli.
               </p>
             </div>
 
-            <div className="card card-tint-sage">
-              <span className="badge badge-sage" style={{ marginBottom: "var(--space-3)" }}>02 · Konteks Nyata</span>
-              <h3 style={{ fontSize: "var(--text-xl)", marginBottom: "var(--space-2)" }}>Amati dalam Kalimat</h3>
+            <div className="card card-tint-sand">
+              <span className="badge badge-gold" style={{ marginBottom: "var(--space-3)" }}>TAHAP 2</span>
+              <h3 style={{ fontSize: "var(--text-xl)", marginBottom: "var(--space-2)" }}>Active Recall & Matching</h3>
               <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-sm)", lineHeight: 1.6 }}>
-                Lihat bagaimana penutur asli memakai kata tersebut dalam kalimat sehari-hari, serial petualangan interaktif, dan materi bacaan HABIT.
+                Latihan interaktif yang menuntut otakmu memilih kata yang tepat berdasarkan situasi, bukan sekadar menebak terjemahan.
               </p>
             </div>
 
-            <div className="card card-tint-slate">
-              <span className="badge badge-navy" style={{ marginBottom: "var(--space-3)" }}>03 · Ingatan Bertahan</span>
+            <div className="card card-tint-sand">
+              <span className="badge badge-sage" style={{ marginBottom: "var(--space-3)" }}>TAHAP 3</span>
               <h3 style={{ fontSize: "var(--text-xl)", marginBottom: "var(--space-2)" }}>Spaced Repetition (SRS)</h3>
               <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-sm)", lineHeight: 1.6 }}>
                 Sistem menjadwalkan review pada interval 1, 3, 8, 16, hingga 30 hari tepat sebelum kamu lupa, mengunci kata ke memori aktifmu.
@@ -199,9 +209,15 @@ export function LandingPage() {
               <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-sm)", marginBottom: "var(--space-4)", lineHeight: 1.6 }}>
                 Kosakata American English terpenting level A1, A2, B1, dan B2 lengkap dengan audio dan kalimat contoh autentik.
               </p>
-              <Link className="btn btn-secondary btn-sm" to="/belajar/vocabulary" style={{ minHeight: "44px" }}>
-                Buka Kosakata ↗
-              </Link>
+              {isAuthenticated ? (
+                <Link className="btn btn-secondary btn-sm" to="/belajar/vocabulary" style={{ minHeight: "44px" }}>
+                  Buka Kosakata ↗
+                </Link>
+              ) : (
+                <Link className="btn btn-secondary btn-sm" to="/daftar" style={{ minHeight: "44px" }}>
+                  Daftar untuk Membuka ↗
+                </Link>
+              )}
             </div>
 
             <div className="card card-interactive">
@@ -210,9 +226,15 @@ export function LandingPage() {
               <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-sm)", marginBottom: "var(--space-4)", lineHeight: 1.6 }}>
                 Pola kalimat tenses, modal verbs, passive voice, hingga conditional sentences dengan 57 kuis interaktif terstruktur.
               </p>
-              <Link className="btn btn-secondary btn-sm" to="/belajar/grammar" style={{ minHeight: "44px" }}>
-                Buka Grammar ↗
-              </Link>
+              {isAuthenticated ? (
+                <Link className="btn btn-secondary btn-sm" to="/belajar/grammar" style={{ minHeight: "44px" }}>
+                  Buka Grammar ↗
+                </Link>
+              ) : (
+                <Link className="btn btn-secondary btn-sm" to="/daftar" style={{ minHeight: "44px" }}>
+                  Daftar untuk Membuka ↗
+                </Link>
+              )}
             </div>
 
             <div className="card card-interactive">
@@ -221,9 +243,15 @@ export function LandingPage() {
               <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-sm)", marginBottom: "var(--space-4)", lineHeight: 1.6 }}>
                 63.309 kata bacaan berbobot untuk membangun intuisi membaca cepat dan melatih fokus pemahaman mendalam.
               </p>
-              <Link className="btn btn-secondary btn-sm" to="/belajar/reading" style={{ minHeight: "44px" }}>
-                Buka Bacaan ↗
-              </Link>
+              {isAuthenticated ? (
+                <Link className="btn btn-secondary btn-sm" to="/belajar/reading" style={{ minHeight: "44px" }}>
+                  Buka Bacaan ↗
+                </Link>
+              ) : (
+                <Link className="btn btn-secondary btn-sm" to="/daftar" style={{ minHeight: "44px" }}>
+                  Daftar untuk Membuka ↗
+                </Link>
+              )}
             </div>
 
             <div className="card card-interactive">
@@ -232,9 +260,15 @@ export function LandingPage() {
               <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-sm)", marginBottom: "var(--space-4)", lineHeight: 1.6 }}>
                 Serial petualangan interaktif 10 cerita × 10 episode, simulasi dialog situasi nyata, dan studio pelafalan berpandu.
               </p>
-              <Link className="btn btn-secondary btn-sm" to="/belajar/adventure" style={{ minHeight: "44px" }}>
-                Mulai Petualangan ↗
-              </Link>
+              {isAuthenticated ? (
+                <Link className="btn btn-secondary btn-sm" to="/belajar/adventure" style={{ minHeight: "44px" }}>
+                  Mulai Petualangan ↗
+                </Link>
+              ) : (
+                <Link className="btn btn-secondary btn-sm" to="/daftar" style={{ minHeight: "44px" }}>
+                  Daftar untuk Membuka ↗
+                </Link>
+              )}
             </div>
           </div>
         </section>
@@ -246,11 +280,17 @@ export function LandingPage() {
               Mulai Belajar Hari Ini
             </h2>
             <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-md)", maxWidth: "560px", margin: "0 auto var(--space-6)", lineHeight: 1.6 }}>
-              Tidak perlu biaya langganan. Langsung buka ruang belajar dan lanjutkan kemajuan belajarmu kapan saja.
+              Buat akun dalam 10 detik. Langsung buka ruang belajar dan mulai kuasai bahasa Inggris dengan terstruktur.
             </p>
-            <Link className="btn btn-primary btn-lg" to="/belajar" style={{ minHeight: "44px" }}>
-              Buka Ruang Belajar Sekarang ↗
-            </Link>
+            {isAuthenticated ? (
+              <Link className="btn btn-primary btn-lg" to="/belajar" style={{ minHeight: "44px" }}>
+                Buka Ruang Belajar Sekarang ↗
+              </Link>
+            ) : (
+              <Link className="btn btn-primary btn-lg" to="/daftar" style={{ minHeight: "44px" }}>
+                Buat Akun Gratis Sekarang ↗
+              </Link>
+            )}
           </div>
         </section>
       </main>

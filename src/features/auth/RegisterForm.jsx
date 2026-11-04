@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { Button } from "../../components/common/Button.jsx";
 
@@ -12,6 +12,7 @@ export function RegisterForm() {
 
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +32,8 @@ export function RegisterForm() {
     setSubmitting(false);
 
     if (res.success) {
-      navigate("/belajar");
+      const dest = location.state?.from?.pathname || "/belajar";
+      navigate(dest, { replace: true });
     } else {
       setErrorMessage(res.error || "Gagal membuat akun.");
     }
@@ -134,4 +136,3 @@ export function RegisterForm() {
     </div>
   );
 }
-

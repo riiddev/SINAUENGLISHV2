@@ -10,7 +10,7 @@ export function AppSidebar({
   onToggleCollapse
 }) {
   const location = useLocation();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const sidebarRef = useRef(null);
   const closeBtnRef = useRef(null);
   const touchStartXRef = useRef(0);
@@ -292,27 +292,25 @@ export function AppSidebar({
         </nav>
 
         <div className="sidebar-footer">
-          {isAuthenticated ? (
-            <div>
-              <strong style={{ display: "block", color: "var(--color-text-primary)", marginBottom: "2px" }}>
-                {user.displayName}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <strong style={{ display: "block", color: "var(--color-text-primary)", marginBottom: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {user?.displayName || "Pelajar Sinau"}
               </strong>
-              <p style={{ margin: 0, fontSize: "var(--text-xs)", color: "var(--color-success)" }}>
-                ✓ Tersinkronisasi ke Cloud
+              <p style={{ margin: 0, fontSize: "var(--text-xs)", color: "var(--color-success)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                Tersinkronisasi
               </p>
             </div>
-          ) : (
-            <div>
-              <strong style={{ display: "block", color: "var(--color-text-primary)", marginBottom: "2px" }}>
-                Mode Tamu
-              </strong>
-              <p style={{ margin: 0 }}>
-                <Link to="/login" style={{ color: "var(--color-accent-navy)", fontWeight: 700, textDecoration: "underline" }}>
-                  Masuk Akun ↗
-                </Link>
-              </p>
-            </div>
-          )}
+            <button
+              type="button"
+              onClick={logout}
+              className="btn btn-secondary btn-sm"
+              title="Keluar dari akun"
+              style={{ padding: "4px 8px", fontSize: "11px", minHeight: "28px" }}
+            >
+              Keluar
+            </button>
+          </div>
         </div>
 
         {/* Desktop Collapse Toggle Button (≥ 1024px) */}

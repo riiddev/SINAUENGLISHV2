@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { LandingPage } from "../pages/LandingPage.jsx";
+import { useAuth } from "../hooks/useAuth.jsx";
 
 const WorkspacePage = lazy(() =>
   import("../pages/WorkspacePage.jsx").then((m) => ({ default: m.WorkspacePage }))
@@ -46,15 +47,49 @@ function PageLoading() {
   );
 }
 
+/**
+ * Route guard requiring registered account to access learning features.
+ * Unauthenticated visitors are redirected to the registration page.
+ */
+function RequireAuth({ children }) {
+  const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return <PageLoading />;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/daftar" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
+
 export function AppRoutes() {
   return (
     <Suspense fallback={<PageLoading />}>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/belajar" element={<WorkspacePage />} />
-        <Route path="/belajar/:view" element={<WorkspacePage />} />
+        <Route
+          path="/belajar"
+          element={
+            <RequireAuth>
+              <WorkspacePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/belajar/:view"
+          element={
+            <RequireAuth>
+              <WorkspacePage />
+            </RequireAuth>
+          }
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/daftar" element={<RegisterPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>
