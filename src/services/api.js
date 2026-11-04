@@ -204,6 +204,33 @@ function handleDevFallback(action, payload, token) {
     return { success: true, message: "Gelar berhasil dibuka (Dev Preview)." };
   }
 
+  if (action === "getDailyQuests") {
+    return {
+      success: true,
+      data: {
+        dateStr: payload.dateStr || new Date().toISOString().slice(0, 10),
+        quests: []
+      }
+    };
+  }
+
+  if (action === "updateQuestProgress") {
+    return { success: true, message: "Progres misi tersimpan (Dev Preview)." };
+  }
+
+  if (action === "claimQuestReward") {
+    return {
+      success: true,
+      message: "Hadiah berhasil diklaim (Dev Preview).",
+      data: {
+        questId: payload.questId,
+        claimedAt: new Date().toISOString(),
+        xpEarned: payload.xpReward || 35,
+        coinsEarned: payload.coinsReward || 15
+      }
+    };
+  }
+
   return { success: true, message: "Aksi berhasil (Dev Preview)." };
 }
 
@@ -286,6 +313,19 @@ export const api = {
 
   async unlockTitle(titleId) {
     return request("unlockTitle", { titleId }, true);
+  },
+
+  // Daily Quests / Missions
+  async getDailyQuests(dateStr) {
+    return request("getDailyQuests", { dateStr }, true);
+  },
+
+  async updateQuestProgress({ questId, progress, target, dateStr }) {
+    return request("updateQuestProgress", { questId, progress, target, dateStr }, true);
+  },
+
+  async claimQuestReward({ questId, dateStr, xpReward, coinsReward }) {
+    return request("claimQuestReward", { questId, dateStr, xpReward, coinsReward }, true);
   },
 
   // One-time migration

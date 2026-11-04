@@ -12,6 +12,7 @@ import { AdventureHub } from "../features/adventure/AdventureHub.jsx";
 import { ReviewQueue } from "../features/review/ReviewQueue.jsx";
 import { ProgressStats } from "../features/progress/ProgressStats.jsx";
 import { ProfileView } from "../features/profile/ProfileView.jsx";
+import { MissionsView } from "../features/missions/MissionsView.jsx";
 import { SettingsPanel } from "../features/settings/SettingsPanel.jsx";
 import { useProgressSync } from "../hooks/useProgressSync.js";
 
@@ -73,6 +74,7 @@ export function WorkspacePage() {
   const viewTitles = {
     overview: "Beranda Belajar",
     vocabulary: "Daftar Kosakata",
+    missions: "Misi Harian",
     study: "Latihan Kosakata",
     grammar: "Kurikulum Grammar",
     quiz: "Kuis Interaktif",
@@ -221,6 +223,13 @@ export function WorkspacePage() {
                 progressMap={progressMap}
                 onStartStudy={handleStartStudy}
               />
+            </section>
+          )}
+
+          {/* VIEW: MISSIONS */}
+          {currentView === "missions" && (
+            <section className="view-section is-active" id="view-missions">
+              <MissionsView />
             </section>
           )}
 

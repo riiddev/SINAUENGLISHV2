@@ -161,16 +161,19 @@ export function AppSidebar({
           </Link>
 
           <Link
-            to="/belajar/study"
+            to="/belajar/missions"
             onClick={onClose}
-            className={`sidebar-link ${isView("study") ? "is-active" : ""}`}
-            title="Latihan Fokus"
+            className={`sidebar-link ${isView("missions") ? "is-active" : ""}`}
+            title="Misi Harian"
+            id="sidebar-missions-link"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="10"/>
-              <polygon points="10 8 16 12 10 16 10 8"/>
+              <circle cx="12" cy="12" r="6"/>
+              <circle cx="12" cy="12" r="2"/>
             </svg>
-            <span>Latihan Fokus</span>
+            <span>Misi Harian</span>
+            <span className="sidebar-count" id="sidebar-missions-count">3</span>
           </Link>
 
           <Link

@@ -219,3 +219,4 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
     setAvatarKey
   };
 }
+

@@ -25,7 +25,8 @@ const SHEETS = {
   QUIZ: "QuizAttempts",
   SETTINGS: "Settings",
   PROFILES: "Profiles",
-  TITLES: "Titles"
+  TITLES: "Titles",
+  QUESTS: "Quests"
 };
 
 /**
@@ -99,7 +100,15 @@ function doPost(e) {
       case "unlockTitle":
         return handleUnlockTitle(ss, token, payload);
 
-      // 6. One-time Migration from V1/V2 JSON Backup
+      // 6. Daily Quests / Missions
+      case "getDailyQuests":
+        return handleGetDailyQuests(ss, token, payload);
+      case "updateQuestProgress":
+        return handleUpdateQuestProgress(ss, token, payload);
+      case "claimQuestReward":
+        return handleClaimQuestReward(ss, token, payload);
+
+      // 7. One-time Migration from V1/V2 JSON Backup
       case "importBackup":
         return handleImportBackup(ss, token, payload);
 
@@ -704,6 +713,161 @@ function handleUnlockTitle(ss, token, payload) {
 }
 
 /* ==========================================================================
+   DAILY QUESTS / MISSIONS HANDLERS (NON-DESTRUCTIVE MIGRATION)
+   ========================================================================== */
+
+function ensureQuestsSheet(ss) {
+  let questSheet = ss.getSheetByName(SHEETS.QUESTS);
+  if (!questSheet) {
+    questSheet = ss.insertSheet(SHEETS.QUESTS);
+    questSheet.appendRow(["user_id", "date_str", "quest_id", "progress", "target", "is_completed", "claimed_at"]);
+    const hRange = questSheet.getRange(1, 1, 1, 7);
+    hRange.setFontWeight("bold");
+    hRange.setBackground("#4B5E73");
+    hRange.setFontColor("#FFFFFF");
+    questSheet.setFrozenRows(1);
+    [180, 120, 180, 80, 80, 100, 200].forEach((w, idx) => questSheet.setColumnWidth(idx + 1, w));
+  }
+  return questSheet;
+}
+
+function handleGetDailyQuests(ss, token, payload) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const dateStr = payload.dateStr || new Date().toISOString().slice(0, 10);
+  const questSheet = ensureQuestsSheet(ss);
+  const data = questSheet.getDataRange().getValues();
+  const quests = [];
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === userId && String(data[i][1]) === dateStr) {
+      quests.push({
+        userId: data[i][0],
+        dateStr: data[i][1],
+        questId: data[i][2],
+        progress: Number(data[i][3]) || 0,
+        target: Number(data[i][4]) || 1,
+        isCompleted: Boolean(data[i][5]),
+        claimedAt: data[i][6] || null
+      });
+    }
+  }
+
+  return jsonResponse({
+    success: true,
+    data: { dateStr: dateStr, quests: quests }
+  });
+}
+
+function handleUpdateQuestProgress(ss, token, payload) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const dateStr = payload.dateStr || new Date().toISOString().slice(0, 10);
+  const questId = payload.questId;
+  const progress = Number(payload.progress) || 0;
+  const target = Number(payload.target) || 1;
+  const isCompleted = progress >= target;
+
+  const questSheet = ensureQuestsSheet(ss);
+  const data = questSheet.getDataRange().getValues();
+  let rowIdx = -1;
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === userId && String(data[i][1]) === dateStr && data[i][2] === questId) {
+      rowIdx = i + 1;
+      break;
+    }
+  }
+
+  if (rowIdx > 0) {
+    questSheet.getRange(rowIdx, 4).setValue(progress);
+    questSheet.getRange(rowIdx, 6).setValue(isCompleted);
+  } else {
+    questSheet.appendRow([userId, dateStr, questId, progress, target, isCompleted, ""]);
+  }
+
+  return jsonResponse({
+    success: true,
+    data: { questId, progress, isCompleted }
+  });
+}
+
+function handleClaimQuestReward(ss, token, payload) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const dateStr = payload.dateStr || new Date().toISOString().slice(0, 10);
+  const questId = payload.questId;
+  const xpReward = Number(payload.xpReward) || 35;
+  const coinsReward = Number(payload.coinsReward) || 15;
+
+  const questSheet = ensureQuestsSheet(ss);
+  const data = questSheet.getDataRange().getValues();
+  let rowIdx = -1;
+  let alreadyClaimed = false;
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === userId && String(data[i][1]) === dateStr && data[i][2] === questId) {
+      rowIdx = i + 1;
+      if (data[i][6]) alreadyClaimed = true;
+      break;
+    }
+  }
+
+  if (alreadyClaimed) {
+    return jsonResponse({ success: false, error: "Hadiah misi sudah diklaim sebelumnya." }, 400);
+  }
+
+  const now = new Date().toISOString();
+  if (rowIdx > 0) {
+    questSheet.getRange(rowIdx, 6).setValue(true);
+    questSheet.getRange(rowIdx, 7).setValue(now);
+  } else {
+    questSheet.appendRow([userId, dateStr, questId, 1, 1, true, now]);
+  }
+
+  // Update profile XP & Coins
+  const { profileSheet } = ensureProfilesAndTitlesSheets(ss);
+  const pData = profileSheet.getDataRange().getValues();
+  let pRowIdx = -1;
+  let currentXp = 50;
+  let currentCoins = 50;
+
+  for (let i = 1; i < pData.length; i++) {
+    if (pData[i][0] === userId) {
+      pRowIdx = i + 1;
+      currentXp = Number(pData[i][3]) || 0;
+      currentCoins = Number(pData[i][5]) || 0;
+      break;
+    }
+  }
+
+  const newXp = currentXp + xpReward;
+  const newCoins = currentCoins + coinsReward;
+
+  if (pRowIdx > 0) {
+    profileSheet.getRange(pRowIdx, 4).setValue(newXp);
+    profileSheet.getRange(pRowIdx, 6).setValue(newCoins);
+    profileSheet.getRange(pRowIdx, 7).setValue(now);
+  }
+
+  return jsonResponse({
+    success: true,
+    message: "Hadiah misi berhasil diklaim!",
+    data: {
+      questId: questId,
+      claimedAt: now,
+      xpEarned: xpReward,
+      coinsEarned: coinsReward,
+      totalXp: newXp,
+      totalCoins: newCoins
+    }
+  });
+}
+
+/* ==========================================================================
    SECURITY & UTILITY FUNCTIONS
    ========================================================================== */
 
@@ -842,6 +1006,11 @@ function setupDatabase() {
       name: "Titles",
       headers: ["user_id", "title_id", "unlocked_at"],
       columnWidths: [180, 180, 200]
+    },
+    {
+      name: "Quests",
+      headers: ["user_id", "date_str", "quest_id", "progress", "target", "is_completed", "claimed_at"],
+      columnWidths: [180, 120, 180, 80, 80, 100, 200]
     }
   ];
 
