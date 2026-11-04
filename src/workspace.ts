@@ -305,10 +305,10 @@ class WorkspaceApp {
         fetch("/data/grammar.json"),
         fetch("/data/habit-reading-library.json"),
         fetch("/data/reading-lessons.json"),
-        fetch("/public/data/adventure/stories.json"),
-        fetch("/public/data/adventure/dialogues.json"),
-        fetch("/public/data/adventure/listening.json"),
-        fetch("/public/data/adventure/pronunciation.json")
+        fetch("/data/adventure/stories.json"),
+        fetch("/data/adventure/dialogues.json"),
+        fetch("/data/adventure/listening.json"),
+        fetch("/data/adventure/pronunciation.json")
       ]);
 
       const [vData, gData, hData, rData, stData, diaData, lisData, proData] = await Promise.all([
