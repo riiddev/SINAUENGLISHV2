@@ -17,7 +17,6 @@ export function ReadingLibrary({ passages = [] }) {
   return (
     <div>
       <div style={{ marginBottom: "var(--space-6)" }}>
-        <span className="section-eyebrow">Perpustakaan HABIT</span>
         <h2 className="section-title">156 Bacaan Bahasa Inggris Nyata</h2>
         <p className="section-desc">
           Tingkatkan kecepatan membaca, perluas konteks kosakata, dan pahami tata kalimat otentik melalui teks perpustakaan HABIT.

@@ -57,11 +57,11 @@ export function WorkspacePage() {
     study: "Latihan Kosakata",
     grammar: "Kurikulum Grammar",
     quiz: "Kuis Interaktif",
-    reading: "Perpustakaan HABIT",
-    adventure: "Everyday Adventure",
+    reading: "Materi Bacaan",
+    adventure: "Cerita & Dialog",
     review: "Spaced Review & Jurnal",
     progress: "Statistik & Progres",
-    settings: "Pengaturan & Cadangan"
+    settings: "Pengaturan Akun"
   };
 
   const handleStartStudy = (word) => {
@@ -107,12 +107,11 @@ export function WorkspacePage() {
           {currentView === "overview" && (
             <section className="view-section is-active" id="view-overview">
               <div className="card card-tint-sand" style={{ padding: "var(--space-8)", marginBottom: "var(--space-8)" }}>
-                <span className="section-eyebrow">Rencana Belajar Terarah</span>
                 <h2 style={{ fontSize: "var(--text-3xl)", marginBottom: "var(--space-2)" }}>
                   Target Harian: Belajar Sampai Kepakai
                 </h2>
                 <p style={{ color: "var(--color-text-secondary)", marginBottom: "var(--space-6)", maxWidth: "580px", lineHeight: 1.6 }}>
-                  Selesaikan review kata hari ini untuk menjaga ritme ingatan. Sistem otomatis menyinkronkan progres ke Google Spreadsheet.
+                  Selesaikan review kata hari ini untuk menjaga ritme ingatan. Sistem otomatis menyinkronkan progres belajarmu secara teratur.
                 </p>
                 <button
                   className="btn btn-primary btn-lg"

@@ -44,11 +44,11 @@ export function AppTopbar({ title = "Beranda Belajar", onToggleSidebar, isSyncin
           />
           <span id="storage-status-text">
             {isSyncing
-              ? "Menyinkronkan ke Spreadsheet..."
+              ? "Menyinkronkan ke Cloud..."
               : syncError
               ? "Sinkron tertunda"
               : isAuthenticated
-              ? "Tersimpan di Spreadsheet"
+              ? "Tersimpan di Cloud"
               : "Mode Tamu"}
           </span>
         </div>

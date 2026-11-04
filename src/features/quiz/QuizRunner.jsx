@@ -45,7 +45,7 @@ export function QuizRunner({ topic, onFinish, onRetry }) {
       const nextIdx = questionIndex + 1;
       setQuestionIndex(nextIdx);
 
-      // If finished, save to Google Spreadsheet QuizAttempts
+      // If finished, save quiz attempts
       if (nextIdx >= questions.length && isAuthenticated) {
         setIsSaving(true);
         const finalScore = correct ? score + 1 : score;
@@ -54,7 +54,7 @@ export function QuizRunner({ topic, onFinish, onRetry }) {
           score: finalScore,
           total: questions.length
         }).catch(err => {
-          console.warn("Gagal menyimpan hasil kuis ke spreadsheet:", err.message);
+          console.warn("Gagal menyimpan hasil kuis:", err.message);
         }).finally(() => {
           setIsSaving(false);
         });
@@ -85,7 +85,7 @@ export function QuizRunner({ topic, onFinish, onRetry }) {
           </span>
           {isSaving && (
             <p style={{ fontSize: "var(--text-xs)", color: "var(--color-accent-gold)", marginTop: "var(--space-2)" }}>
-              Menyimpan hasil ke Google Spreadsheet...
+              Menyimpan hasil kuis...
             </p>
           )}
         </div>

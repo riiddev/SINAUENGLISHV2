@@ -177,8 +177,8 @@ export function StudySession({ word, onFinish, onNextWord, onRecordReview }) {
                 <strong>{outcome?.intervalDays || 1} Hari Lagi</strong>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Penyimpanan:</span>
-                <span style={{ color: "var(--color-success)", fontWeight: 700 }}>✓ Google Spreadsheet</span>
+                <span>Sinkronisasi:</span>
+                <span style={{ color: "var(--color-success)", fontWeight: 700 }}>✓ Tersimpan Otomatis</span>
               </div>
             </div>
 

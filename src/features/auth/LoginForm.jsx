@@ -39,7 +39,7 @@ export function LoginForm() {
           Masuk ke SinauEnglish
         </h2>
         <p style={{ fontSize: "var(--text-sm)", color: "var(--color-text-secondary)", margin: 0 }}>
-          Progres dan hafalanmu tersimpan aman di Google Spreadsheet.
+          Progres dan hafalanmu tersimpan aman dan terintegrasi.
         </p>
       </div>
 

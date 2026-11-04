@@ -271,7 +271,7 @@ class WorkspaceApp {
       study: "Latihan Kosakata",
       grammar: "Kurikulum Grammar",
       quiz: "Kuis Interaktif",
-      reading: "Perpustakaan HABIT",
+      reading: "Materi Bacaan",
       adventure: "Everyday Adventure",
       review: "Spaced Review & Jurnal",
       progress: "Statistik & Progres",

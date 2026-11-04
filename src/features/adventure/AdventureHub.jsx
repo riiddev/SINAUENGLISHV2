@@ -11,7 +11,6 @@ export function AdventureHub({ stories = [], dialogues = [], listening = [], pro
   return (
     <div>
       <div style={{ marginBottom: "var(--space-6)" }}>
-        <span className="section-eyebrow">Everyday Adventure Series</span>
         <h2 className="section-title">Petualangan Bahasa Inggris Terapan</h2>
         <p className="section-desc">
           Kembangkan keterampilan berbicara, menyimak percakapan nyata, dan ketepatan pelafalan aksen.

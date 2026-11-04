@@ -29,10 +29,9 @@ export function ProgressStats({ vocabulary = [], progressMap = {} }) {
   return (
     <div>
       <div style={{ marginBottom: "var(--space-6)" }}>
-        <span className="section-eyebrow">Statistik Riil</span>
         <h2 className="section-title">Progres Penguasaan Kosakata</h2>
         <p className="section-desc">
-          Pantau perkembangan kosakata aktifmu yang telah tersimpan di cloud database Google Spreadsheet.
+          Pantau perkembangan kosakata aktifmu yang telah tersimpan dan terorganisasi.
         </p>
       </div>
 

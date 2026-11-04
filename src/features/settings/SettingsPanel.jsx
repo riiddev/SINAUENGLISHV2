@@ -1,20 +1,20 @@
 import React, { useState } from "react";
-import { Button } from "../../components/common/Button.jsx";
 import { useAuth } from "../../hooks/useAuth.jsx";
+import { Button } from "../../components/common/Button.jsx";
 import { api } from "../../services/api.js";
 
 export function SettingsPanel({ onProgressReload }) {
   const { user, isAuthenticated, logout } = useAuth();
   const [dailyGoal, setDailyGoal] = useState(10);
   const [isImporting, setIsImporting] = useState(false);
-  const [importStatus, setImportStatus] = useState(null);
+  const [importStatus, setImportStatus] = useState("");
 
-  const handleImportFile = async (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (!isAuthenticated) {
-      alert("Silakan login terlebih dahulu agar backup dapat diimpor ke akun Google Spreadsheet Anda.");
+      alert("Silakan login terlebih dahulu agar data dapat diimpor ke akun Anda.");
       return;
     }
 
@@ -25,11 +25,11 @@ export function SettingsPanel({ onProgressReload }) {
       const text = await file.text();
       const backupData = JSON.parse(text);
 
-      setImportStatus("Mengunggah data ke Google Spreadsheet...");
+      setImportStatus("Mengunggah data ke server...");
       const res = await api.importBackup(backupData);
 
       if (res.success) {
-        setImportStatus(`✓ Berhasil mengimpor ${res.count || 0} riwayat kata ke Spreadsheet!`);
+        setImportStatus(`✓ Berhasil mengimpor ${res.count || 0} riwayat kata ke akun Anda!`);
         if (onProgressReload) onProgressReload();
       } else {
         throw new Error(res.error || "Gagal mengimpor.");
@@ -45,17 +45,16 @@ export function SettingsPanel({ onProgressReload }) {
   return (
     <div style={{ maxWidth: "680px", margin: "0 auto" }}>
       <div style={{ marginBottom: "var(--space-6)" }}>
-        <span className="section-eyebrow">Pengaturan Akun & Data</span>
         <h2 className="section-title">Preferensi Belajar & Cloud</h2>
         <p className="section-desc">
-          Kelola sesi login, target harian, dan migrasi cadangan data ke Google Spreadsheet.
+          Kelola sesi login, target harian, dan preferensi akun belajarmu.
         </p>
       </div>
 
       {/* Account Info Card */}
       <div className="card card-tint-sand" style={{ padding: "var(--space-6)", marginBottom: "var(--space-6)" }}>
         <h3 style={{ fontSize: "var(--text-lg)", marginBottom: "var(--space-4)" }}>
-          Status Akun Google Spreadsheet
+          Status Akun Belajar
         </h3>
 
         {isAuthenticated ? (
@@ -69,9 +68,6 @@ export function SettingsPanel({ onProgressReload }) {
 
               <span style={{ color: "var(--color-text-secondary)" }}>ID Pengguna:</span>
               <code style={{ fontFamily: "var(--font-mono)" }}>{user.id}</code>
-
-              <span style={{ color: "var(--color-text-secondary)" }}>Penyimpanan:</span>
-              <span style={{ color: "var(--color-success)", fontWeight: 700 }}>Google Apps Script (Cloud)</span>
             </div>
 
             <Button variant="outline" size="sm" onClick={logout}>
@@ -116,36 +112,41 @@ export function SettingsPanel({ onProgressReload }) {
       {/* Backup Migration Tool */}
       <div className="card card-tint-sage" style={{ padding: "var(--space-6)" }}>
         <h3 style={{ fontSize: "var(--text-lg)", marginBottom: "var(--space-2)" }}>
-          Alat Impor Backup (Migrasi V1/V2 → Spreadsheet)
+          Alat Impor Cadangan Data
         </h3>
-        <p style={{ fontSize: "var(--text-sm)", color: "var(--color-text-secondary)", marginBottom: "var(--space-4)", lineHeight: 1.5 }}>
-          Punya file backup JSON dari versi lama? Unggah di sini untuk memindahkan seluruh riwayat hafalan kata langsung ke database Google Spreadsheet akunmu.
+        <p style={{ fontSize: "var(--text-sm)", color: "var(--color-text-secondary)", marginBottom: "var(--space-4)" }}>
+          Punya file cadangan JSON dari versi sebelumnya? Unggah di sini untuk memindahkan seluruh riwayat hafalan kata langsung ke akunmu.
         </p>
 
+        <label
+          htmlFor="backup-file-input"
+          className={`btn btn-secondary btn-sm ${isImporting ? "disabled" : ""}`}
+          style={{ cursor: "pointer", display: "inline-block" }}
+        >
+          {isImporting ? "Mengimpor Data..." : "Pilih File Backup (.json) ↗"}
+        </label>
         <input
+          id="backup-file-input"
           type="file"
           accept=".json"
-          disabled={isImporting || !isAuthenticated}
-          onChange={handleImportFile}
-          style={{ marginBottom: "var(--space-3)", display: "block" }}
+          onChange={handleFileUpload}
+          disabled={isImporting}
+          style={{ display: "none" }}
         />
 
         {importStatus && (
-          <div
+          <p
             style={{
-              padding: "var(--space-3) var(--space-4)",
-              borderRadius: "var(--radius-md)",
-              backgroundColor: "var(--color-bg-surface)",
-              border: "var(--border-sm)",
+              marginTop: "var(--space-3)",
               fontSize: "var(--text-xs)",
-              fontWeight: 700
+              fontWeight: 600,
+              color: importStatus.startsWith("✓") ? "var(--color-success)" : "var(--color-text-secondary)"
             }}
           >
             {importStatus}
-          </div>
+          </p>
         )}
       </div>
     </div>
   );
 }
-

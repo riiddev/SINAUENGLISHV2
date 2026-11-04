@@ -121,7 +121,7 @@ export function AppSidebar({ isOpen, onClose }) {
                 {user.displayName}
               </strong>
               <p style={{ margin: 0, fontSize: "var(--text-xs)", color: "var(--color-success)" }}>
-                ✓ Tersimpan di Google Spreadsheet
+                ✓ Tersinkronisasi ke Cloud
               </p>
             </div>
           ) : (
@@ -131,7 +131,7 @@ export function AppSidebar({ isOpen, onClose }) {
               </strong>
               <p style={{ margin: 0 }}>
                 <Link to="/login" style={{ color: "var(--color-accent-navy)", fontWeight: 700, textDecoration: "underline" }}>
-                  Masuk Akun Spreadsheet ↗
+                  Masuk Akun ↗
                 </Link>
               </p>
             </div>

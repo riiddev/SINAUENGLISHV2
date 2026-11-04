@@ -2,51 +2,50 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "../components/layout/Navbar.jsx";
 import { Footer } from "../components/layout/Footer.jsx";
-import { useSpeech } from "../hooks/useSpeech.js";
 
 const SPECIMENS = [
   {
     word: "notice",
-    ipa: "/ˈnoʊ.t̬ɪs/ · US English",
+    ipa: "/ˈnoʊ.tɪs/ · US English",
     part: "VERB · LEVEL A2",
     meaning: "melihat, memperhatikan, menyadari",
     exampleEn: "Did you notice anything unusual about him today?",
     exampleId: "Apakah kamu memperhatikan sesuatu yang aneh tentangnya hari ini?"
   },
   {
-    word: "deliberate",
-    ipa: "/dɪˈlɪb.ər.ət/ · US English",
-    part: "ADJECTIVE · LEVEL B2",
-    meaning: "sengaja, terencana, dengan pertimbangan matang",
-    exampleEn: "It wasn't an accident; it was a deliberate choice.",
-    exampleId: "Itu bukan kecelakaan; itu adalah pilihan yang disengaja."
-  },
-  {
-    word: "gather",
-    ipa: "/ˈɡæð.ɚ/ · US English",
-    part: "VERB · LEVEL A2",
-    meaning: "mengumpulkan, berkumpul bersama",
-    exampleEn: "A large crowd gathered in the town square this morning.",
-    exampleId: "Kerumunan besar berkumpul di alun-alun kota pagi ini."
-  },
-  {
-    word: "significant",
-    ipa: "/sɪɡˈnɪf.ə.kənt/ · US English",
+    word: "crucial",
+    ipa: "/ˈkruː.ʃəl/ · US English",
     part: "ADJECTIVE · LEVEL B1",
-    meaning: "penting, bermakna, berdampak besar",
-    exampleEn: "This discovery marks a significant step forward in research.",
-    exampleId: "Penemuan ini menandai langkah maju yang signifikan dalam penelitian."
+    meaning: "sangat penting, menentukan, krusial",
+    exampleEn: "Early diagnostic tests played a crucial role in his recovery.",
+    exampleId: "Tes diagnostik dini memainkan peran yang sangat penting dalam pemulihannya."
+  },
+  {
+    word: "acquire",
+    ipa: "/əˈkwaɪ.ɚ/ · US English",
+    part: "VERB · LEVEL B2",
+    meaning: "memperoleh, menguasai (keterampilan/kebiasaan)",
+    exampleEn: "Children acquire their first language naturally through context.",
+    exampleId: "Anak-anak menguasai bahasa pertama mereka secara alami melalui konteks."
   }
 ];
 
 export function LandingPage() {
-  const [specimenIdx, setSpecimenIdx] = useState(0);
-  const { speak } = useSpeech();
+  const [specimenIndex, setSpecimenIndex] = useState(0);
+  const currentSpecimen = SPECIMENS[specimenIndex];
 
-  const currentSpecimen = SPECIMENS[specimenIdx];
+  const cycleSpecimen = () => {
+    setSpecimenIndex((prev) => (prev + 1) % SPECIMENS.length);
+  };
 
-  const handleNextSpecimen = () => {
-    setSpecimenIdx((prev) => (prev + 1) % SPECIMENS.length);
+  const speak = (text) => {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "en-US";
+      u.rate = 0.9;
+      window.speechSynthesis.speak(u);
+    }
   };
 
   return (
@@ -58,20 +57,16 @@ export function LandingPage() {
         <section className="container" style={{ paddingTop: "var(--space-12)", paddingBottom: "var(--space-16)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "var(--space-10)", alignItems: "center" }}>
             <div>
-              <span className="section-eyebrow">SinauEnglish V2 · Metode Belajar Berjeda</span>
               <h1 style={{ fontSize: "clamp(2.5rem, 5.5vw, 3.8rem)", lineHeight: 1.06, letterSpacing: "-0.025em", marginBottom: "var(--space-4)" }}>
                 Kata baru<br />belum jadi<br /><em style={{ fontFamily: "var(--font-editorial)", fontStyle: "italic", color: "var(--color-accent-gold)" }}>milikmu.</em>
               </h1>
               <p style={{ fontSize: "var(--text-md)", color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: "var(--space-6)", maxWidth: "520px" }}>
-                Mengetahui arti terjemahan belum tentu tahu cara memakainya. Amati kata dalam kalimat nyata, bedakan nuansanya, dan kunci ingatanmu dengan spaced repetition di Google Spreadsheet.
+                Mengetahui arti terjemahan belum tentu tahu cara memakainya. Amati kata dalam kalimat nyata, bedakan nuansanya, dan kunci ingatanmu dengan spaced repetition yang terstruktur.
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-3)", alignItems: "center", marginBottom: "var(--space-6)" }}>
                 <Link className="btn btn-primary btn-lg" to="/belajar">Mulai Belajar Sekarang ↗</Link>
                 <a className="btn btn-secondary btn-lg" href="#materi">Lihat Peta Materi</a>
               </div>
-              <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-muted)", fontWeight: 600 }}>
-                ✓ 100% Gratis &nbsp;·&nbsp; ✓ Tanpa Biaya Server &nbsp;·&nbsp; ✓ Tersimpan di Google Spreadsheet
-              </p>
             </div>
 
             {/* Interactive Specimen Card */}
@@ -123,11 +118,11 @@ export function LandingPage() {
                 </div>
 
                 <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
-                  <button className="btn btn-secondary btn-sm" type="button" onClick={handleNextSpecimen}>
-                    Ganti Contoh Kata ↺
+                  <button className="btn btn-outline btn-sm" type="button" onClick={cycleSpecimen}>
+                    Ganti Contoh Kata ↻
                   </button>
-                  <Link className="btn btn-primary btn-sm" to="/belajar/study">
-                    Coba Latihan ⚡
+                  <Link className="btn btn-primary btn-sm" to="/belajar/vocabulary">
+                    Coba Latihan
                   </Link>
                 </div>
               </div>
@@ -138,7 +133,6 @@ export function LandingPage() {
         {/* 3-Step Methodology Section */}
         <section className="container" id="pendekatan" style={{ paddingTop: "var(--space-12)", paddingBottom: "var(--space-16)" }}>
           <div className="section-header" style={{ textAlign: "center", maxWidth: "680px", marginLeft: "auto", marginRight: "auto" }}>
-            <span className="section-eyebrow">Alur Belajar 3 Tahap</span>
             <h2 className="section-title">Dari sekadar tahu arti, jadi reflek bicara.</h2>
             <p className="section-desc" style={{ marginLeft: "auto", marginRight: "auto" }}>
               Metode belajar terarah yang memastikan setiap kata yang kamu pelajari tidak lekas menguap.
@@ -166,7 +160,7 @@ export function LandingPage() {
               <span className="badge badge-navy" style={{ marginBottom: "var(--space-3)" }}>03 · Ingatan Bertahan</span>
               <h3 style={{ fontSize: "var(--text-xl)", marginBottom: "var(--space-2)" }}>Spaced Repetition (SRS)</h3>
               <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-sm)" }}>
-                Sistem menjadwalkan review pada interval 1, 3, 8, 16, hingga 30 hari tepat sebelum kamu lupa, mengunci kata ke database Google Spreadsheet.
+                Sistem menjadwalkan review pada interval 1, 3, 8, 16, hingga 30 hari tepat sebelum kamu lupa, mengunci kata ke memori jangka panjangmu.
               </p>
             </div>
           </div>
@@ -175,7 +169,6 @@ export function LandingPage() {
         {/* Material Map Section */}
         <section className="container" id="materi" style={{ paddingTop: "var(--space-8)", paddingBottom: "var(--space-16)" }}>
           <div className="section-header">
-            <span className="section-eyebrow">Kurikulum Komprehensif</span>
             <h2 className="section-title">Peta Materi Belajar</h2>
             <p className="section-desc">Semua materi tersusun bertingkat sesuai standar CEFR (A1 Pemula hingga B2 Mahir).</p>
           </div>

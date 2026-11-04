@@ -31,7 +31,7 @@ export function useProgressSync() {
         }
       } catch (err) {
         if (isMounted) {
-          console.warn("Gagal mengambil progres dari spreadsheet:", err.message);
+          console.warn("Gagal mengambil progres:", err.message);
           setSyncError(err.message);
         }
       }
@@ -43,7 +43,7 @@ export function useProgressSync() {
     };
   }, [isAuthenticated, user?.id]);
 
-  // Flush pending queue to Google Spreadsheet
+  // Flush pending queue to cloud
   const flushQueue = useCallback(async () => {
     if (!isAuthenticated || pendingQueueRef.current.size === 0) return;
 

@@ -5,7 +5,6 @@ export function GrammarGrid({ topics = [], onSelectTopic }) {
   return (
     <div>
       <div style={{ marginBottom: "var(--space-6)" }}>
-        <span className="section-eyebrow">Kurikulum Terstruktur</span>
         <h2 className="section-title">19 Modul Tata Bahasa (A1–B2)</h2>
         <p className="section-desc">
           Pahami konsep, pola rumus, dan hindari kesalahan umum yang sering terjadi saat menyusun kalimat bahasa Inggris.

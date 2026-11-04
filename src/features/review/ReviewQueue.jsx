@@ -19,7 +19,6 @@ export function ReviewQueue({ vocabulary = [], progressMap = {}, onStartStudy })
   return (
     <div>
       <div style={{ marginBottom: "var(--space-6)" }}>
-        <span className="section-eyebrow">Spaced Repetition & Evaluasi</span>
         <h2 className="section-title">Antrean Review Berjeda</h2>
         <p className="section-desc">
           Kunci ingatan jangka panjang dengan meninjau kembali kata-kata yang telah jatuh tempo atau pernah salah dijawab.
