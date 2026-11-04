@@ -13,6 +13,7 @@ import { ReviewQueue } from "../features/review/ReviewQueue.jsx";
 import { ProgressStats } from "../features/progress/ProgressStats.jsx";
 import { ProfileView } from "../features/profile/ProfileView.jsx";
 import { MissionsView } from "../features/missions/MissionsView.jsx";
+import { ContextMatching } from "../features/matching/ContextMatching.jsx";
 import { SettingsPanel } from "../features/settings/SettingsPanel.jsx";
 import { useProgressSync } from "../hooks/useProgressSync.js";
 
@@ -75,6 +76,7 @@ export function WorkspacePage() {
     overview: "Beranda Belajar",
     vocabulary: "Daftar Kosakata",
     missions: "Misi Harian",
+    matching: "Matching Konteks Kalimat",
     study: "Latihan Kosakata",
     grammar: "Kurikulum Grammar",
     quiz: "Kuis Interaktif",
@@ -230,6 +232,15 @@ export function WorkspacePage() {
           {currentView === "missions" && (
             <section className="view-section is-active" id="view-missions">
               <MissionsView />
+            </section>
+          )}
+
+          {/* VIEW: CONTEXT MATCHING */}
+          {currentView === "matching" && (
+            <section className="view-section is-active" id="view-matching">
+              <ContextMatching
+                vocabulary={vocabulary}
+              />
             </section>
           )}
 

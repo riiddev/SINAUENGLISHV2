@@ -187,3 +187,4 @@ export function useDailyQuests({ onRewardClaimed } = {}) {
     claimReward
   };
 }
+
