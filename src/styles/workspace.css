@@ -667,3 +667,26 @@
   }
 }
 
+/* Tablet Landscape Enhancements (iPad 1024x768, iPad Air 1180x820, Android Tablets 1280x800) */
+@media (min-width: 768px) and (orientation: landscape) {
+  .workspace-body {
+    padding: var(--space-5) var(--space-6);
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+  }
+
+  .vocab-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .story-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5);
+  }
+}
+
+

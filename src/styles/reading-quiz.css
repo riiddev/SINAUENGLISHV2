@@ -287,3 +287,16 @@
   }
 }
 
+@media (orientation: landscape) and (max-height: 850px) {
+  .reading-quiz-card {
+    max-height: 96vh;
+  }
+  .reading-quiz-header {
+    padding: var(--space-3) var(--space-5);
+  }
+  .reading-quiz-body {
+    padding: var(--space-4) var(--space-6);
+  }
+}
+
+

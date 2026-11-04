@@ -246,3 +246,16 @@
   }
 }
 
+@media (orientation: landscape) and (max-height: 850px) {
+  .story-runner-card {
+    max-height: 96vh;
+  }
+  .story-runner-header {
+    padding: var(--space-3) var(--space-5);
+  }
+  .story-runner-body {
+    padding: var(--space-4) var(--space-6);
+  }
+}
+
+
