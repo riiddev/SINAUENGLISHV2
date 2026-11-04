@@ -26,8 +26,10 @@ export function KanciMascot({
   };
 
   const dim = sizeDimensions[size] || sizeDimensions.md;
-  const assetUrl = getAssetUrl("mascot", expression) || getAssetUrl("mascot", "base");
+  const baseAssetUrl = getAssetUrl("mascot", expression) || getAssetUrl("mascot", "base");
   const outfitUrl = equippedOutfit ? getAssetUrl("outfits", equippedOutfit) : null;
+  // If outfit is equipped and has a custom asset, use the full outfit mascot character
+  const assetUrl = (equippedOutfit && outfitUrl) ? outfitUrl : baseAssetUrl;
 
   return (
     <div
@@ -107,8 +109,8 @@ export function KanciMascot({
           <KanciSvgFallback expression={expression} size={dim.icon} />
         )}
 
-        {/* Outfit Overlay */}
-        {equippedOutfit && (
+        {/* Outfit Overlay (Only needed if falling back to SVG mascot) */}
+        {equippedOutfit && (imgError || !outfitUrl) && (
           <div
             className="kanci-outfit-layer"
             style={{
@@ -119,20 +121,7 @@ export function KanciMascot({
               pointerEvents: "none"
             }}
           >
-            {!outfitImgError && outfitUrl ? (
-              <img
-                src={outfitUrl}
-                alt={`Outfit ${equippedOutfit}`}
-                onError={() => setOutfitImgError(true)}
-                style={{
-                  width: `${dim.icon}px`,
-                  height: `${dim.icon}px`,
-                  objectFit: "contain"
-                }}
-              />
-            ) : (
-              <KanciOutfitSvgFallback outfit={equippedOutfit} size={dim.icon} />
-            )}
+            <KanciOutfitSvgFallback outfit={equippedOutfit} size={dim.icon} />
           </div>
         )}
       </div>

@@ -130,10 +130,12 @@ export function CollectionView({ userProfileHook }) {
         <div className="economy-stats-row">
           {/* Coin Pill */}
           <div className="coin-balance-pill" id="collection-coin-pill">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D69E2E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" fill="#ECC94B"/>
-              <path d="M12 6v12M15 9.5a2.5 2.5 0 0 0-2.5-2.5H10a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4h-3.5A2.5 2.5 0 0 1 8 12.5" stroke="#744210" strokeWidth="2"/>
-            </svg>
+            <img
+              src={getAssetUrl("ui", "coin") || "/assets/ui/sinau-coin.png"}
+              alt="Sinau Coin"
+              style={{ width: "24px", height: "24px", objectFit: "contain" }}
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
+            />
             <span id="collection-coins-amount">{currentCoins}</span>
             <span style={{ fontSize: "var(--text-xs)", color: "#744210" }}>Coin</span>
           </div>

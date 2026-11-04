@@ -14,6 +14,7 @@ import story09Data from "../../data/stories/story-09.json";
 import story10Data from "../../data/stories/story-10.json";
 import { StoryRunner } from "./StoryRunner.jsx";
 import { api } from "../../services/api.js";
+import { getAssetUrl } from "../../data/assets.js";
 import "../../styles/adventure.css";
 
 // Map of available story content bundles
@@ -81,19 +82,50 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
           </div>
 
           {/* Story Hero Banner */}
-          <div className="card card-tint-slate" style={{ padding: "var(--space-6) var(--space-8)", marginBottom: "var(--space-6)" }}>
-            <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center", marginBottom: "var(--space-2)" }}>
-              <Badge variant="navy">Cerita {selectedStory.number}</Badge>
-              <Badge variant="gold">{selectedStory.level}</Badge>
-            </div>
-            <h2 style={{ fontSize: "var(--text-3xl)", fontFamily: "var(--font-heading)", margin: "0 0 var(--space-2) 0" }}>
-              {selectedStory.title}
-            </h2>
-            <p style={{ fontSize: "var(--text-sm)", color: "var(--color-text-secondary)", margin: "0 0 var(--space-3) 0" }}>
-              {selectedStory.description}
-            </p>
-            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-primary)", fontWeight: 700 }}>
-              🎯 Fokus Pembelajaran: {selectedStory.learningFocus}
+          <div
+            className="card card-tint-slate"
+            style={{
+              padding: "var(--space-6) var(--space-8)",
+              marginBottom: "var(--space-6)",
+              display: "flex",
+              gap: "var(--space-6)",
+              alignItems: "center",
+              flexWrap: "wrap"
+            }}
+          >
+            {getAssetUrl("stories", selectedStory.coverAssetKey) && (
+              <div
+                style={{
+                  width: "220px",
+                  height: "148px",
+                  flexShrink: 0,
+                  borderRadius: "var(--radius-md)",
+                  overflow: "hidden",
+                  border: "var(--border-sm)",
+                  boxShadow: "var(--shadow-sm)"
+                }}
+              >
+                <img
+                  src={getAssetUrl("stories", selectedStory.coverAssetKey)}
+                  alt={selectedStory.title}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
+              </div>
+            )}
+            <div style={{ flex: 1, minWidth: "260px" }}>
+              <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center", marginBottom: "var(--space-2)" }}>
+                <Badge variant="navy">Cerita {selectedStory.number}</Badge>
+                <Badge variant="gold">{selectedStory.level}</Badge>
+              </div>
+              <h2 style={{ fontSize: "var(--text-3xl)", fontFamily: "var(--font-heading)", margin: "0 0 var(--space-2) 0" }}>
+                {selectedStory.title}
+              </h2>
+              <p style={{ fontSize: "var(--text-sm)", color: "var(--color-text-secondary)", margin: "0 0 var(--space-3) 0" }}>
+                {selectedStory.description}
+              </p>
+              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-primary)", fontWeight: 700 }}>
+                🎯 Fokus Pembelajaran: {selectedStory.learningFocus}
+              </div>
             </div>
           </div>
 
@@ -252,6 +284,35 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
                         {isLevelUnlocked ? "✓ Terbuka" : `🔒 Butuh Level ${story.levelReq}`}
                       </span>
                     </div>
+
+                    {/* Story Cover Thumbnail */}
+                    {getAssetUrl("stories", story.coverAssetKey) && (
+                      <div
+                        className="story-card-cover-container"
+                        style={{
+                          width: "100%",
+                          height: "140px",
+                          borderRadius: "var(--radius-md)",
+                          overflow: "hidden",
+                          marginBottom: "var(--space-3)",
+                          position: "relative",
+                          backgroundColor: "var(--color-bg-subtle)"
+                        }}
+                      >
+                        <img
+                          src={getAssetUrl("stories", story.coverAssetKey)}
+                          alt={`Sampul ${story.title}`}
+                          loading="lazy"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            display: "block",
+                            filter: isLevelUnlocked ? "none" : "grayscale(80%) opacity(0.6)"
+                          }}
+                        />
+                      </div>
+                    )}
 
                     <h3 style={{ fontSize: "var(--text-xl)", fontFamily: "var(--font-heading)", marginBottom: "4px" }}>
                       {story.title}
