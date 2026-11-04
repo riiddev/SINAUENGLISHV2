@@ -261,6 +261,119 @@ function handleDevFallback(action, payload, token) {
     };
   }
 
+  // Economy & Collections dev fallback
+  if (action === "getCatalog") {
+    return {
+      success: true,
+      data: {
+        items: [
+          { id: "border_daun", type: "border", name: "Border Daun Belajar", price: 0, levelReq: 1, active: true },
+          { id: "border_tinta", type: "border", name: "Border Tinta Cendekiawan", price: 0, levelReq: 1, active: true },
+          { id: "border_kawung", type: "border", name: "Border Kawung Tradisional", price: 120, levelReq: 3, active: true },
+          { id: "border_buku", type: "border", name: "Border Buku Terbuka", price: 250, levelReq: 5, active: true },
+          { id: "border_emas", type: "border", name: "Border Emas Mahkota", price: 400, levelReq: 6, active: true },
+          { id: "border_kanci", type: "border", name: "Border Kanci Orisinal", price: 600, levelReq: 8, active: true },
+          { id: "outfit_kacamata", type: "outfit", name: "Kacamata Baca Cerdik", price: 150, levelReq: 3, active: true },
+          { id: "outfit_syal", type: "outfit", name: "Syal Tenun Hangat", price: 200, levelReq: 4, active: true },
+          { id: "outfit_headphone", type: "outfit", name: "Headphone Audio Fokus", price: 350, levelReq: 6, active: true },
+          { id: "outfit_petualang", type: "outfit", name: "Topi Petualang Rimba", price: 500, levelReq: 7, active: true },
+          { id: "streak_freeze", type: "utility", name: "Pelindung Streak (Streak Freeze)", price: 80, levelReq: 2, active: true }
+        ]
+      }
+    };
+  }
+
+  if (action === "getInventory") {
+    let saved = [];
+    try {
+      const raw = localStorage.getItem("sinau_local_inventory");
+      if (raw) saved = JSON.parse(raw);
+    } catch (e) {}
+
+    const now = new Date().toISOString();
+    const hasDaun = saved.some(it => it.itemId === "border_daun");
+    const hasTinta = saved.some(it => it.itemId === "border_tinta");
+
+    if (!hasDaun) saved.push({ itemId: "border_daun", unlockedAt: now, equipped: false });
+    if (!hasTinta) saved.push({ itemId: "border_tinta", unlockedAt: now, equipped: false });
+    try {
+      localStorage.setItem("sinau_local_inventory", JSON.stringify(saved));
+    } catch (e) {}
+
+    return {
+      success: true,
+      data: { inventory: saved }
+    };
+  }
+
+  if (action === "buyItem") {
+    let saved = [];
+    try {
+      const raw = localStorage.getItem("sinau_local_inventory");
+      if (raw) saved = JSON.parse(raw);
+    } catch (e) {}
+
+    const now = new Date().toISOString();
+    saved.push({ itemId: payload.itemId, unlockedAt: now, equipped: false });
+    try {
+      localStorage.setItem("sinau_local_inventory", JSON.stringify(saved));
+    } catch (e) {}
+
+    return {
+      success: true,
+      message: "Berhasil membeli item (Dev Preview).",
+      data: {
+        itemId: payload.itemId,
+        inventory: saved
+      }
+    };
+  }
+
+  if (action === "equipItem") {
+    let saved = [];
+    try {
+      const raw = localStorage.getItem("sinau_local_inventory");
+      if (raw) saved = JSON.parse(raw);
+    } catch (e) {}
+
+    const type = payload.type || "border";
+    saved = saved.map(it => {
+      // Toggle logic
+      const isTarget = it.itemId === payload.itemId;
+      return {
+        ...it,
+        equipped: isTarget ? true : (it.itemId.startsWith(type) ? false : it.equipped)
+      };
+    });
+
+    try {
+      localStorage.setItem("sinau_local_inventory", JSON.stringify(saved));
+    } catch (e) {}
+
+    return {
+      success: true,
+      message: "Item berhasil diperbarui (Dev Preview).",
+      data: {
+        equippedItemId: payload.itemId,
+        type: payload.type
+      }
+    };
+  }
+
+  if (action === "grantReward") {
+    return {
+      success: true,
+      data: {
+        earnedXp: payload.meta?.difficulty === 2 ? 40 : 30,
+        earnedCoins: payload.meta?.difficulty === 2 ? 20 : 15,
+        totalXp: 150,
+        totalCoins: 80,
+        level: 4,
+        isLevelUp: false
+      }
+    };
+  }
+
   return { success: true, message: "Aksi berhasil (Dev Preview)." };
 }
 
@@ -356,6 +469,27 @@ export const api = {
 
   async deleteAvatar() {
     return request("deleteAvatar", {}, true);
+  },
+
+  // Economy, Collections & Server-side Rewards (Tahap 3)
+  async getCatalog() {
+    return request("getCatalog", {}, true);
+  },
+
+  async getInventory() {
+    return request("getInventory", {}, true);
+  },
+
+  async buyItem({ itemId }) {
+    return request("buyItem", { itemId }, true);
+  },
+
+  async equipItem({ itemId, type = "border" }) {
+    return request("equipItem", { itemId, type }, true);
+  },
+
+  async grantReward({ eventId, source, refId = "", meta = {} }) {
+    return request("grantReward", { eventId, source, refId, meta }, true);
   },
 
   // Daily Quests / Missions

@@ -19,6 +19,7 @@ export function AppSidebar({
   const isView = (v) => {
     if (v === "overview") return location.pathname === "/belajar" || location.pathname === "/belajar/";
     if (v === "progress") return location.pathname === "/belajar/progress" || location.pathname === "/belajar/profile";
+    if (v === "collection" || v === "koleksi") return location.pathname === "/belajar/collection" || location.pathname === "/belajar/koleksi";
     return location.pathname === `/belajar/${v}`;
   };
 
@@ -258,6 +259,21 @@ export function AppSidebar({
               <circle cx="12" cy="7" r="4"/>
             </svg>
             <span>Profil & Progres</span>
+          </Link>
+
+          <Link
+            to="/belajar/collection"
+            onClick={onClose}
+            className={`sidebar-link ${isView("collection") || isView("koleksi") ? "is-active" : ""}`}
+            title="Koleksi & Kanci"
+            id="sidebar-collection-link"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+              <path d="M3 6h18"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            <span>Koleksi & Kanci</span>
           </Link>
 
           <Link

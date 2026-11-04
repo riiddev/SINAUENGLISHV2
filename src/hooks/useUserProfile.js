@@ -3,10 +3,12 @@ import { useAuth } from "./useAuth.jsx";
 import { api } from "../services/api.js";
 import { getWordStatus } from "./useSpacedRepetition.js";
 import { TITLES_CATALOG, getTitleById, evaluateAllTitles } from "../features/profile/titleSystem.js";
+import { calculateLevelFromXp, getCatalogItemById } from "../features/collection/collectionCatalog.js";
 
 const LOCAL_PROFILE_KEY = "sinau_local_profile";
 const LOCAL_AVATAR_URL_KEY = "sinau_avatar_url";
 const LOCAL_AVATAR_TIME_KEY = "sinau_avatar_updated_at";
+const LOCAL_INVENTORY_KEY = "sinau_local_inventory";
 
 export function useUserProfile({ vocabulary = [], progressMap = {} }) {
   const { user, isAuthenticated } = useAuth();
@@ -49,6 +51,19 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
   const [unlockedTitleIds, setUnlockedTitleIds] = useState(["word_explorer"]);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  // Economy & Inventory state
+  const [inventory, setInventory] = useState(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_INVENTORY_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    const now = new Date().toISOString();
+    return [
+      { itemId: "border_daun", unlockedAt: now, equipped: true },
+      { itemId: "border_tinta", unlockedAt: now, equipped: false }
+    ];
+  });
 
   // Derive stats from real vocabulary & progress
   const userStats = useMemo(() => {
@@ -186,9 +201,23 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
 
   // Calculate Level from XP
   const calculatedLevel = useMemo(() => {
-    const xp = profile.xp || 50;
-    return Math.max(1, Math.floor(Math.sqrt(xp / 15)) + 1);
+    return calculateLevelFromXp(profile.xp);
   }, [profile.xp]);
+
+  // Derived Equipped Border & Outfit
+  const equippedBorder = useMemo(() => {
+    const item = inventory.find((it) => it.equipped && it.itemId.startsWith("border_"));
+    return item ? item.itemId : "border_daun";
+  }, [inventory]);
+
+  const equippedOutfit = useMemo(() => {
+    const item = inventory.find((it) => it.equipped && it.itemId.startsWith("outfit_"));
+    return item ? item.itemId.replace(/^outfit_/, "") : null;
+  }, [inventory]);
+
+  const streakFreezesCount = useMemo(() => {
+    return inventory.filter((it) => it.itemId === "streak_freeze").length;
+  }, [inventory]);
 
   // Update Display Name
   const updateDisplayName = useCallback(async (newName) => {
@@ -279,6 +308,114 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
     return { success: true };
   }, [isAuthenticated]);
 
+  // Buy item from collection catalog
+  const buyItem = useCallback(async (itemId) => {
+    const catItem = getCatalogItemById(itemId);
+    if (!catItem) return { success: false, error: "Item tidak ditemukan di katalog." };
+
+    const currentCoins = profile.coins || 0;
+    if (currentCoins < catItem.price) {
+      return { success: false, error: "Sinau Coin tidak mencukupi (Butuh " + catItem.price + " Coin, saldomu " + currentCoins + " Coin)." };
+    }
+
+    const currentLvl = calculateLevelFromXp(profile.xp);
+    if (currentLvl < catItem.levelReq) {
+      return { success: false, error: "Level belum mencukupi (Butuh Level " + catItem.levelReq + ", levelmu " + currentLvl + ")." };
+    }
+
+    const now = new Date().toISOString();
+    const updatedCoins = currentCoins - catItem.price;
+
+    setProfile((prev) => {
+      const next = { ...prev, coins: updatedCoins };
+      localStorage.setItem(LOCAL_PROFILE_KEY, JSON.stringify(next));
+      return next;
+    });
+
+    setInventory((prev) => {
+      const next = [...prev, { itemId, unlockedAt: now, equipped: false }];
+      localStorage.setItem(LOCAL_INVENTORY_KEY, JSON.stringify(next));
+      return next;
+    });
+
+    if (isAuthenticated) {
+      try {
+        await api.buyItem({ itemId });
+      } catch (err) {
+        console.warn("Buy item cloud sync warning:", err);
+      }
+    }
+
+    return { success: true, item: catItem };
+  }, [profile.coins, profile.xp, isAuthenticated]);
+
+  // Equip border or outfit
+  const equipItem = useCallback(async (itemId, type = "border") => {
+    setInventory((prev) => {
+      const next = prev.map((it) => {
+        const itType = it.itemId.startsWith("outfit_") ? "outfit" : "border";
+        if (itType === type) {
+          return {
+            ...it,
+            equipped: it.itemId === itemId
+          };
+        }
+        return it;
+      });
+      localStorage.setItem(LOCAL_INVENTORY_KEY, JSON.stringify(next));
+      return next;
+    });
+
+    if (isAuthenticated) {
+      try {
+        await api.equipItem({ itemId, type });
+      } catch (err) {
+        console.warn("Equip item cloud sync warning:", err);
+      }
+    }
+  }, [isAuthenticated]);
+
+  // Server-side idempotent reward grant
+  const claimReward = useCallback(async ({ eventId, source, refId = "", meta = {} }) => {
+    let expEarned = 15;
+    let coinsEarned = 10;
+    if (source === "daily_quest") {
+      expEarned = meta.difficulty === 2 ? 40 : 30;
+      coinsEarned = meta.difficulty === 2 ? 20 : 15;
+    } else if (source === "story_episode") {
+      expEarned = 50;
+      coinsEarned = 30;
+    } else if (source === "article_quiz") {
+      expEarned = 30;
+      coinsEarned = meta.scorePct >= 100 ? 20 : 0;
+    } else if (source === "grammar_quiz") {
+      expEarned = 25;
+      coinsEarned = 15;
+    }
+
+    if (isAuthenticated) {
+      try {
+        const res = await api.grantReward({ eventId, source, refId, meta });
+        if (res.success && res.data) {
+          expEarned = res.data.earnedXp;
+          coinsEarned = res.data.earnedCoins;
+        }
+      } catch (err) {
+        console.warn("Grant reward warning:", err);
+      }
+    }
+
+    setProfile((prev) => {
+      const nextXp = (prev.xp || 0) + expEarned;
+      const nextCoins = (prev.coins || 0) + coinsEarned;
+      const next = { ...prev, xp: nextXp, coins: nextCoins };
+      localStorage.setItem(LOCAL_PROFILE_KEY, JSON.stringify(next));
+      return next;
+    });
+
+    return { success: true, earnedXp: expEarned, earnedCoins: coinsEarned };
+  }, [isAuthenticated]);
+
   const activeTitleObj = useMemo(() => {
     return getTitleById(profile.activeTitle);
   }, [profile.activeTitle]);
@@ -296,6 +433,13 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
     updateDisplayName,
     setActiveTitle,
     uploadCustomAvatar,
-    deleteCustomAvatar
+    deleteCustomAvatar,
+    inventory,
+    equippedBorder,
+    equippedOutfit,
+    streakFreezesCount,
+    buyItem,
+    equipItem,
+    claimReward
   };
 }

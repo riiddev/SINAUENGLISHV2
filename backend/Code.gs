@@ -26,7 +26,10 @@ const SHEETS = {
   SETTINGS: "Settings",
   PROFILES: "Profiles",
   TITLES: "Titles",
-  QUESTS: "Quests"
+  QUESTS: "Quests",
+  CATALOG: "Catalog",
+  INVENTORY: "Inventory",
+  TRANSACTIONS: "Transactions"
 };
 
 /**
@@ -119,6 +122,18 @@ function doPost(e) {
       // 7. One-time Migration from V1/V2 JSON Backup
       case "importBackup":
         return handleImportBackup(ss, token, payload);
+
+      // 8. Economy & Collections (Tahap 3)
+      case "getCatalog":
+        return handleGetCatalog(ss, token);
+      case "getInventory":
+        return handleGetInventory(ss, token);
+      case "buyItem":
+        return handleBuyItem(ss, token, payload);
+      case "equipItem":
+        return handleEquipItem(ss, token, payload);
+      case "grantReward":
+        return handleGrantReward(ss, token, payload);
 
       default:
         return jsonResponse({ success: false, error: "Aksi tidak dikenal: " + action }, 400);
@@ -1231,3 +1246,402 @@ function setupDatabase() {
   Logger.log("✅ SinauEnglish V2 Database setup completed successfully!");
 }
 
+
+
+/* ==========================================================================
+   ECONOMY, CATALOG & INVENTORY HANDLERS (TAHAP 3)
+   ========================================================================== */
+
+function ensureEconomySheets(ss) {
+  let catalogSheet = ss.getSheetByName(SHEETS.CATALOG);
+  if (!catalogSheet) {
+    catalogSheet = ss.insertSheet(SHEETS.CATALOG);
+    catalogSheet.appendRow(["item_id", "type", "name", "price", "level_req", "active"]);
+    const hRange = catalogSheet.getRange(1, 1, 1, 6);
+    hRange.setFontWeight("bold");
+    hRange.setBackground("#4B5E73");
+    hRange.setFontColor("#FFFFFF");
+    catalogSheet.setFrozenRows(1);
+    [160, 100, 200, 100, 100, 80].forEach((w, idx) => catalogSheet.setColumnWidth(idx + 1, w));
+  }
+
+  // Seed default catalog if empty
+  if (catalogSheet.getLastRow() <= 1) {
+    const initialItems = [
+      ["border_daun", "border", "Border Daun Belajar", 0, 1, true],
+      ["border_tinta", "border", "Border Tinta Cendekiawan", 0, 1, true],
+      ["border_kawung", "border", "Border Kawung Tradisional", 120, 3, true],
+      ["border_buku", "border", "Border Buku Terbuka", 250, 5, true],
+      ["border_emas", "border", "Border Emas Mahkota", 400, 6, true],
+      ["border_kanci", "border", "Border Kanci Orisinal", 600, 8, true],
+      ["outfit_kacamata", "outfit", "Kacamata Baca Cerdik", 150, 3, true],
+      ["outfit_syal", "outfit", "Syal Tenun Hangat", 200, 4, true],
+      ["outfit_headphone", "outfit", "Headphone Audio Fokus", 350, 6, true],
+      ["outfit_petualang", "outfit", "Topi Petualang Rimba", 500, 7, true],
+      ["streak_freeze", "utility", "Pelindung Streak (Streak Freeze)", 80, 2, true]
+    ];
+    initialItems.forEach(row => catalogSheet.appendRow(row));
+  }
+
+  let inventorySheet = ss.getSheetByName(SHEETS.INVENTORY);
+  if (!inventorySheet) {
+    inventorySheet = ss.insertSheet(SHEETS.INVENTORY);
+    inventorySheet.appendRow(["user_id", "item_id", "unlocked_at", "equipped"]);
+    const hRange = inventorySheet.getRange(1, 1, 1, 4);
+    hRange.setFontWeight("bold");
+    hRange.setBackground("#4B5E73");
+    hRange.setFontColor("#FFFFFF");
+    inventorySheet.setFrozenRows(1);
+    [180, 160, 200, 100].forEach((w, idx) => inventorySheet.setColumnWidth(idx + 1, w));
+  }
+
+  let txSheet = ss.getSheetByName(SHEETS.TRANSACTIONS);
+  if (!txSheet) {
+    txSheet = ss.insertSheet(SHEETS.TRANSACTIONS);
+    txSheet.appendRow(["user_id", "tx_id", "type", "amount", "source", "ref_id", "created_at"]);
+    const hRange = txSheet.getRange(1, 1, 1, 7);
+    hRange.setFontWeight("bold");
+    hRange.setBackground("#4B5E73");
+    hRange.setFontColor("#FFFFFF");
+    txSheet.setFrozenRows(1);
+    [180, 200, 100, 100, 140, 200, 200].forEach((w, idx) => txSheet.setColumnWidth(idx + 1, w));
+  }
+
+  return { catalogSheet, inventorySheet, txSheet };
+}
+
+function handleGetCatalog(ss, token) {
+  const { catalogSheet } = ensureEconomySheets(ss);
+  const data = catalogSheet.getDataRange().getValues();
+  const items = [];
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][5] === true || String(data[i][5]).toLowerCase() === "true") {
+      items.push({
+        id: data[i][0],
+        type: data[i][1],
+        name: data[i][2],
+        price: Number(data[i][3]) || 0,
+        levelReq: Number(data[i][4]) || 1,
+        active: true
+      });
+    }
+  }
+  return jsonResponse({ success: true, data: { items } });
+}
+
+function handleGetInventory(ss, token) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const { inventorySheet } = ensureEconomySheets(ss);
+  const data = inventorySheet.getDataRange().getValues();
+  const items = [];
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === userId) {
+      items.push({
+        itemId: data[i][1],
+        unlockedAt: data[i][2],
+        equipped: data[i][3] === true || String(data[i][3]).toLowerCase() === "true"
+      });
+    }
+  }
+
+  // Ensure starter items (border_daun, border_tinta) are unlocked
+  const hasDaun = items.some(it => it.itemId === "border_daun");
+  const hasTinta = items.some(it => it.itemId === "border_tinta");
+  const now = new Date().toISOString();
+
+  if (!hasDaun) {
+    inventorySheet.appendRow([userId, "border_daun", now, false]);
+    items.push({ itemId: "border_daun", unlockedAt: now, equipped: false });
+  }
+  if (!hasTinta) {
+    inventorySheet.appendRow([userId, "border_tinta", now, false]);
+    items.push({ itemId: "border_tinta", unlockedAt: now, equipped: false });
+  }
+
+  return jsonResponse({ success: true, data: { inventory: items } });
+}
+
+function handleBuyItem(ss, token, payload) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const itemId = payload.itemId;
+  if (!itemId) return jsonResponse({ success: false, error: "Item ID tidak valid." }, 400);
+
+  const { catalogSheet, inventorySheet, txSheet } = ensureEconomySheets(ss);
+  const catData = catalogSheet.getDataRange().getValues();
+  let targetItem = null;
+
+  for (let i = 1; i < catData.length; i++) {
+    if (catData[i][0] === itemId) {
+      targetItem = {
+        id: catData[i][0],
+        type: catData[i][1],
+        name: catData[i][2],
+        price: Number(catData[i][3]) || 0,
+        levelReq: Number(catData[i][4]) || 1,
+        active: catData[i][5] === true || String(catData[i][5]).toLowerCase() === "true"
+      };
+      break;
+    }
+  }
+
+  if (!targetItem || !targetItem.active) {
+    return jsonResponse({ success: false, error: "Item tidak ditemukan di katalog." }, 404);
+  }
+
+  // 1. Check user level from XP in Profiles
+  const { profileSheet } = ensureProfilesAndTitlesSheets(ss);
+  const pData = profileSheet.getDataRange().getValues();
+  let pRowIdx = -1;
+  let userXp = 0;
+  let userCoins = 0;
+
+  for (let i = 1; i < pData.length; i++) {
+    if (pData[i][0] === userId) {
+      pRowIdx = i + 1;
+      userXp = Number(pData[i][3]) || 0;
+      userCoins = Number(pData[i][5]) || 0;
+      break;
+    }
+  }
+
+  const userLevel = Math.max(1, Math.floor(Math.sqrt(userXp / 15)) + 1);
+  if (userLevel < targetItem.levelReq) {
+    return jsonResponse({
+      success: false,
+      error: "Level belum mencukupi. Butuh Level " + targetItem.levelReq + " (Levelmu saat ini: " + userLevel + ")."
+    }, 400);
+  }
+
+  // 2. Check if already owned
+  const invData = inventorySheet.getDataRange().getValues();
+  let ownedCount = 0;
+  for (let i = 1; i < invData.length; i++) {
+    if (invData[i][0] === userId && invData[i][1] === itemId) {
+      ownedCount++;
+    }
+  }
+
+  if (targetItem.type !== "utility" && ownedCount > 0) {
+    return jsonResponse({ success: false, error: "Item ini sudah kamu miliki di inventaris." }, 400);
+  }
+  if (targetItem.id === "streak_freeze" && ownedCount >= 2) {
+    return jsonResponse({ success: false, error: "Maksimal penyimpanan Pelindung Streak adalah 2 buah." }, 400);
+  }
+
+  // 3. Check coins
+  if (userCoins < targetItem.price) {
+    return jsonResponse({
+      success: false,
+      error: "Sinau Coin tidak mencukupi (Butuh " + targetItem.price + " Coin, saldomu " + userCoins + " Coin)."
+    }, 400);
+  }
+
+  // 4. Deduct coins
+  const remainingCoins = userCoins - targetItem.price;
+  const now = new Date().toISOString();
+  if (pRowIdx > 0) {
+    profileSheet.getRange(pRowIdx, 6).setValue(remainingCoins);
+    profileSheet.getRange(pRowIdx, 7).setValue(now);
+  }
+
+  // 5. Add to inventory
+  inventorySheet.appendRow([userId, itemId, now, false]);
+
+  // 6. Record transaction
+  const txId = "tx_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
+  txSheet.appendRow([userId, txId, "debit", targetItem.price, "shop_purchase", itemId, now]);
+
+  return jsonResponse({
+    success: true,
+    message: "Berhasil membeli " + targetItem.name + "!",
+    data: {
+      item: targetItem,
+      coins: remainingCoins
+    }
+  });
+}
+
+function handleEquipItem(ss, token, payload) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const itemId = payload.itemId; // e.g. "border_kawung" or "none"
+  const type = payload.type || "border"; // "border" or "outfit"
+
+  const { catalogSheet, inventorySheet } = ensureEconomySheets(ss);
+  const catData = catalogSheet.getDataRange().getValues();
+  const invData = inventorySheet.getDataRange().getValues();
+
+  // If itemId is not "none", verify user owns it
+  if (itemId && itemId !== "none") {
+    let owned = false;
+    for (let i = 1; i < invData.length; i++) {
+      if (invData[i][0] === userId && invData[i][1] === itemId) {
+        owned = true;
+        break;
+      }
+    }
+    if (!owned) {
+      return jsonResponse({ success: false, error: "Kamu belum memiliki item ini." }, 400);
+    }
+  }
+
+  // Map each item in catalog to its type
+  const itemTypeMap = {};
+  for (let i = 1; i < catData.length; i++) {
+    itemTypeMap[catData[i][0]] = catData[i][1];
+  }
+
+  // Update equipped flag in Inventory
+  for (let i = 1; i < invData.length; i++) {
+    if (invData[i][0] === userId) {
+      const invItemId = invData[i][1];
+      const invItemType = itemTypeMap[invItemId] || "border";
+      if (invItemType === type) {
+        const isTarget = invItemId === itemId;
+        inventorySheet.getRange(i + 1, 4).setValue(isTarget);
+      }
+    }
+  }
+
+  return jsonResponse({
+    success: true,
+    message: itemId === "none" ? "Item berhasil dilepas." : "Item berhasil dipasang!",
+    data: {
+      equippedItemId: itemId === "none" ? null : itemId,
+      type: type
+    }
+  });
+}
+
+function handleGrantReward(ss, token, payload) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const eventId = payload.eventId;
+  const source = payload.source; // "daily_quest" | "story_episode" | "article_quiz" | "grammar_quiz" | "srs_review" | "matching" | "streak_milestone"
+  const refId = payload.refId || "";
+  const meta = payload.meta || {};
+
+  if (!eventId || !source) {
+    return jsonResponse({ success: false, error: "Parameter event reward tidak lengkap." }, 400);
+  }
+
+  const { txSheet } = ensureEconomySheets(ss);
+  const txData = txSheet.getDataRange().getValues();
+
+  // 1. IDEMPOTENCY CHECK: Check if eventId was already rewarded
+  for (let i = 1; i < txData.length; i++) {
+    if (txData[i][0] === userId && txData[i][5] === eventId) {
+      return jsonResponse({
+        success: true,
+        alreadyClaimed: true,
+        message: "Reward sudah diklaim sebelumnya."
+      });
+    }
+  }
+
+  // 2. DAILY CAP CHECK
+  const todayStr = new Date().toISOString().slice(0, 10);
+  let todayCount = 0;
+  for (let i = 1; i < txData.length; i++) {
+    if (txData[i][0] === userId && txData[i][4] === source) {
+      const txDateStr = String(txData[i][6]).slice(0, 10);
+      if (txDateStr === todayStr) {
+        todayCount++;
+      }
+    }
+  }
+
+  // 3. SERVER-SIDE CALCULATION OF REWARD
+  let xpReward = 0;
+  let coinsReward = 0;
+
+  if (source === "daily_quest") {
+    if (todayCount >= 3) return jsonResponse({ success: false, error: "Batas harian reward misi sudah tercapai (3 misi/hari)." }, 400);
+    xpReward = Number(meta.difficulty) === 2 ? 40 : 30;
+    coinsReward = Number(meta.difficulty) === 2 ? 20 : 15;
+  } else if (source === "story_episode") {
+    if (todayCount >= 1) return jsonResponse({ success: false, error: "Batas harian reward cerita sudah tercapai (1 episode/hari)." }, 400);
+    xpReward = 50;
+    coinsReward = 30;
+  } else if (source === "article_quiz") {
+    if (todayCount >= 2) return jsonResponse({ success: false, error: "Batas harian kuis artikel sudah tercapai (2 kuis/hari)." }, 400);
+    const scorePct = Number(meta.scorePct) || 0;
+    if (scorePct >= 80) xpReward = 30;
+    if (scorePct >= 100) coinsReward = 20;
+    if (xpReward === 0 && coinsReward === 0) {
+      return jsonResponse({ success: true, message: "Kuis selesai, butuh skor minimal 80% untuk mendapatkan reward." });
+    }
+  } else if (source === "grammar_quiz") {
+    if (todayCount >= 2) return jsonResponse({ success: false, error: "Batas harian latihan grammar sudah tercapai (2 sesi/hari)." }, 400);
+    xpReward = 25;
+    coinsReward = 15;
+  } else if (source === "srs_review") {
+    if (todayCount >= 4) return jsonResponse({ success: false, error: "Batas harian review terhadiah sudah tercapai (40 kata/hari)." }, 400);
+    xpReward = 15;
+    coinsReward = 10;
+  } else if (source === "matching") {
+    if (todayCount >= 2) return jsonResponse({ success: false, error: "Batas harian matching konteks sudah tercapai (2 sesi/hari)." }, 400);
+    xpReward = 15;
+    coinsReward = 10;
+  } else if (source === "streak_milestone") {
+    const days = Number(meta.streakDays) || 7;
+    if (days >= 100) { xpReward = 1000; coinsReward = 500; }
+    else if (days >= 30) { xpReward = 300; coinsReward = 150; }
+    else { xpReward = 100; coinsReward = 50; }
+  } else {
+    xpReward = 10;
+    coinsReward = 5;
+  }
+
+  // 4. Update Profile XP & Coins in Spreadsheet
+  const { profileSheet } = ensureProfilesAndTitlesSheets(ss);
+  const pData = profileSheet.getDataRange().getValues();
+  let pRowIdx = -1;
+  let currentXp = 50;
+  let currentCoins = 50;
+
+  for (let i = 1; i < pData.length; i++) {
+    if (pData[i][0] === userId) {
+      pRowIdx = i + 1;
+      currentXp = Number(pData[i][3]) || 0;
+      currentCoins = Number(pData[i][5]) || 0;
+      break;
+    }
+  }
+
+  const prevLevel = Math.max(1, Math.floor(Math.sqrt(currentXp / 15)) + 1);
+  const nextXp = currentXp + xpReward;
+  const nextCoins = currentCoins + coinsReward;
+  const nextLevel = Math.max(1, Math.floor(Math.sqrt(nextXp / 15)) + 1);
+  const isLevelUp = nextLevel > prevLevel;
+  const now = new Date().toISOString();
+
+  if (pRowIdx > 0) {
+    profileSheet.getRange(pRowIdx, 4).setValue(nextXp);
+    profileSheet.getRange(pRowIdx, 6).setValue(nextCoins);
+    profileSheet.getRange(pRowIdx, 7).setValue(now);
+  }
+
+  // 5. Append Transaction record
+  const txId = "tx_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
+  txSheet.appendRow([userId, txId, "credit", coinsReward, source, eventId, now]);
+
+  return jsonResponse({
+    success: true,
+    data: {
+      earnedXp: xpReward,
+      earnedCoins: coinsReward,
+      totalXp: nextXp,
+      totalCoins: nextCoins,
+      level: nextLevel,
+      isLevelUp: isLevelUp
+    }
+  });
+}

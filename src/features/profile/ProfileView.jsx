@@ -3,10 +3,14 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { useUserProfile } from "../../hooks/useUserProfile.js";
 import { AVATAR_PRESETS } from "./titleSystem.js";
+import { AvatarWithBorder } from "./AvatarWithBorder.jsx";
 import "../../styles/profile.css";
 
-export function ProfileView({ vocabulary = [], progressMap = {} }) {
+export function ProfileView({ vocabulary = [], progressMap = {}, userProfileHook }) {
   const { user, isAuthenticated } = useAuth();
+  const internalProfileHook = useUserProfile({ vocabulary, progressMap });
+  const activeHook = userProfileHook || internalProfileHook;
+
   const {
     profile,
     userStats,
@@ -15,11 +19,12 @@ export function ProfileView({ vocabulary = [], progressMap = {} }) {
     activeTitleObj,
     evaluatedTitles,
     calculatedLevel,
+    equippedBorder,
     updateDisplayName,
     setActiveTitle,
     uploadCustomAvatar,
     deleteCustomAvatar
-  } = useUserProfile({ vocabulary, progressMap });
+  } = activeHook;
 
   const [filterMode, setFilterMode] = useState("all"); // "all" | "unlocked" | "locked"
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -208,25 +213,15 @@ export function ProfileView({ vocabulary = [], progressMap = {} }) {
         <div className="scholar-header-wrap">
           <div className="scholar-bio-section">
             <div className="scholar-avatar-box">
-              <div
-                className="scholar-avatar-circle"
-                style={{
-                  backgroundColor: avatarUrl ? "transparent" : currentAvatar.bg,
-                  color: currentAvatar.color,
-                  overflow: "hidden"
-                }}
-              >
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt={profile.displayName || "Pelajar Sinau"}
-                    className="scholar-avatar-img"
-                    id="scholar-avatar-image"
-                  />
-                ) : (
-                  <span id="scholar-avatar-initials">{currentAvatar.letter}</span>
-                )}
-              </div>
+              <AvatarWithBorder
+                avatarUrl={avatarUrl}
+                initialLetter={currentAvatar.letter}
+                bgColor={avatarUrl ? "transparent" : currentAvatar.bg}
+                color={currentAvatar.color}
+                equippedBorder={equippedBorder}
+                size={88}
+                id="scholar-avatar-border-wrap"
+              />
               <button
                 type="button"
                 className="avatar-edit-btn"

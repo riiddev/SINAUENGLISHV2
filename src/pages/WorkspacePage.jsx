@@ -15,6 +15,9 @@ import { ProfileView } from "../features/profile/ProfileView.jsx";
 import { MissionsView } from "../features/missions/MissionsView.jsx";
 import { ContextMatching } from "../features/matching/ContextMatching.jsx";
 import { SettingsPanel } from "../features/settings/SettingsPanel.jsx";
+import { CollectionView } from "../features/collection/CollectionView.jsx";
+import { KanciMascot } from "../components/mascot/KanciMascot.jsx";
+import { useUserProfile } from "../hooks/useUserProfile.js";
 import { useProgressSync } from "../hooks/useProgressSync.js";
 
 // Static dataset imports
@@ -65,6 +68,7 @@ export function WorkspacePage() {
   } = useProgressSync();
 
   const vocabulary = vocabData.entries || [];
+  const userProfile = useUserProfile({ vocabulary, progressMap });
   const grammarTopics = grammarData.topics || [];
   const habitPassages = habitData.passages || [];
   const stories = storiesData.stories || [];
@@ -86,6 +90,8 @@ export function WorkspacePage() {
     review: "Spaced Review & Jurnal",
     progress: "Profil & Progres Belajar",
     profile: "Profil & Progres Belajar",
+    collection: "Koleksi & Kanci",
+    koleksi: "Koleksi & Kanci",
     settings: "Pengaturan Akun"
   };
 
@@ -134,25 +140,39 @@ export function WorkspacePage() {
           {/* VIEW 1: OVERVIEW */}
           {currentView === "overview" && (
             <section className="view-section is-active" id="view-overview">
-              <div className="card card-tint-sand" style={{ padding: "var(--space-8)", marginBottom: "var(--space-8)" }}>
-                <h2 style={{ fontSize: "var(--text-3xl)", marginBottom: "var(--space-2)" }}>
-                  Target Harian: Belajar Sampai Kepakai
-                </h2>
-                <p style={{ color: "var(--color-text-secondary)", marginBottom: "var(--space-6)", maxWidth: "580px", lineHeight: 1.6 }}>
-                  Selesaikan review kata hari ini untuk menjaga ritme ingatan. Sistem otomatis menyinkronkan progres belajarmu secara teratur.
-                </p>
-                <button
-                  className="btn btn-primary btn-lg"
-                  id="overview-quick-start"
-                  type="button"
-                  onClick={() => {
-                    const dueWord = vocabulary.find((w) => getWordStatus(w.id) === "review_due");
-                    const wordToStudy = dueWord || vocabulary.find((w) => !progressMap[w.id]) || vocabulary[0];
-                    handleStartStudy(wordToStudy);
-                  }}
-                >
-                  Lanjutkan Belajar Sekarang ↗
-                </button>
+              <div className="card card-tint-sand" style={{ padding: "var(--space-8)", marginBottom: "var(--space-8)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-6)", flexWrap: "wrap" }}>
+                <div style={{ flex: "1 1 360px" }}>
+                  <span style={{ fontSize: "var(--text-xs)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 800, color: "var(--color-text-secondary)" }}>
+                    Sapaan Kanci
+                  </span>
+                  <h2 style={{ fontSize: "var(--text-3xl)", margin: "4px 0 var(--space-2)" }}>
+                    Halo, {userProfile.profile.displayName || "Pelajar Sinau"}!
+                  </h2>
+                  <p style={{ color: "var(--color-text-secondary)", marginBottom: "var(--space-6)", maxWidth: "560px", lineHeight: 1.6 }}>
+                    Selesaikan misi dan review kata hari ini untuk menjaga ritme ingatan serta mengumpulkan Sinau Coin.
+                  </p>
+                  <button
+                    className="btn btn-primary btn-lg"
+                    id="overview-quick-start"
+                    type="button"
+                    onClick={() => {
+                      const dueWord = vocabulary.find((w) => getWordStatus(w.id) === "review_due");
+                      const wordToStudy = dueWord || vocabulary.find((w) => !progressMap[w.id]) || vocabulary[0];
+                      handleStartStudy(wordToStudy);
+                    }}
+                  >
+                    Lanjutkan Belajar Sekarang ↗
+                  </button>
+                </div>
+
+                <div style={{ flex: "0 0 auto", margin: "0 auto" }}>
+                  <KanciMascot
+                    expression="happy"
+                    equippedOutfit={userProfile.equippedOutfit}
+                    size="lg"
+                    dialogue="Yuk mulai latihan hari ini!"
+                  />
+                </div>
               </div>
 
               <div className="stats-grid">
@@ -322,7 +342,15 @@ export function WorkspacePage() {
               <ProfileView
                 vocabulary={vocabulary}
                 progressMap={progressMap}
+                userProfileHook={userProfile}
               />
+            </section>
+          )}
+
+          {/* VIEW 11: COLLECTION & KANCI */}
+          {(currentView === "collection" || currentView === "koleksi") && (
+            <section className="view-section is-active" id="view-collection">
+              <CollectionView userProfileHook={userProfile} />
             </section>
           )}
 

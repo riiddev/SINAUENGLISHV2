@@ -2,6 +2,7 @@ import React from "react";
 import { Badge } from "../../components/common/Badge.jsx";
 import { Button } from "../../components/common/Button.jsx";
 import { getWordStatus, STATUS_META } from "../../hooks/useSpacedRepetition.js";
+import { KanciMascot } from "../../components/mascot/KanciMascot.jsx";
 
 export function ReviewQueue({ vocabulary = [], progressMap = {}, onStartStudy }) {
   const wordsWithProgress = vocabulary.filter((w) => progressMap[w.id]);
@@ -39,9 +40,12 @@ export function ReviewQueue({ vocabulary = [], progressMap = {}, onStartStudy })
         </div>
 
         {dueWords.length === 0 ? (
-          <p style={{ color: "var(--color-text-secondary)", margin: 0 }}>
-            Hebat! Tidak ada kata yang jatuh tempo hari ini. Kamu bisa melatih kata baru dari daftar kosakata.
-          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", padding: "var(--space-2) 0" }}>
+            <KanciMascot expression="sleepy" size="sm" animate={false} />
+            <p style={{ color: "var(--color-text-secondary)", margin: 0, fontSize: "var(--text-sm)", lineHeight: 1.5 }}>
+              Bagus sekali! Tidak ada kata yang jatuh tempo hari ini. Kanci sedang santai sejenak sambil menanti giliran review berikutnya. Kamu bisa menambah kata baru dari daftar kosakata.
+            </p>
+          </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
             {dueWords.map((w) => (
