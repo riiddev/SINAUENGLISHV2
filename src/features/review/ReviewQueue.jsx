@@ -33,7 +33,7 @@ export function ReviewQueue({ vocabulary = [], progressMap = {}, onStartStudy })
           </h3>
           {dueWords.length > 0 && (
             <Button size="sm" variant="primary" onClick={() => onStartStudy(dueWords[0])}>
-              Mulai Review Cepat ⚡
+              Mulai Review Cepat ↗
             </Button>
           )}
         </div>

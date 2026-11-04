@@ -21,6 +21,8 @@
 
 @layer tokens {
   :root {
+    color-scheme: light;
+
     /* ------------------------------------------------------------------------
        1. TYPOGRAPHY SYSTEM
        ------------------------------------------------------------------------ */
@@ -129,50 +131,4 @@
     --header-height: 72px;
     --sidebar-width: 270px;
   }
-
-  /* --------------------------------------------------------------------------
-     DARK MODE (Warm Espresso Night Theme)
-     -------------------------------------------------------------------------- */
-  [data-theme="dark"] {
-    --color-bg-base: #171411;
-    --color-bg-nav: #1F1B16;
-    --color-bg-surface: #26211C;
-    --color-bg-footer: #1A1612;
-    --color-bg-subtle: #211C17;
-
-    --color-tint-sand: #2C261F;
-    --color-tint-sage: #20281E;
-    --color-tint-slate: #1F252C;
-    --color-tint-rose: #2C2020;
-
-    --color-text-primary: #F3ECE1;
-    --color-text-secondary: #B5ABA0;
-    --color-text-muted: #82786D;
-    --color-text-inverse: #171411;
-
-    --color-accent-gold: #D8AA47;
-    --color-accent-gold-hover: #E4B959;
-    --color-accent-navy: #728AA5;
-    --color-accent-navy-hover: #869EB9;
-    --color-accent-sage: #81A36A;
-    --color-accent-sage-hover: #93B57C;
-    --color-accent-berry: #B86B70;
-    --color-accent-terracotta: #CF7651;
-
-    --color-success: #70AD62;
-    --color-success-bg: #1B2917;
-    --color-warning: #D8A527;
-    --color-warning-bg: #2B2310;
-    --color-danger: #D86363;
-    --color-danger-bg: #2D1414;
-
-    --border-color: #383129;
-    --border-color-subtle: rgba(243, 236, 225, 0.12);
-    --shadow-color: rgba(0, 0, 0, 0.6);
-    --shadow-flat: 2px 2px 0 var(--border-color);
-    --shadow-card: 4px 4px 0 var(--shadow-color);
-    --shadow-card-hover: 6px 6px 0 var(--shadow-color);
-    --shadow-button: 3px 3px 0 #000000;
-  }
 }
-

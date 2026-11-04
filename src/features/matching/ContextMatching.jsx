@@ -228,7 +228,12 @@ export function ContextMatching({ vocabulary = [], onRecordMatchComplete }) {
             </span>
 
             <span className="matching-stat-pill" id="matching-score-badge">
-              ⭐ Skor: {score}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true" style={{ color: "var(--color-accent-gold)" }}>
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                <span>Skor: {score}</span>
+              </span>
             </span>
 
             <button

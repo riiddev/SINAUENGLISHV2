@@ -128,7 +128,7 @@ export function usePWA() {
       return;
     }
 
-    const notifTitle = title || "🎯 Pengingat Misi SinauEnglish";
+    const notifTitle = title || "Pengingat Misi SinauEnglish";
     const notifBody = body || "3 misi harian menunggumu di SinauEnglish! Jaga streak belajarmu hari ini.";
 
     if (swRegistration && "showNotification" in swRegistration) {

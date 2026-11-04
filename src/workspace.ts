@@ -118,17 +118,9 @@ class WorkspaceApp {
 
   private setupTheme(): void {
     const root = document.documentElement;
-    const toggle = document.getElementById("theme-toggle");
-    const savedTheme = localStorage.getItem("sinauu-theme") || this.state.settings.theme || "light";
-    root.dataset.theme = savedTheme;
-
-    toggle?.addEventListener("click", () => {
-      const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
-      root.dataset.theme = nextTheme;
-      localStorage.setItem("sinauu-theme", nextTheme);
-      this.state.settings.theme = nextTheme;
-      this.storage.save(this.state);
-    });
+    delete root.dataset.theme;
+    localStorage.removeItem("sinauu-theme");
+    this.state.settings.theme = "light";
   }
 
   private setupNavigation(): void {

@@ -99,7 +99,7 @@ export function StudySession({ word, onFinish, onNextWord, onRecordReview }) {
                   type="button"
                   onClick={() => setIsMeaningRevealed(true)}
                 >
-                  Buka Arti Kata 👁
+                  Buka Arti Kata ↗
                 </button>
               )}
             </div>
@@ -158,7 +158,15 @@ export function StudySession({ word, onFinish, onNextWord, onRecordReview }) {
         {stage === 3 && (
           <div style={{ textAlign: "center", padding: "var(--space-6)" }}>
             <div style={{ fontSize: "48px", marginBottom: "var(--space-2)" }}>
-              {isCorrect ? "🎉" : "💡"}
+              <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "56px", height: "56px", borderRadius: "var(--radius-pill)", backgroundColor: isCorrect ? "var(--color-success-bg)" : "var(--color-warning-bg)", border: "var(--border-sm)", color: isCorrect ? "var(--color-success)" : "var(--color-warning)" }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {isCorrect ? (
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3" />
+                ) : (
+                  <circle cx="12" cy="12" r="10" />
+                )}
+              </svg>
+            </div>
             </div>
             <h2 style={{ fontSize: "var(--text-2xl)", marginBottom: "var(--space-2)" }}>
               {isCorrect ? "Penguasaan Meningkat!" : "Perlu Diulang Lagi"}
@@ -196,7 +204,7 @@ export function StudySession({ word, onFinish, onNextWord, onRecordReview }) {
                   onNextWord();
                 }}
               >
-                Latih Kata Selanjutnya ⚡
+                Latih Kata Selanjutnya ↗
               </button>
             </div>
           </div>

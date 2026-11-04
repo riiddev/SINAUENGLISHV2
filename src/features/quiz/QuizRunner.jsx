@@ -67,7 +67,15 @@ export function QuizRunner({ topic, onFinish, onRetry }) {
     return (
       <div className="card card-tint-sand" style={{ maxWidth: "600px", margin: "0 auto", textAlign: "center", padding: "var(--space-10)" }}>
         <div style={{ fontSize: "52px", marginBottom: "var(--space-3)" }}>
-          {pct >= 80 ? "🏆" : pct >= 60 ? "👍" : "📚"}
+          <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "64px", height: "64px", borderRadius: "var(--radius-pill)", backgroundColor: "var(--color-bg-surface)", border: "var(--border-sm)", color: pct >= 80 ? "var(--color-accent-gold)" : "var(--color-accent-navy)" }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+              <path d="M4 22h16"/>
+              <path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"/>
+              <path d="M6 4h12v7a6 6 0 0 1-12 0V4Z"/>
+            </svg>
+          </div>
         </div>
         <h2 style={{ fontSize: "var(--text-3xl)", marginBottom: "var(--space-2)" }}>
           Kuis Selesai!

@@ -82,6 +82,7 @@ export function WorkspacePage() {
     quiz: "Kuis Interaktif",
     reading: "Materi Bacaan",
     adventure: "Cerita & Dialog",
+    petualangan: "Cerita & Dialog",
     review: "Spaced Review & Jurnal",
     progress: "Profil & Progres Belajar",
     profile: "Profil & Progres Belajar",
@@ -293,7 +294,7 @@ export function WorkspacePage() {
           )}
 
           {/* VIEW 7: ADVENTURE */}
-          {currentView === "adventure" && (
+          {(currentView === "adventure" || currentView === "petualangan") && (
             <section className="view-section is-active" id="view-adventure">
               <AdventureHub
                 stories={stories}

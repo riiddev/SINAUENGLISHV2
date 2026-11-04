@@ -67,7 +67,7 @@ export function SettingsPanel({ onProgressReload }) {
 
   const handleTestNotification = () => {
     sendTestNotification({
-      title: "🎯 Misi Harian SinauEnglish",
+      title: "Misi Harian SinauEnglish",
       body: "3 misi harian menunggumu hari ini! Selesaikan sekarang untuk mengamankan streak belajarmu.",
       url: "/belajar/missions"
     });
@@ -156,7 +156,7 @@ export function SettingsPanel({ onProgressReload }) {
               <polyline points="7 10 12 15 17 10"/>
               <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            Pasang Aplikasi Sekarang 📲
+            Pasang Aplikasi Sekarang ↗
           </button>
         ) : isInstalled ? (
           <p style={{ margin: 0, fontSize: "var(--text-xs)", color: "var(--color-success)", fontWeight: 700 }}>
@@ -164,7 +164,7 @@ export function SettingsPanel({ onProgressReload }) {
           </p>
         ) : (
           <p style={{ margin: 0, fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
-            💡 Tips: Untuk memasang di iOS/Safari, ketuk tombol <strong>Bagikan (Share)</strong> lalu pilih <strong>Tambahkan ke Layar Utama (Add to Home Screen)</strong>.
+            Tips: Untuk memasang di iOS/Safari, ketuk tombol <strong>Bagikan (Share)</strong> lalu pilih <strong>Tambahkan ke Layar Utama (Add to Home Screen)</strong>.
           </p>
         )}
       </div>
@@ -210,7 +210,7 @@ export function SettingsPanel({ onProgressReload }) {
                 <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
                 <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
               </svg>
-              Aktifkan Pengingat Misi Harian 🔔
+              Aktifkan Pengingat Misi Harian
             </button>
           </div>
         ) : (
@@ -270,7 +270,7 @@ export function SettingsPanel({ onProgressReload }) {
                 id="test-notif-btn"
                 style={{ minHeight: "44px" }}
               >
-                Kirim Notifikasi Uji Coba 🔔
+                Kirim Notifikasi Uji Coba
               </button>
 
               <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>

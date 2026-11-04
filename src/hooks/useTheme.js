@@ -1,21 +1,16 @@
-import { useState, useEffect, useCallback } from "react";
-
+/**
+ * Light theme hook (Dark Mode removed per specification).
+ * Retains hook structure for future extensions.
+ */
 export function useTheme() {
-  const [theme, setTheme] = useState(() => {
-    if (typeof window !== "undefined") {
-      return document.documentElement.dataset.theme || "light";
+  if (typeof document !== "undefined") {
+    if (document.documentElement.dataset.theme) {
+      delete document.documentElement.dataset.theme;
     }
-    return "light";
-  });
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
-
-  const toggleTheme = useCallback(() => {
-    setTheme(prev => (prev === "dark" ? "light" : "dark"));
-  }, []);
-
-  return { theme, toggleTheme, isDark: theme === "dark" };
+  }
+  return {
+    theme: "light",
+    toggleTheme: () => {},
+    isDark: false
+  };
 }
-
