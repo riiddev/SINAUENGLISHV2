@@ -17,6 +17,7 @@ import { ContextMatching } from "../features/matching/ContextMatching.jsx";
 import { SettingsPanel } from "../features/settings/SettingsPanel.jsx";
 import { CollectionView } from "../features/collection/CollectionView.jsx";
 import { KanciMascot } from "../components/mascot/KanciMascot.jsx";
+import { WidgetDeck } from "../components/widgets/WidgetDeck.jsx";
 import { useUserProfile } from "../hooks/useUserProfile.js";
 import { useProgressSync } from "../hooks/useProgressSync.js";
 
@@ -142,6 +143,15 @@ export function WorkspacePage() {
           {/* VIEW 1: OVERVIEW */}
           {currentView === "overview" && (
             <section className="view-section is-active" id="view-overview">
+              {/* WIDGET DECK SUITE */}
+              <WidgetDeck
+                vocabulary={vocabulary}
+                userProfile={userProfile}
+                progressMap={progressMap}
+                onRecordWordReview={recordWordReview}
+                onNavigate={(targetView) => navigate(`/belajar/${targetView}`)}
+              />
+
               <div className="card card-tint-sand" style={{ padding: "var(--space-8)", marginBottom: "var(--space-8)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-6)", flexWrap: "wrap" }}>
                 <div style={{ flex: "1 1 360px" }}>
                   <span style={{ fontSize: "var(--text-xs)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 800, color: "var(--color-text-secondary)" }}>
