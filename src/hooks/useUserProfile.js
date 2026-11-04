@@ -5,6 +5,8 @@ import { getWordStatus } from "./useSpacedRepetition.js";
 import { TITLES_CATALOG, getTitleById, evaluateAllTitles } from "../features/profile/titleSystem.js";
 
 const LOCAL_PROFILE_KEY = "sinau_local_profile";
+const LOCAL_AVATAR_URL_KEY = "sinau_avatar_url";
+const LOCAL_AVATAR_TIME_KEY = "sinau_avatar_updated_at";
 
 export function useUserProfile({ vocabulary = [], progressMap = {} }) {
   const { user, isAuthenticated } = useAuth();
@@ -28,8 +30,25 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
     };
   });
 
+  const [avatarUrl, setAvatarUrl] = useState(() => {
+    try {
+      return localStorage.getItem(LOCAL_AVATAR_URL_KEY) || null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const [avatarUpdatedAt, setAvatarUpdatedAt] = useState(() => {
+    try {
+      return localStorage.getItem(LOCAL_AVATAR_TIME_KEY) || null;
+    } catch (e) {
+      return null;
+    }
+  });
+
   const [unlockedTitleIds, setUnlockedTitleIds] = useState(["word_explorer"]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Derive stats from real vocabulary & progress
   const userStats = useMemo(() => {
@@ -51,14 +70,12 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
       }
     });
 
-    // Check reading history if stored
     let readingCount = 0;
     try {
       const readingSaved = localStorage.getItem("sinau_habit_read_history");
       if (readingSaved) readingCount = JSON.parse(readingSaved).length || 0;
     } catch (e) {}
 
-    // Check grammar history
     let grammarCount = 0;
     try {
       const grammarSaved = localStorage.getItem("sinau_grammar_history");
@@ -103,7 +120,7 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
     setIsLoading(true);
 
     api.getProfile()
-      .then((res) => {
+      .then(async (res) => {
         if (!isMounted || !res.success || !res.data) return;
         const remoteP = res.data.profile;
         const remoteTitles = (res.data.unlockedTitles || []).map((t) => t.titleId);
@@ -126,6 +143,34 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
         if (remoteTitles.length > 0) {
           setUnlockedTitleIds((prev) => Array.from(new Set([...prev, ...remoteTitles])));
         }
+
+        // Cache-aware Avatar Fetch
+        const remoteAvatarTime = remoteP.avatarUpdatedAt;
+        const localAvatarTime = localStorage.getItem(LOCAL_AVATAR_TIME_KEY);
+        const cachedUrl = localStorage.getItem(LOCAL_AVATAR_URL_KEY);
+
+        if (remoteAvatarTime && (remoteAvatarTime !== localAvatarTime || !cachedUrl)) {
+          // Fetch updated avatar from Google DriveApp
+          try {
+            const avatarRes = await api.getAvatar();
+            if (isMounted && avatarRes.success && avatarRes.data?.hasAvatar) {
+              setAvatarUrl(avatarRes.data.avatarUrl);
+              setAvatarUpdatedAt(avatarRes.data.avatarUpdatedAt);
+              localStorage.setItem(LOCAL_AVATAR_URL_KEY, avatarRes.data.avatarUrl);
+              localStorage.setItem(LOCAL_AVATAR_TIME_KEY, avatarRes.data.avatarUpdatedAt || remoteAvatarTime);
+            } else if (isMounted && avatarRes.success && !avatarRes.data?.hasAvatar) {
+              setAvatarUrl(null);
+              localStorage.removeItem(LOCAL_AVATAR_URL_KEY);
+            }
+          } catch (e) {
+            console.warn("[UserProfile] Gagal fetch avatar Drive:", e);
+          }
+        } else if (!remoteAvatarTime && cachedUrl) {
+          // Avatar was removed
+          setAvatarUrl(null);
+          localStorage.removeItem(LOCAL_AVATAR_URL_KEY);
+          localStorage.removeItem(LOCAL_AVATAR_TIME_KEY);
+        }
       })
       .catch((err) => {
         console.warn("[UserProfile] Gagal memuat profil cloud:", err.message);
@@ -141,7 +186,6 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
 
   // Calculate Level from XP
   const calculatedLevel = useMemo(() => {
-    // Smooth level scaling: Level 1 at 0-99 XP, Level 2 at 100 XP, etc.
     const xp = profile.xp || 50;
     return Math.max(1, Math.floor(Math.sqrt(xp / 15)) + 1);
   }, [profile.xp]);
@@ -186,21 +230,53 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
     }
   }, [isAuthenticated]);
 
-  // Change Avatar
-  const setAvatarKey = useCallback(async (avatarKey) => {
-    setProfile((prev) => {
-      const next = { ...prev, avatarKey };
-      localStorage.setItem(LOCAL_PROFILE_KEY, JSON.stringify(next));
-      return next;
-    });
+  // Upload Custom Avatar (from gallery/crop)
+  const uploadCustomAvatar = useCallback(async ({ imageBase64, mimeType = "image/webp" }) => {
+    setIsUploadingAvatar(true);
+    // Optimistic local update
+    setAvatarUrl(imageBase64);
+    const now = new Date().toISOString();
+    setAvatarUpdatedAt(now);
+    localStorage.setItem(LOCAL_AVATAR_URL_KEY, imageBase64);
+    localStorage.setItem(LOCAL_AVATAR_TIME_KEY, now);
+
+    if (!isAuthenticated) {
+      setIsUploadingAvatar(false);
+      return { success: true, localOnly: true };
+    }
+
+    try {
+      const res = await api.uploadAvatar({ imageBase64, mimeType });
+      if (res.success && res.data) {
+        if (res.data.avatarUpdatedAt) {
+          setAvatarUpdatedAt(res.data.avatarUpdatedAt);
+          localStorage.setItem(LOCAL_AVATAR_TIME_KEY, res.data.avatarUpdatedAt);
+        }
+      }
+      return { success: true };
+    } catch (err) {
+      console.warn("Upload avatar warning:", err);
+      return { success: true, warning: err.message };
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  }, [isAuthenticated]);
+
+  // Delete Custom Avatar (revert to initials)
+  const deleteCustomAvatar = useCallback(async () => {
+    setAvatarUrl(null);
+    setAvatarUpdatedAt(null);
+    localStorage.removeItem(LOCAL_AVATAR_URL_KEY);
+    localStorage.removeItem(LOCAL_AVATAR_TIME_KEY);
 
     if (isAuthenticated) {
       try {
-        await api.updateProfile({ avatarKey });
-      } catch (e) {
-        console.warn("Gagal update avatar di server:", e);
+        await api.deleteAvatar();
+      } catch (err) {
+        console.warn("Delete avatar warning:", err);
       }
     }
+    return { success: true };
   }, [isAuthenticated]);
 
   const activeTitleObj = useMemo(() => {
@@ -210,13 +286,16 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
   return {
     profile,
     userStats,
+    avatarUrl,
+    avatarUpdatedAt,
+    isUploadingAvatar,
     activeTitleObj,
     evaluatedTitles,
     calculatedLevel,
     isLoading,
     updateDisplayName,
     setActiveTitle,
-    setAvatarKey
+    uploadCustomAvatar,
+    deleteCustomAvatar
   };
 }
-

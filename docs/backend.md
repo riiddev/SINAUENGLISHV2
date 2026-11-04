@@ -148,3 +148,30 @@ Meskipun solusi ini 100% gratis dan mudah dikelola tanpa infrastruktur server, t
 3. **Bukan Database Transaksional (ACID):** Google Spreadsheet bukan sistem RDBMS berkinerja tinggi. Script menggunakan `LockService` untuk mencegah tumpang-tindih penulisan secara simultan, namun jika ada ribuan pengguna menulis di detik yang sama, antrean kunci dapat mengalami batas waktu (*timeout*).
 4. **Wajib Koneksi Internet (Online-Only):** Karena seluruh data akun dan progres dipindahkan ke Google Spreadsheet sesuai kebutuhan proyek, aplikasi membutuhkan koneksi internet aktif untuk menyimpan kemajuan belajar.
 
+
+---
+
+## 5. Arsitektur Penyimpanan Foto Profil (Google DriveApp) & Trade-Offs
+
+### A. Alasan Pemilihan Google DriveApp Dibandingkan Sel Spreadsheet
+- **Batas Karakter Sel**: Google Spreadsheet memiliki batasan ketat maksimal **50.000 karakter per sel teks**. Sebuah gambar beresolusi sedang dalam format Base64 dapat dengan mudah melebihi 100.000 karakter, yang akan menyebabkan penulisan ke spreadsheet gagal (*cell overflow error*) atau merusak struktur tab `Profiles`.
+- **Solusi Arsitektural**: File gambar foto profil disimpan sebagai file mandiri di Google Drive milik pemilik Web App pada folder privat bernama `SinauEnglish_Avatars`.
+- **Skema Tab Profiles**: Di tab `Profiles`, backend hanya menyimpan metadata ringkas:
+  - `avatar_file_id`: ID string unik file di Google Drive (misal: `1A2b3C...`).
+  - `avatar_updated_at`: Timestamp ISO 8601 (misal: `2026-11-04T17:30:00Z`).
+
+### B. Analisis Kuota & Kapasitas (Google Drive & Apps Script)
+1. **Kapasitas Penyimpanan (15 GB Gratis)**:
+   - Client mengompres gambar hasil crop lingkaran ke resolusi **256×256 px WebP** dengan ukuran rata-rata **30–50 KB** (batas maksimal server 60 KB).
+   - Dengan rata-rata 50 KB per avatar, kuota gratis Google Drive sebesar 15 GB sanggup menampung hingga **300.000 foto profil pengguna**.
+2. **Pembersihan Otomatis (Anti-Bloat)**:
+   - Saat pengguna mengunggah foto profil baru atau menekan tombol hapus foto, backend Apps Script (`handleUploadAvatar` dan `handleDeleteAvatar`) secara otomatis memindahkan file avatar lama ke tempat sampah (`file.setTrashed(true)`). Hal ini mencegah penumpukan file yatim (*orphaned files*) di Google Drive.
+3. **Optimasi Kuota Eksekusi via Client Memory Cache**:
+   - Membaca file dari Google Drive via Apps Script membutuhkan waktu eksekusi IO sekitar 200–400ms.
+   - Untuk mencegah pemborosan kuota dan latensi berlebih, client React (`useUserProfile.js`) menyimpan DataURL avatar di memori dan `localStorage` dengan `avatar_updated_at` sebagai versi/etag.
+   - Saat aplikasi dibuka, client hanya mengecek apakah nilai `avatar_updated_at` dari profil cloud berbeda dengan cache lokal. Jika nilainya sama, client **tidak akan memanggil API getAvatar**, melainkan langsung menggunakan cache lokal secara instan (0 ms).
+
+### C. Kesiapan Lapisan Bingkai Avatar (Avatar Borders — Tahap 3)
+- Pada kartu profil dan modal, elemen avatar disusun dalam struktur modular bertingkat (`scholar-avatar-box`):
+  1. Lapisan Dasar: Elemen `img` (foto profil) atau inisial nama.
+  2. Lapisan Atas (`z-index: 2`): Bingkai dekoratif (`avatar-border-overlay`) yang akan dihubungkan ke sistem katalog border (Daun, Tinta, Kawung, Emas, Buku, Kanci) pada Tahap 3.

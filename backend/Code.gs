@@ -100,6 +100,14 @@ function doPost(e) {
       case "unlockTitle":
         return handleUnlockTitle(ss, token, payload);
 
+      // 5b. Custom Profile Avatar (Google DriveApp)
+      case "uploadAvatar":
+        return handleUploadAvatar(ss, token, payload);
+      case "getAvatar":
+        return handleGetAvatar(ss, token);
+      case "deleteAvatar":
+        return handleDeleteAvatar(ss, token);
+
       // 6. Daily Quests / Missions
       case "getDailyQuests":
         return handleGetDailyQuests(ss, token, payload);
@@ -709,6 +717,181 @@ function handleUnlockTitle(ss, token, payload) {
     success: true,
     message: "Gelar berhasil dibuka!",
     data: { titleId: titleId, unlockedAt: now }
+  });
+}
+
+
+/* ==========================================================================
+   AVATAR DRIVEAPP HANDLERS (GOOGLE DRIVE STORAGE FOR PROFILES)
+   ========================================================================== */
+
+const AVATAR_FOLDER_NAME = "SinauEnglish_Avatars";
+
+function getOrCreateAvatarFolder() {
+  const folders = DriveApp.getFoldersByName(AVATAR_FOLDER_NAME);
+  if (folders.hasNext()) {
+    return folders.next();
+  }
+  return DriveApp.createFolder(AVATAR_FOLDER_NAME);
+}
+
+function handleUploadAvatar(ss, token, payload) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const rawBase64 = payload.imageBase64;
+  if (!rawBase64 || typeof rawBase64 !== "string") {
+    return jsonResponse({ success: false, error: "Data gambar tidak valid." }, 400);
+  }
+
+  // Validate MIME type
+  const mimeType = payload.mimeType || "image/webp";
+  if (!["image/webp", "image/jpeg", "image/png"].includes(mimeType)) {
+    return jsonResponse({ success: false, error: "Format gambar harus WebP, JPEG, atau PNG." }, 400);
+  }
+
+  // Clean data URL prefix if present
+  const base64Data = rawBase64.replace(/^data:image\/\w+;base64,/, "");
+
+  // Max size validation (target <= 60 KB, hard limit 75 KB)
+  const bytes = Utilities.base64Decode(base64Data);
+  if (bytes.length > 75 * 1024) {
+    return jsonResponse({ success: false, error: "Ukuran avatar melebihi batas 60 KB." }, 400);
+  }
+
+  const { profileSheet } = ensureProfilesAndTitlesSheets(ss);
+  const pData = profileSheet.getDataRange().getValues();
+  let rowIdx = -1;
+  let oldFileId = "";
+
+  for (let i = 1; i < pData.length; i++) {
+    if (pData[i][0] === userId) {
+      rowIdx = i + 1;
+      oldFileId = pData[i][8] || "";
+      break;
+    }
+  }
+
+  // Delete previous avatar file if exists
+  if (oldFileId) {
+    try {
+      const oldFile = DriveApp.getFileById(oldFileId);
+      oldFile.setTrashed(true);
+    } catch (e) {
+      // old file may have been manually removed
+    }
+  }
+
+  // Create new avatar file in dedicated Drive folder
+  const folder = getOrCreateAvatarFolder();
+  const fileName = "avatar_" + userId + "_" + Date.now() + (mimeType === "image/png" ? ".png" : mimeType === "image/jpeg" ? ".jpg" : ".webp");
+  const blob = Utilities.newBlob(bytes, mimeType, fileName);
+  const newFile = folder.createFile(blob);
+  const newFileId = newFile.getId();
+  const now = new Date().toISOString();
+
+  if (rowIdx > 0) {
+    profileSheet.getRange(rowIdx, 9).setValue(newFileId);
+    profileSheet.getRange(rowIdx, 10).setValue(now);
+  } else {
+    // User row doesn't exist yet, append
+    profileSheet.appendRow([userId, "Pelajar Sinau", "word_explorer", 50, 1, 50, now, "avatar_1", newFileId, now]);
+  }
+
+  const dataUrl = "data:" + mimeType + ";base64," + base64Data;
+
+  return jsonResponse({
+    success: true,
+    message: "Foto profil berhasil diperbarui!",
+    data: {
+      avatarFileId: newFileId,
+      avatarUpdatedAt: now,
+      avatarUrl: dataUrl
+    }
+  });
+}
+
+function handleGetAvatar(ss, token) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const { profileSheet } = ensureProfilesAndTitlesSheets(ss);
+  const pData = profileSheet.getDataRange().getValues();
+  let fileId = "";
+  let updatedAt = "";
+
+  for (let i = 1; i < pData.length; i++) {
+    if (pData[i][0] === userId) {
+      fileId = pData[i][8] || "";
+      updatedAt = pData[i][9] || "";
+      break;
+    }
+  }
+
+  if (!fileId) {
+    return jsonResponse({
+      success: true,
+      data: { hasAvatar: false, avatarUrl: null, avatarUpdatedAt: null }
+    });
+  }
+
+  try {
+    const file = DriveApp.getFileById(fileId);
+    const mimeType = file.getMimeType();
+    const bytes = file.getBlob().getBytes();
+    const base64Data = Utilities.base64Encode(bytes);
+    const avatarUrl = "data:" + mimeType + ";base64," + base64Data;
+
+    return jsonResponse({
+      success: true,
+      data: {
+        hasAvatar: true,
+        avatarUrl: avatarUrl,
+        avatarUpdatedAt: updatedAt
+      }
+    });
+  } catch (e) {
+    return jsonResponse({
+      success: true,
+      data: { hasAvatar: false, avatarUrl: null, avatarUpdatedAt: null, warning: "Avatar lama tidak ditemukan di Drive." }
+    });
+  }
+}
+
+function handleDeleteAvatar(ss, token) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const { profileSheet } = ensureProfilesAndTitlesSheets(ss);
+  const pData = profileSheet.getDataRange().getValues();
+  let rowIdx = -1;
+  let fileId = "";
+
+  for (let i = 1; i < pData.length; i++) {
+    if (pData[i][0] === userId) {
+      rowIdx = i + 1;
+      fileId = pData[i][8] || "";
+      break;
+    }
+  }
+
+  if (fileId) {
+    try {
+      const file = DriveApp.getFileById(fileId);
+      file.setTrashed(true);
+    } catch (e) {}
+  }
+
+  const now = new Date().toISOString();
+  if (rowIdx > 0) {
+    profileSheet.getRange(rowIdx, 9).setValue("");
+    profileSheet.getRange(rowIdx, 10).setValue(now);
+  }
+
+  return jsonResponse({
+    success: true,
+    message: "Foto profil berhasil dihapus.",
+    data: { avatarUpdatedAt: now }
   });
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { useUserProfile } from "../../hooks/useUserProfile.js";
@@ -10,19 +10,32 @@ export function ProfileView({ vocabulary = [], progressMap = {} }) {
   const {
     profile,
     userStats,
+    avatarUrl,
+    isUploadingAvatar,
     activeTitleObj,
     evaluatedTitles,
     calculatedLevel,
     updateDisplayName,
     setActiveTitle,
-    setAvatarKey
+    uploadCustomAvatar,
+    deleteCustomAvatar
   } = useUserProfile({ vocabulary, progressMap });
 
   const [filterMode, setFilterMode] = useState("all"); // "all" | "unlocked" | "locked"
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editName, setEditName] = useState(profile.displayName || "Pelajar Sinau");
-  const [selectedAvatar, setSelectedAvatar] = useState(profile.avatarKey || "avatar_1");
   const [selectedTitleId, setSelectedTitleId] = useState(profile.activeTitle || "word_explorer");
+
+  // Avatar Upload & Crop State
+  const fileInputRef = useRef(null);
+  const [cropImageSrc, setCropImageSrc] = useState(null);
+  const [zoomScale, setZoomScale] = useState(1.0);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [avatarError, setAvatarError] = useState("");
+  const [avatarSuccess, setAvatarSuccess] = useState("");
+  const cropImageRef = useRef(null);
 
   const currentAvatar = AVATAR_PRESETS.find((a) => a.id === profile.avatarKey) || AVATAR_PRESETS[0];
 
@@ -34,9 +47,142 @@ export function ProfileView({ vocabulary = [], progressMap = {} }) {
 
   const handleOpenEditModal = () => {
     setEditName(profile.displayName || "Pelajar Sinau");
-    setSelectedAvatar(profile.avatarKey || "avatar_1");
     setSelectedTitleId(profile.activeTitle || "word_explorer");
+    setCropImageSrc(null);
+    setAvatarError("");
+    setAvatarSuccess("");
     setIsEditModalOpen(true);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAvatarError("");
+    setAvatarSuccess("");
+
+    // Validate MIME type
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setAvatarError("Format file tidak didukung. Harap pilih gambar JPEG, PNG, atau WebP.");
+      return;
+    }
+
+    // Validate size (raw file max 5 MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError("Ukuran gambar terlalu besar (maksimal 5 MB).");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropImageSrc(reader.result);
+      setZoomScale(1.0);
+      setPanOffset({ x: 0, y: 0 });
+    };
+    reader.onerror = () => {
+      setAvatarError("Gagal membaca file gambar.");
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  // Drag handlers for Crop Viewport
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    setPanOffset({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 1) {
+      setIsDragging(true);
+      setDragStart({
+        x: e.touches[0].clientX - panOffset.x,
+        y: e.touches[0].clientY - panOffset.y
+      });
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging || e.touches.length !== 1) return;
+    setPanOffset({
+      x: e.touches[0].clientX - dragStart.x,
+      y: e.touches[0].clientY - dragStart.y
+    });
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  // Save Crop & Compress to WebP <= 60 KB
+  const handleApplyCrop = async () => {
+    if (!cropImageRef.current) return;
+    const img = cropImageRef.current;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext("2d");
+
+    // Center circular crop calculation
+    // Viewport is 200x200, output is 256x256 (ratio 1.28)
+    const ratio = 256 / 200;
+    const baseScale = Math.max(200 / img.naturalWidth, 200 / img.naturalHeight);
+    const totalScale = baseScale * zoomScale;
+
+    const drawW = img.naturalWidth * totalScale * ratio;
+    const drawH = img.naturalHeight * totalScale * ratio;
+    const drawX = 128 - drawW / 2 + panOffset.x * ratio;
+    const drawY = 128 - drawH / 2 + panOffset.y * ratio;
+
+    // Optional circular clip for canvas
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(128, 128, 128, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.clip();
+
+    ctx.drawImage(img, drawX, drawY, drawW, drawH);
+    ctx.restore();
+
+    // Compress to WebP
+    let webpDataUrl = canvas.toDataURL("image/webp", 0.85);
+
+    // Fallback if browser doesn't support webp export
+    if (!webpDataUrl.startsWith("data:image/webp")) {
+      webpDataUrl = canvas.toDataURL("image/jpeg", 0.82);
+    }
+
+    const res = await uploadCustomAvatar({
+      imageBase64: webpDataUrl,
+      mimeType: webpDataUrl.startsWith("data:image/webp") ? "image/webp" : "image/jpeg"
+    });
+
+    if (res.success) {
+      setAvatarSuccess("✓ Foto profil berhasil disimpan ke cloud storage!");
+      setCropImageSrc(null);
+      setTimeout(() => setAvatarSuccess(""), 4000);
+    } else {
+      setAvatarError(res.error || "Gagal mengunggah foto profil.");
+    }
+  };
+
+  const handleDeleteAvatar = async () => {
+    await deleteCustomAvatar();
+    setAvatarSuccess("Foto profil dihapus. Profil kembali menggunakan inisial namamu.");
+    setTimeout(() => setAvatarSuccess(""), 4000);
   };
 
   const handleSaveProfile = (e) => {
@@ -44,7 +190,6 @@ export function ProfileView({ vocabulary = [], progressMap = {} }) {
     if (editName.trim()) {
       updateDisplayName(editName.trim());
     }
-    setAvatarKey(selectedAvatar);
     setActiveTitle(selectedTitleId);
     setIsEditModalOpen(false);
   };
@@ -65,16 +210,30 @@ export function ProfileView({ vocabulary = [], progressMap = {} }) {
             <div className="scholar-avatar-box">
               <div
                 className="scholar-avatar-circle"
-                style={{ backgroundColor: currentAvatar.bg, color: currentAvatar.color }}
+                style={{
+                  backgroundColor: avatarUrl ? "transparent" : currentAvatar.bg,
+                  color: currentAvatar.color,
+                  overflow: "hidden"
+                }}
               >
-                {currentAvatar.letter}
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={profile.displayName || "Pelajar Sinau"}
+                    className="scholar-avatar-img"
+                    id="scholar-avatar-image"
+                  />
+                ) : (
+                  <span id="scholar-avatar-initials">{currentAvatar.letter}</span>
+                )}
               </div>
               <button
                 type="button"
                 className="avatar-edit-btn"
                 onClick={handleOpenEditModal}
+                id="edit-avatar-icon-btn"
                 aria-label="Ubah Foto dan Profil"
-                title="Ubah Profil"
+                title="Ubah Foto dan Profil"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
@@ -180,9 +339,10 @@ export function ProfileView({ vocabulary = [], progressMap = {} }) {
           <div className="bento-box" id="bento-coins-box">
             <div className="bento-icon-wrap bento-icon-coins" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 6v2m0 8v2"/>
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 7v10"/>
+                <path d="M9 10h6"/>
+                <path d="M9 14h6"/>
               </svg>
             </div>
             <div className="bento-value" id="bento-stat-coins">
@@ -201,44 +361,54 @@ export function ProfileView({ vocabulary = [], progressMap = {} }) {
             <div className="bento-value" id="bento-stat-streak">
               {profile.streak || 1} Hari
             </div>
-            <div className="bento-label">Streak Belajar</div>
+            <div className="bento-label">Konsistensi Belajar</div>
           </div>
         </div>
       </section>
 
-      {/* 3. CEFR LEVEL BREAKDOWN PROGRESS BARS */}
-      <section className="cefr-card" aria-label="Cakupan Level CEFR">
-        <div className="cefr-header">
-          <h3 className="overview-title">Cakupan Penguasaan CEFR</h3>
-          <p style={{ margin: "4px 0 0", fontSize: "var(--text-sm)", color: "var(--color-text-secondary)" }}>
-            Distribusi 2.971 kosakata Oxford 3000 berdasarkan kriteria mastery berulang.
-          </p>
+      {/* 3. VOCABULARY MASTERY BY CEFR LEVEL */}
+      <section className="overview-card" aria-label="Penguasaan Kosakata CEFR">
+        <div className="overview-header">
+          <h3 className="overview-title">Penguasaan Kosakata per Jenjang CEFR</h3>
+          <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-text-secondary)" }}>
+            Total 2.971 Lema Inti
+          </span>
         </div>
 
         <div className="cefr-grid">
           {levels.map((lvl) => {
             const levelWords = vocabulary.filter((w) => w.level === lvl.id);
-            const masteredCount = levelWords.filter((w) => {
+            const totalInLevel = lvl.total || levelWords.length || 1;
+            const masteredInLevel = levelWords.filter((w) => {
               const p = progressMap[w.id];
-              return p && (p.masteryStage === "mastered" || (p.correctCount || 0) >= 4);
+              return p && (p.stage === "mastered" || p.correctCount >= 3);
             }).length;
 
-            const pct = Math.round((masteredCount / lvl.total) * 100);
+            const pct = Math.min(100, Math.round((masteredInLevel / totalInLevel) * 100));
 
             return (
-              <div key={lvl.id} className="cefr-bar-item">
-                <div className="cefr-bar-meta">
-                  <span>{lvl.label}</span>
-                  <span id={`cefr-count-${lvl.id.toLowerCase()}`}>
-                    {masteredCount} / {lvl.total} ({pct}%)
+              <div key={lvl.id} className="cefr-card" id={`cefr-card-${lvl.id.toLowerCase()}`}>
+                <div className="cefr-card-header">
+                  <span className="cefr-badge">{lvl.id}</span>
+                  <span className="cefr-count">
+                    <strong>{masteredInLevel}</strong> / {totalInLevel} Kata
                   </span>
                 </div>
-                <div className="cefr-track">
+                <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: "var(--space-2)" }}>
+                  {lvl.label}
+                </div>
+                <div className="progress-track" style={{ height: "10px" }}>
                   <div
-                    className="cefr-fill"
-                    id={`cefr-bar-${lvl.id.toLowerCase()}`}
-                    style={{ width: `${pct}%` }}
+                    className="progress-fill"
+                    style={{ width: `${pct}%`, transition: "width 0.6s ease" }}
+                    role="progressbar"
+                    aria-valuenow={pct}
+                    aria-valuemin="0"
+                    aria-valuemax="100"
                   />
+                </div>
+                <div style={{ textAlign: "right", fontSize: "var(--text-xs)", fontWeight: 700, marginTop: "6px" }}>
+                  {pct}% Dikuasai
                 </div>
               </div>
             );
@@ -246,152 +416,151 @@ export function ProfileView({ vocabulary = [], progressMap = {} }) {
         </div>
       </section>
 
-      {/* 4. TITLE & BADGE MILESTONES SHOWCASE */}
-      <section className="titles-card" aria-label="Gelar dan Pencapaian Akademik">
-        <div className="titles-header">
+      {/* 4. ACADEMIC TITLES SYSTEM */}
+      <section className="titles-section" aria-label="Gelar Akademik">
+        <div className="titles-header-row">
           <div>
-            <h3 className="overview-title">Gelar & Pencapaian Akademik</h3>
-            <p style={{ margin: "4px 0 0", fontSize: "var(--text-sm)", color: "var(--color-text-secondary)" }}>
-              Buka gelar kehormatan dengan menyelesaikan sasaran belajar nyata.
+            <h3 className="titles-main-heading">Gelar Akademik Cendekiawan</h3>
+            <p className="titles-sub-heading">
+              Gelar kehormatan terbuka berdasarkan pencapaian nyata dalam mempelajari kosakata, membaca konteks, dan konsistensi harian.
             </p>
           </div>
 
-          <div className="titles-filter-group" role="tablist" aria-label="Filter Gelar">
+          {/* Filter Pills */}
+          <div className="titles-filter-pills" role="tablist" aria-label="Filter Gelar">
             <button
               type="button"
-              className={`filter-pill-btn ${filterMode === "all" ? "is-active" : ""}`}
+              className={`filter-pill ${filterMode === "all" ? "is-active" : ""}`}
               onClick={() => setFilterMode("all")}
-              role="tab"
-              aria-selected={filterMode === "all"}
             >
               Semua ({evaluatedTitles.length})
             </button>
             <button
               type="button"
-              className={`filter-pill-btn ${filterMode === "unlocked" ? "is-active" : ""}`}
+              className={`filter-pill ${filterMode === "unlocked" ? "is-active" : ""}`}
               onClick={() => setFilterMode("unlocked")}
-              role="tab"
-              aria-selected={filterMode === "unlocked"}
             >
               Terbuka ({evaluatedTitles.filter((t) => t.isUnlocked).length})
             </button>
             <button
               type="button"
-              className={`filter-pill-btn ${filterMode === "locked" ? "is-active" : ""}`}
+              className={`filter-pill ${filterMode === "locked" ? "is-active" : ""}`}
               onClick={() => setFilterMode("locked")}
-              role="tab"
-              aria-selected={filterMode === "locked"}
             >
               Terkunci ({evaluatedTitles.filter((t) => !t.isUnlocked).length})
             </button>
           </div>
         </div>
 
-        <div className="titles-list" role="list">
-          {filteredTitles.map((title) => {
-            const isActive = profile.activeTitle === title.id;
+        {/* Titles List */}
+        <div className="titles-list" id="titles-catalog-list">
+          {filteredTitles.map((item) => {
+            const isActive = profile.activeTitle === item.id;
 
             return (
-              <article
-                key={title.id}
-                className={`title-milestone-item ${title.isUnlocked ? "is-unlocked" : ""} ${isActive ? "is-active-title" : ""}`}
-                role="listitem"
-                id={`title-item-${title.id}`}
+              <div
+                key={item.id}
+                className={`title-milestone-item ${item.isUnlocked ? "is-unlocked" : "is-locked"}`}
+                id={`title-card-${item.id}`}
               >
-                <div className={`title-icon-box ${title.isUnlocked ? "is-unlocked" : ""}`} aria-hidden="true">
-                  <TitleIcon type={title.iconType} isUnlocked={title.isUnlocked} />
+                <div className="title-icon-badge" aria-hidden="true">
+                  <TitleIcon type={item.iconType} isUnlocked={item.isUnlocked} />
                 </div>
 
                 <div className="title-info-wrap">
-                  <div className="title-top-row">
-                    <span className="title-name-text">{title.name}</span>
-                    <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", fontStyle: "italic" }}>
-                      ({title.englishName})
-                    </span>
-                    <span className="scholar-chip chip-neutral" style={{ fontSize: "10px", padding: "2px 8px" }}>
-                      {title.badgeLabel}
+                  <div className="title-name-row">
+                    <h4 className="title-name-id">{item.name}</h4>
+                    <span className="title-name-en">({item.englishName})</span>
+                    <span className="title-category-badge">{item.badgeLabel}</span>
+                  </div>
+                  <p className="title-desc">{item.description}</p>
+                </div>
+
+                <div className="title-progress-wrap">
+                  <div className="title-progress-header">
+                    <span>Target Capaian</span>
+                    <span>
+                      {item.progressValue} / {item.targetValue} {item.unit}
                     </span>
                   </div>
-
-                  <p className="title-desc-text">{title.description}</p>
-
-                  <div className="title-progress-wrap">
-                    <div className="title-track">
-                      <div
-                        className="title-fill"
-                        style={{ width: `${title.percentage}%` }}
-                      />
-                    </div>
-                    <span className="title-count-pill">
-                      {title.isUnlocked ? (
-                        <span style={{ color: "var(--color-success)" }}>✓ Terbuka</span>
-                      ) : (
-                        `${title.current}/${title.total} ${title.unit}`
-                      )}
-                    </span>
+                  <div className="progress-track" style={{ height: "8px" }}>
+                    <div
+                      className="progress-fill"
+                      style={{
+                        width: `${item.percentage}%`,
+                        backgroundColor: item.isUnlocked ? "var(--color-success)" : "var(--color-accent-navy)"
+                      }}
+                      role="progressbar"
+                      aria-valuenow={item.percentage}
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    />
                   </div>
                 </div>
 
                 <div className="title-action-wrap">
-                  {isActive ? (
-                    <span
-                      className="scholar-chip chip-gold"
-                      style={{ minHeight: "44px", display: "inline-flex", alignItems: "center" }}
-                    >
-                      ✓ Gelar Aktif
-                    </span>
-                  ) : title.isUnlocked ? (
-                    <button
-                      type="button"
-                      className="btn btn-outline btn-sm"
-                      onClick={() => setActiveTitle(title.id)}
-                      style={{ minHeight: "44px" }}
-                      aria-label={`Pilih ${title.name} sebagai gelar aktif`}
-                    >
-                      Gunakan Gelar
-                    </button>
+                  {item.isUnlocked ? (
+                    isActive ? (
+                      <span className="active-badge" id={`active-badge-${item.id}`}>
+                        ✓ Gelar Aktif
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        onClick={() => setActiveTitle(item.id)}
+                        id={`activate-title-btn-${item.id}`}
+                        style={{ minHeight: "44px" }}
+                      >
+                        Pasang Gelar
+                      </button>
+                    )
                   ) : (
-                    <span
-                      className="scholar-chip chip-neutral"
-                      style={{ color: "var(--color-text-secondary)", minHeight: "44px", display: "inline-flex", alignItems: "center", gap: "6px" }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <span className="locked-badge">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: "4px" }}>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                       </svg>
-                      Terkunci
+                      {item.percentage}%
                     </span>
                   )}
                 </div>
-              </article>
+              </div>
             );
           })}
         </div>
       </section>
 
-      {/* 5. EDIT PROFILE MODAL (ACCESSIBLE & ANTI-OVERLAP) */}
+      {/* 5. EDIT PROFILE & AVATAR CROP MODAL */}
       {isEditModalOpen && (
         <div
           className="modal-overlay is-open"
+          id="edit-profile-modal-overlay"
+          onClick={() => {
+            if (!cropImageSrc) setIsEditModalOpen(false);
+          }}
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-edit-profile-title"
-          onClick={() => setIsEditModalOpen(false)}
         >
           <div
             className="modal-sheet"
-            style={{ maxWidth: "520px" }}
+            style={{ maxWidth: "540px", maxHeight: "90vh", overflowY: "auto" }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header Bar with Flex (Anti-Overlap) */}
+            {/* Modal Header */}
             <div className="modal-header-bar" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-4)" }}>
               <h3 className="modal-title" id="modal-edit-profile-title" style={{ margin: 0, fontSize: "var(--text-lg)" }}>
-                Ubah Profil Cendekiawan
+                {cropImageSrc ? "Sesuaikan Foto Profil (Crop)" : "Ubah Profil Cendekiawan"}
               </h3>
               <button
                 type="button"
                 className="modal-close-btn"
-                onClick={() => setIsEditModalOpen(false)}
+                onClick={() => {
+                  setCropImageSrc(null);
+                  setIsEditModalOpen(false);
+                }}
+                id="close-profile-modal-btn"
                 aria-label="Tutup modal edit profil"
                 style={{
                   width: "44px",
@@ -414,93 +583,252 @@ export function ProfileView({ vocabulary = [], progressMap = {} }) {
               </button>
             </div>
 
-            <form onSubmit={handleSaveProfile}>
-              {/* Name Input */}
-              <div style={{ marginBottom: "var(--space-4)" }}>
-                <label
-                  htmlFor="edit-display-name-input"
-                  style={{ display: "block", fontWeight: 700, fontSize: "var(--text-sm)", marginBottom: "var(--space-1)" }}
-                >
-                  Nama Panggilan Pelajar
-                </label>
-                <input
-                  id="edit-display-name-input"
-                  type="text"
-                  className="form-input"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  maxLength={30}
-                  required
-                  style={{ width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "var(--border-sm)" }}
-                />
+            {avatarError && (
+              <div className="card card-tint-rose" style={{ padding: "8px 12px", marginBottom: "var(--space-3)", color: "var(--color-danger)", fontSize: "var(--text-xs)", fontWeight: 700 }}>
+                {avatarError}
               </div>
+            )}
+            {avatarSuccess && (
+              <div className="card card-tint-sage" style={{ padding: "8px 12px", marginBottom: "var(--space-3)", color: "var(--color-success)", fontSize: "var(--text-xs)", fontWeight: 700 }}>
+                {avatarSuccess}
+              </div>
+            )}
 
-              {/* Avatar Selection */}
-              <div style={{ marginBottom: "var(--space-4)" }}>
-                <label style={{ display: "block", fontWeight: 700, fontSize: "var(--text-sm)", marginBottom: "var(--space-1)" }}>
-                  Pilih Lambang Avatar
-                </label>
-                <div className="avatar-preset-grid">
-                  {AVATAR_PRESETS.map((preset) => (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      className={`avatar-preset-btn ${selectedAvatar === preset.id ? "is-selected" : ""}`}
-                      style={{ backgroundColor: preset.bg, color: preset.color }}
-                      onClick={() => setSelectedAvatar(preset.id)}
-                      aria-label={`Pilih tema avatar ${preset.label}`}
-                    >
-                      {preset.letter}
-                    </button>
-                  ))}
+            {/* Hidden file input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/png,image/jpeg,image/webp"
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+              id="avatar-file-input"
+            />
+
+            {/* VIEW A: CROP TOOL VIEW */}
+            {cropImageSrc ? (
+              <div>
+                <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginBottom: "var(--space-3)", textAlign: "center" }}>
+                  Geser foto dan gunakan slider perbesaran agar wajah atau objek pas di dalam lingkaran.
+                </p>
+
+                {/* Circular Viewport */}
+                <div
+                  className={`avatar-crop-viewport ${isDragging ? "is-dragging" : ""}`}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  id="avatar-crop-viewport"
+                >
+                  <img
+                    ref={cropImageRef}
+                    src={cropImageSrc}
+                    alt="Preview Crop"
+                    draggable={false}
+                    style={{
+                      position: "absolute",
+                      transformOrigin: "center center",
+                      transform: `translate(calc(-50% + ${panOffset.x}px), calc(-50% + ${panOffset.y}px)) scale(${zoomScale})`,
+                      top: "50%",
+                      left: "50%",
+                      maxWidth: "none",
+                      maxHeight: "none",
+                      pointerEvents: "none"
+                    }}
+                  />
+                  {/* Subtle crosshair guide lines */}
+                  <div style={{ position: "absolute", inset: 0, border: "1px dashed rgba(255,255,255,0.4)", borderRadius: "50%", pointerEvents: "none" }} />
+                </div>
+
+                {/* Zoom Slider */}
+                <div className="avatar-crop-controls">
+                  <div className="avatar-crop-slider-wrap">
+                    <span style={{ fontSize: "var(--text-xs)", fontWeight: 700 }}>Zoom</span>
+                    <input
+                      type="range"
+                      min="1.0"
+                      max="3.0"
+                      step="0.05"
+                      value={zoomScale}
+                      onChange={(e) => setZoomScale(parseFloat(e.target.value))}
+                      style={{ width: "160px", cursor: "pointer" }}
+                      id="crop-zoom-slider"
+                      aria-label="Perbesaran foto"
+                    />
+                    <span style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-mono)", width: "36px" }}>
+                      {zoomScale.toFixed(1)}x
+                    </span>
+                  </div>
+
+                  <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", textAlign: "center", margin: 0 }}>
+                    Target: 256×256 px WebP (≤ 60 KB) disimpan aman di Google Drive.
+                  </p>
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "var(--space-3)", marginTop: "var(--space-4)" }}>
+                  <button
+                    type="button"
+                    className="btn btn-outline"
+                    onClick={() => setCropImageSrc(null)}
+                    style={{ minHeight: "44px" }}
+                    id="cancel-crop-btn"
+                  >
+                    Batal Pilihan
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={handleApplyCrop}
+                    disabled={isUploadingAvatar}
+                    style={{ minHeight: "44px" }}
+                    id="save-cropped-avatar-btn"
+                  >
+                    {isUploadingAvatar ? "Menyimpan ke Cloud..." : "Potong & Simpan Foto ↗"}
+                  </button>
                 </div>
               </div>
+            ) : (
+              /* VIEW B: GENERAL PROFILE FORM */
+              <form onSubmit={handleSaveProfile}>
+                {/* Custom Photo Upload Card */}
+                <div
+                  className="card card-tint-sand"
+                  style={{
+                    padding: "var(--space-4)",
+                    marginBottom: "var(--space-5)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "var(--space-4)",
+                    flexWrap: "wrap"
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "64px",
+                      height: "64px",
+                      borderRadius: "50%",
+                      border: "var(--border-sm)",
+                      overflow: "hidden",
+                      backgroundColor: avatarUrl ? "transparent" : currentAvatar.bg,
+                      color: currentAvatar.color,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontFamily: "var(--font-heading)",
+                      fontWeight: 800,
+                      fontSize: "var(--text-xl)",
+                      flexShrink: 0
+                    }}
+                  >
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="Avatar saat ini" className="scholar-avatar-img" />
+                    ) : (
+                      currentAvatar.letter
+                    )}
+                  </div>
 
-              {/* Active Title Selector from Unlocked Titles */}
-              <div style={{ marginBottom: "var(--space-6)" }}>
-                <label
-                  htmlFor="select-active-title"
-                  style={{ display: "block", fontWeight: 700, fontSize: "var(--text-sm)", marginBottom: "var(--space-1)" }}
-                >
-                  Gelar Aktif Terbuka
-                </label>
-                <select
-                  id="select-active-title"
-                  className="form-input"
-                  value={selectedTitleId}
-                  onChange={(e) => setSelectedTitleId(e.target.value)}
-                  style={{ width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "var(--border-sm)" }}
-                >
-                  {evaluatedTitles
-                    .filter((t) => t.isUnlocked)
-                    .map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.name} ({t.englishName})
-                      </option>
-                    ))}
-                </select>
-              </div>
+                  <div style={{ flex: 1, minWidth: "200px" }}>
+                    <strong style={{ display: "block", fontSize: "var(--text-sm)", marginBottom: "2px" }}>
+                      {avatarUrl ? "Foto Profil Kustom Aktif" : "Foto Profil (Inisial Nama)"}
+                    </strong>
+                    <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", display: "block", marginBottom: "var(--space-2)" }}>
+                      {avatarUrl ? "Tersimpan di Google Drive cloud akunmu." : "Bisa diganti dengan foto dari galeri atau kamera ponsel."}
+                    </span>
 
-              {/* Action Buttons */}
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "var(--space-3)" }}>
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={() => setIsEditModalOpen(false)}
-                  style={{ minHeight: "44px" }}
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  id="save-profile-btn"
-                  style={{ minHeight: "44px" }}
-                >
-                  Simpan Perubahan
-                </button>
-              </div>
-            </form>
+                    <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        id="choose-avatar-gallery-btn"
+                        style={{ minHeight: "40px" }}
+                      >
+                        Pilih dari Galeri / Kamera ↗
+                      </button>
+
+                      {avatarUrl && (
+                        <button
+                          type="button"
+                          className="btn btn-outline btn-sm"
+                          onClick={handleDeleteAvatar}
+                          id="delete-avatar-btn"
+                          style={{ minHeight: "40px" }}
+                        >
+                          Hapus Foto (Gunakan Inisial)
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Name Input */}
+                <div style={{ marginBottom: "var(--space-4)" }}>
+                  <label
+                    htmlFor="edit-display-name-input"
+                    style={{ display: "block", fontWeight: 700, fontSize: "var(--text-sm)", marginBottom: "var(--space-1)" }}
+                  >
+                    Nama Panggilan Pelajar
+                  </label>
+                  <input
+                    id="edit-display-name-input"
+                    type="text"
+                    className="form-input"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    maxLength={30}
+                    required
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "var(--border-sm)" }}
+                  />
+                </div>
+
+                {/* Active Title Selector from Unlocked Titles */}
+                <div style={{ marginBottom: "var(--space-6)" }}>
+                  <label
+                    htmlFor="select-active-title"
+                    style={{ display: "block", fontWeight: 700, fontSize: "var(--text-sm)", marginBottom: "var(--space-1)" }}
+                  >
+                    Gelar Aktif Terbuka
+                  </label>
+                  <select
+                    id="select-active-title"
+                    className="form-input"
+                    value={selectedTitleId}
+                    onChange={(e) => setSelectedTitleId(e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "var(--border-sm)" }}
+                  >
+                    {evaluatedTitles
+                      .filter((t) => t.isUnlocked)
+                      .map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name} ({t.englishName})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "var(--space-3)" }}>
+                  <button
+                    type="button"
+                    className="btn btn-outline"
+                    onClick={() => setIsEditModalOpen(false)}
+                    style={{ minHeight: "44px" }}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    id="save-profile-btn"
+                    style={{ minHeight: "44px" }}
+                  >
+                    Simpan Perubahan
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

@@ -231,6 +231,36 @@ function handleDevFallback(action, payload, token) {
     };
   }
 
+  if (action === "uploadAvatar") {
+    const updatedAt = new Date().toISOString();
+    return {
+      success: true,
+      message: "Foto profil berhasil diunggah (Dev Preview).",
+      data: {
+        avatarUrl: payload.imageBase64,
+        avatarUpdatedAt: updatedAt
+      }
+    };
+  }
+
+  if (action === "getAvatar") {
+    return {
+      success: true,
+      data: {
+        hasAvatar: false,
+        avatarUrl: null,
+        avatarUpdatedAt: null
+      }
+    };
+  }
+
+  if (action === "deleteAvatar") {
+    return {
+      success: true,
+      message: "Foto profil berhasil dihapus (Dev Preview)."
+    };
+  }
+
   return { success: true, message: "Aksi berhasil (Dev Preview)." };
 }
 
@@ -313,6 +343,19 @@ export const api = {
 
   async unlockTitle(titleId) {
     return request("unlockTitle", { titleId }, true);
+  },
+
+  // Custom Profile Avatar (Google Drive via Apps Script DriveApp)
+  async uploadAvatar({ imageBase64, mimeType = "image/webp" }) {
+    return request("uploadAvatar", { imageBase64, mimeType }, true);
+  },
+
+  async getAvatar() {
+    return request("getAvatar", {}, true);
+  },
+
+  async deleteAvatar() {
+    return request("deleteAvatar", {}, true);
   },
 
   // Daily Quests / Missions

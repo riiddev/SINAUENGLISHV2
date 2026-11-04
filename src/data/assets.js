@@ -59,3 +59,4 @@ export function getAssetUrl(category, key) {
   }
   return null;
 }
+
