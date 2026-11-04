@@ -1946,3 +1946,4 @@ console.log("✓ SUCCESS: Story 2 (story-02.json) successfully created with all 
 console.log("Total Episodes:", story02.episodes.length);
 console.log("Total Quiz Questions:", story02.episodes.length * 5);
 console.log("Total Oxford 3000 Vocabularies:", story02.episodes.length * 6);
+

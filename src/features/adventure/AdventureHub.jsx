@@ -4,6 +4,7 @@ import { Button } from "../../components/common/Button.jsx";
 import { STORIES_CATALOG } from "../../data/stories/storiesCatalog.js";
 import story01Data from "../../data/stories/story-01.json";
 import story02Data from "../../data/stories/story-02.json";
+import story03Data from "../../data/stories/story-03.json";
 import { StoryRunner } from "./StoryRunner.jsx";
 import { api } from "../../services/api.js";
 import "../../styles/adventure.css";
@@ -11,7 +12,8 @@ import "../../styles/adventure.css";
 // Map of available story content bundles
 const STORIES_CONTENT_MAP = {
   "story-01": story01Data,
-  "story-02": story02Data
+  "story-02": story02Data,
+  "story-03": story03Data
 };
 
 export function AdventureHub({ userProfileHook, onRecordWordReview }) {
