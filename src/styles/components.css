@@ -25,15 +25,46 @@
   height: 100%;
 }
 
+.sinau-brand,
 .brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: var(--text-lg);
-  color: var(--color-text-primary);
+  gap: 10px;
   text-decoration: none;
+  user-select: none;
+}
+
+.sinau-brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background-color: var(--logo-box-bg);
+  border: 1.5px solid var(--logo-box-border);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
+  display: block;
+}
+
+.sinau-brand-text,
+.brand-text {
+  font-family: 'Plus Jakarta Sans', 'Inter', var(--font-heading);
+  font-size: 20px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.sinau-brand-text strong,
+.brand-text strong {
+  font-weight: 800;
+  color: var(--wordmark-primary);
+  transition: color 0.2s ease;
+}
+
+.sinau-brand-text span,
+.brand-text span {
+  font-weight: 700;
+  color: var(--wordmark-accent);
+  transition: color 0.2s ease;
 }
 
 .brand-badge {
@@ -49,10 +80,6 @@
   font-weight: 700;
   font-size: var(--text-sm);
   color: var(--color-text-primary);
-}
-
-.brand-text span {
-  color: var(--color-accent-gold);
 }
 
 .nav-menu {

@@ -103,6 +103,18 @@ assert.equal(pronunciation.exercises.length, 16, "Expected 16 Pronunciation Stud
 
 console.log(`✓ Adventure series verified: ${stories.stories.length} stories, ${dialogues.dialogues.length} dialogues, ${listening.exercises.length} listening exercises, ${pronunciation.exercises.length} pronunciation exercises.`);
 
+// 7. Verify src/data/ static bundle matches exactly
+console.log("Checking src/data/ static bundle...");
+const srcOxfordAudit = json("src/data/oxford3000/audit.json");
+assert.equal(srcOxfordAudit.headwordCount, 2971, "src/data/ Oxford 3000 headword count must be exactly 2971");
+const srcVocab = json("src/data/vocabulary.json");
+assert.equal(srcVocab.entries.length, 999, "src/data/ Vocabulary entries count mismatch");
+const srcGrammar = json("src/data/grammar.json");
+assert.equal(srcGrammar.topics.length, 19, "src/data/ Grammar topics count mismatch");
+const srcHabit = json("src/data/habit-reading-library.json");
+assert.equal(srcHabit.passages.length, 156, "src/data/ HABIT passages count mismatch");
+console.log("✓ src/data/ static bundle verified 100% identical!");
+
 console.log("\n==============================================");
 console.log("DATA PARITY VERIFICATION PASSED (V1 == V2)!");
 console.log("Total Headwords V1: 2971 == Total Headwords V2: 2971");

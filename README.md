@@ -1,8 +1,20 @@
-# SINAUENGLISH V2
+# SINAUENGLISH V2 — React Motion & Google Sheets Edition
 
-Website belajar bahasa Inggris modern bergaya **Warm Editorial Neobrutalism** (terinspirasi dari bahasa visual [themainideas.com](https://themainideas.com/home)), dirancang khusus untuk pelajar Indonesia dari level pemula hingga menengah atas (CEFR A1–C1).
+Website belajar bahasa Inggris modern bergaya **Warm Editorial Neobrutalism** (terinspirasi dari bahasa visual [themainideas.com](https://themainideas.com/home)), dirancang khusus untuk pelajar Indonesia dari level pemula hingga menengah atas (CEFR A1–B2).
 
-100% bebas biaya, tanpa backend berbayar, bebas hambatan login paksa, dan seluruh kemajuan belajar tersimpan secara aman di browser lokal pengguna (*local-first*).
+100% bebas biaya langganan, dibangun menggunakan **React JS + Vite**, CSS bertingkat (`@layer`), animasi performan (GSAP, Lenis, Framer Motion), dan backend serverless **Google Apps Script + Google Spreadsheet** untuk penyimpanan akun dan progres belajar secara terpusat tanpa database berbayar.
+
+---
+
+## 🚀 Arsitektur Teknologi
+
+- **Frontend:** React 19 + React Router (JavaScript ESM + JSX)
+- **Styling:** CSS Murni dengan CSS Modules + `@layer reset, tokens, base, components, utilities;` (fluid `clamp()`, container queries, `:has()`, `@property`, `color-mix()`)
+- **Motion Engine:** GSAP + ScrollTrigger, Lenis Smooth Scroll, Framer Motion (lengkap dengan kepatuhan `prefers-reduced-motion`)
+- **Backend:** Google Apps Script Web App (`backend/Code.gs`)
+- **Database:** Private Google Spreadsheet (5 tab: `Users`, `Sessions`, `Progress`, `QuizAttempts`, `Settings`)
+- **Keamanan:** Password hashing (salt acak + 5.000 iterasi SHA-256), session token di `sessionStorage` (tanpa data sensitif di `localStorage`/`IndexedDB`)
+- **Mitigasi Kuota:** Client-side batch debouncing (`useProgressSync`) untuk menghemat batas eksekusi Google Cloud
 
 ---
 
@@ -11,10 +23,6 @@ Website belajar bahasa Inggris modern bergaya **Warm Editorial Neobrutalism** (t
 | Resolusi Desktop (1280px) | Resolusi Mobile (360px) |
 |---|---|
 | ![Desktop Landing](docs/screenshots/qa-desktop-1280-home.png) | ![Mobile Landing](docs/screenshots/qa-mobile-360-home.png) |
-
-| Ruang Belajar (Dashboard) | Daftar Kosakata Oxford 3000 |
-|---|---|
-| ![Workspace Overview](docs/screenshots/qa-desktop-1280-workspace.png) | ![Vocabulary View](docs/screenshots/v2-workspace-vocabulary.png) |
 
 ---
 
@@ -26,23 +34,22 @@ Website belajar bahasa Inggris modern bergaya **Warm Editorial Neobrutalism** (t
 2. **Kurikulum Grammar Komprehensif:**
    - 19 topik materi terstruktur dari level A1 hingga B2.
    - Penjelasan konsep, rumus/pattern, contoh kalimat, dan panduan kesalahan umum (*common mistakes*).
-   - Bank 57 soal kuis tervalidasi dengan umpan balik instan.
+   - Bank 57 soal kuis tervalidasi dengan pencatatan hasil ke Google Spreadsheet.
 3. **Metode Belajar 3 Tahap (Fokus & Latihan):**
    - *Tahap 1: Recall Makna* (tebak arti kata sebelum membuka jawaban).
    - *Tahap 2: Pahami Konteks* (soal pilihan ganda kalimat rumpang).
-   - *Tahap 3: Konfirmasi Ingatan* (kalkulasi interval SRS otomatis).
+   - *Tahap 3: Konfirmasi Ingatan* (kalkulasi interval SRS otomatis & batch sync).
 4. **Sistem Spaced Repetition (SRS) & Mistake Review:**
    - Pengulangan otomatis pada interval adaptif: `[1, 3, 8, 16, 30]` hari.
-   - Status penguasaan bertingkat: *Baru (Fresh)*, *Belajar (Learning)*, *Review (Due)*, *Lemah (Weak)*, dan *Mastered*.
-   - Jurnal kesalahan (*Mistake Journal*) untuk meninjau kembali materi yang pernah keliru.
+   - Jurnal kesalahan (*Mistake Journal*) untuk meninjau kembali kata-kata yang pernah keliru.
 5. **HABIT Reading Library:**
    - 156 artikel bacaan berbobot (total 63.309 kata) dengan estimasi waktu baca untuk melatih kelancaran membaca.
    - 12 materi keterampilan membaca (*reading skills*) lengkap dengan pertanyaan pemahaman.
 6. **Everyday Adventure Series:**
    - 8 cerita tematik (*Everyday Stories*), 4 dialog interaktif (*Everyday English*), 8 latihan mendengarkan (*Listening Lab*), dan 16 panduan pengucapan (*Pronunciation Studio*).
-7. **Penyimpanan Local-First & Cadangan Mandiri:**
-   - Database lokal IndexedDB (`sinauu-english-v1`) dengan fallback otomatis ke `localStorage`.
-   - Fitur **Ekspor Cadangan** (unduh file JSON `schemaVersion: 1`) dan **Impor Cadangan** (unggah file JSON) yang sepenuhnya kompatibel dua arah dengan data V1.
+7. **Penyimpanan Cloud Bebas Biaya:**
+   - Seluruh akun dan progres tersimpan di Google Spreadsheet privat melalui Apps Script Web App.
+   - Alat sekali jalan untuk migrasi cadangan JSON lama (*Backup Importer*) ke Spreadsheet.
 8. **Dukungan Dark Mode:**
    - Pilihan tema ramah mata: *Warm Parchment* (terang) dan *Warm Espresso Night* (gelap) yang sinkron otomatis antar halaman.
 

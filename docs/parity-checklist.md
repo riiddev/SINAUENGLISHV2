@@ -49,13 +49,14 @@ Dokumen ini menjadi instrumen verifikasi utama untuk memastikan **100% fitur dan
 
 | Fungsionalitas | Spesifikasi | Status di V2 |
 |---|---|---|
-| **Storage Local-First** | IndexedDB utama (`sinauu-english-v1`) dengan auto-fallback `localStorage` (`sinauu-english-state-v1`) | ✅ **LULUS (Passed)** |
-| **Tanpa Layanan Berbayar** | Berjalan 100% di browser pengguna tanpa ketergantungan API berbayar | ✅ **LULUS (Passed)** |
-| **Akses Langsung Tanpa Paksaan Login** | Pengguna langsung masuk ke ruang belajar tanpa hambatan autentikasi cloud | ✅ **LULUS (Passed)** |
-| **Ekspor & Impor Cadangan** | File format JSON valid schema version 1, interoperabel dua arah V1 ↔ V2 | ✅ **LULUS (Passed)** |
-| **Spaced Repetition Algorithm** | Interval adaptif `[1, 3, 8, 16, 30]` hari sesuai performa jawaban | ✅ **LULUS (Passed)** |
-| **Audio Pronunciation** | Web Speech Synthesis API dengan fallback UK/US voice selection | ✅ **LULUS (Passed)** |
-| **Toggle Dark/Light Mode** | State tema tersimpan dan sinkron antar halaman (*Warm Parchment* ↔ *Warm Espresso Night*) | ✅ **LULUS (Passed)** |
+| **Penyimpanan Terpusat Bebas Biaya** | Google Apps Script API + Private Google Spreadsheet (5 Tab: Users, Sessions, Progress, QuizAttempts, Settings). Nol data di localStorage / IndexedDB. | ✅ **LULUS (Passed)** |
+| **Keamanan Autentikasi** | Salt acak + 5.000 iterasi SHA-256. Token disimpan strictly di `sessionStorage` (atau memory). | ✅ **LULUS (Passed)** |
+| **Batch Syncing & Quota Guard** | Debounced batch queue di sisi klien (`useProgressSync`) menghemat kuota harian eksekusi Google Apps Script. | ✅ **LULUS (Passed)** |
+| **Tanpa Layanan Berbayar** | Berjalan 100% gratis memanfaatkan kuota gratis Google Cloud / Workspace. | ✅ **LULUS (Passed)** |
+| **Alat Migrasi Cadangan** | Pengguna dapat mengunggah file backup lama (V1/V2 JSON) langsung ke Spreadsheet akunnya. | ✅ **LULUS (Passed)** |
+| **Spaced Repetition Algorithm** | Interval adaptif `[1, 3, 8, 16, 30]` hari sesuai performa jawaban pengguna. | ✅ **LULUS (Passed)** |
+| **Audio Pronunciation** | Web Speech Synthesis API dengan fallback UK/US voice selection. | ✅ **LULUS (Passed)** |
+| **Toggle Dark/Light Mode** | State tema tersimpan dan sinkron antar halaman (*Warm Parchment* ↔ *Warm Espresso Night*). | ✅ **LULUS (Passed)** |
 
 ---
 
