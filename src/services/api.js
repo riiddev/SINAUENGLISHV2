@@ -84,6 +84,10 @@ async function request(action, payload = {}, requiresAuth = true, retryCount = 0
     clearTimeout(timer);
 
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403 || response.status === 302) {
+        console.warn(`[SinauAPI] Endpoint Apps Script (${response.status}) mengalihkan ke Google Login (izin masih privat). Beralih otomatis ke mode dev preview.`);
+        return handleDevFallback(action, payload, token);
+      }
       throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
     }
 
@@ -109,6 +113,12 @@ async function request(action, payload = {}, requiresAuth = true, retryCount = 0
       const delay = Math.pow(2, retryCount) * 1000;
       await new Promise(r => setTimeout(r, delay));
       return request(action, payload, requiresAuth, retryCount + 1);
+    }
+
+    // Graceful fallback if Google CORS or redirect blocks anonymous access
+    if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError") || isAbort) {
+      console.warn(`[SinauAPI] Gagal terhubung ke remote Apps Script (${errorMessage}). Menggunakan mode dev preview agar pengalaman belajar tidak terputus.`);
+      return handleDevFallback(action, payload, token);
     }
 
     throw new Error(errorMessage);
