@@ -137,3 +137,4 @@ export const STORIES_CATALOG = [
     learningFocus: "Bahasa akademik tingkat tinggi, argumentasi formal berimbang, kosakata C1."
   }
 ];
+
