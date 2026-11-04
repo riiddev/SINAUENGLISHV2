@@ -1853,6 +1853,32 @@ function handleCompleteStoryEpisode(ss, token, payload) {
     }
   }
 
+  // Sequential story check: Story N requires Story N-1 to have 10 unique completed episodes
+  const storyNumMatch = String(storyId).match(/story-(\d+)/);
+  if (storyNumMatch) {
+    const sNum = parseInt(storyNumMatch[1], 10);
+    if (sNum > 1) {
+      const prevStoryId = "story-" + (sNum - 1 < 10 ? "0" + (sNum - 1) : (sNum - 1));
+      let prevCount = 0;
+      const countedEps = {};
+      for (let i = 1; i < data.length; i++) {
+        if (data[i][0] === userId && data[i][1] === prevStoryId) {
+          const ep = Number(data[i][2]);
+          if (!countedEps[ep]) {
+            countedEps[ep] = true;
+            prevCount++;
+          }
+        }
+      }
+      if (prevCount < 10) {
+        return jsonResponse({
+          success: false,
+          error: "Cerita sebelumnya belum selesai. Anda harus menyelesaikan seluruh 10 episode Cerita " + (sNum - 1) + " terlebih dahulu!"
+        }, 403);
+      }
+    }
+  }
+
   // If this episode was ALREADY completed previously: allow replay without reward
   if (alreadyCompletedThisEpisode) {
     return jsonResponse({

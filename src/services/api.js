@@ -438,6 +438,23 @@ function handleDevFallback(action, payload, token) {
 
     const { storyId, episodeId } = payload;
     const epIdNum = Number(episodeId);
+
+    // Sequential story check: Story N requires Story N-1 to have 10 completed episodes
+    const sMatch = String(storyId).match(/story-(\d+)/);
+    if (sMatch) {
+      const sNum = parseInt(sMatch[1], 10);
+      if (sNum > 1) {
+        const prevStoryId = "story-" + String(sNum - 1).padStart(2, "0");
+        const prevEps = saved[prevStoryId] || [];
+        if (prevEps.length < 10) {
+          return {
+            success: false,
+            error: `Cerita ${sNum - 1} belum selesai. Anda harus menyelesaikan seluruh 10 episode Cerita ${sNum - 1} terlebih dahulu!`
+          };
+        }
+      }
+    }
+
     if (!saved[storyId]) saved[storyId] = [];
 
     const isReplay = saved[storyId].includes(epIdNum);

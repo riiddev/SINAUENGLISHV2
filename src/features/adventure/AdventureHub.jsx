@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Badge } from "../../components/common/Badge.jsx";
 import { Button } from "../../components/common/Button.jsx";
+import {
+  IconTarget,
+  IconClock,
+  IconLock,
+  IconCheck,
+  IconArrowRight,
+  IconArrowLeft,
+  IconArrowUpRight,
+  IconRefresh,
+  IconTrophy
+} from "../../components/common/Icons.jsx";
 import { STORIES_CATALOG } from "../../data/stories/storiesCatalog.js";
 import story01Data from "../../data/stories/story-01.json";
 import story02Data from "../../data/stories/story-02.json";
@@ -39,7 +50,7 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
 
   const userLevel = userProfileHook?.calculatedLevel || userProfileHook?.profile?.level || 1;
 
-  // Fetch story progress from cloud
+  // Fetch story progress from cloud/local
   const refreshProgress = async () => {
     try {
       const res = await api.getStoryProgress();
@@ -57,8 +68,35 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
     refreshProgress();
   }, []);
 
+  /**
+   * Sequential story unlocking:
+   * Story 1 is always unlocked.
+   * Story N requires all 10 episodes of Story N-1 to be completed.
+   */
+  const isStoryUnlocked = (storyIndex) => {
+    if (storyIndex === 0) return true;
+    const prevStory = STORIES_CATALOG[storyIndex - 1];
+    if (!prevStory) return true;
+    const prevCompletedCount = (storyProgressData.progress?.[prevStory.id] || []).length;
+    return prevCompletedCount >= (prevStory.totalEpisodes || 10);
+  };
+
+  // If a story was selected but is not unlocked, safely reset
+  useEffect(() => {
+    if (selectedStory) {
+      const idx = STORIES_CATALOG.findIndex((s) => s.id === selectedStory.id);
+      if (idx !== -1 && !isStoryUnlocked(idx)) {
+        setSelectedStory(null);
+      }
+    }
+  }, [storyProgressData, selectedStory]);
+
   const completedEpisodes = selectedStory ? (storyProgressData.progress?.[selectedStory.id] || []) : [];
-  const totalCompletedEpisodes = Object.values(storyProgressData.progress || {}).reduce((sum, list) => sum + (Array.isArray(list) ? list.length : 0), 0);
+  const totalCompletedEpisodes = Object.values(storyProgressData.progress || {}).reduce(
+    (sum, list) => sum + (Array.isArray(list) ? list.length : 0),
+    0
+  );
+  const unlockedStoriesCount = STORIES_CATALOG.filter((_, idx) => isStoryUnlocked(idx)).length;
 
   return (
     <div className="adventure-hub-container" id="adventure-hub-view">
@@ -72,8 +110,9 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
               size="sm"
               onClick={() => setSelectedStory(null)}
               id="back-to-stories-catalog-btn"
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
             >
-              ← Kembali ke 10 Cerita Petualangan
+              <IconArrowLeft size={14} /> Kembali ke 10 Cerita Petualangan
             </Button>
 
             <span className="scholar-chip chip-gold" style={{ fontSize: "11px", fontWeight: 800 }}>
@@ -124,8 +163,8 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
               <p style={{ fontSize: "var(--text-sm)", color: "var(--color-text-secondary)", margin: "0 0 var(--space-3) 0" }}>
                 {selectedStory.description}
               </p>
-              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-primary)", fontWeight: 700 }}>
-                🎯 Fokus Pembelajaran: {selectedStory.learningFocus}
+              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-primary)", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                <IconTarget size={14} /> Fokus Pembelajaran: {selectedStory.learningFocus}
               </div>
             </div>
           </div>
@@ -135,7 +174,7 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
             className="card card-tint-sand"
             style={{
               padding: "var(--space-4) var(--space-5)",
-              marginBottom: "var(--space-6)",
+              marginBottom: "var(--space-5)",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
@@ -144,21 +183,76 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
             }}
           >
             <div>
-              <span style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", color: "#744210" }}>
-                ⏳ Ritme Belajar Harian (Pacing Sistematis)
+              <span style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", color: "#744210", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                <IconClock size={13} /> Ritme Belajar Harian (Pacing Sistematis)
               </span>
               <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", margin: "2px 0 0" }}>
                 Pengguna dapat membuka <strong>1 episode baru per hari (WIB)</strong> untuk menjaga daya serap memori. Episode yang telah tuntas dapat diulang kapan saja tanpa batasan.
               </p>
             </div>
             <div>
-              <span className={`scholar-chip ${storyProgressData.hasUnlockedNewEpisodeToday ? "chip-neutral" : "chip-level"}`}>
-                {storyProgressData.hasUnlockedNewEpisodeToday
-                  ? "⏱ Episode baru dibuka esok hari (WIB)"
-                  : "✓ 1 Episode Baru Tersedia Hari Ini"}
+              <span className={`scholar-chip ${storyProgressData.hasUnlockedNewEpisodeToday ? "chip-neutral" : "chip-level"}`} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                {storyProgressData.hasUnlockedNewEpisodeToday ? (
+                  <>
+                    <IconClock size={12} /> Episode baru dibuka esok hari (WIB)
+                  </>
+                ) : (
+                  <>
+                    <IconCheck size={12} /> 1 Episode Baru Tersedia Hari Ini
+                  </>
+                )}
               </span>
             </div>
           </div>
+
+          {/* Celebration Banner when 10/10 episodes completed */}
+          {completedEpisodes.length >= (selectedStory.totalEpisodes || 10) && (
+            <div
+              className="card card-tint-gold story-completion-banner"
+              id="story-completion-banner"
+              style={{
+                padding: "var(--space-4) var(--space-5)",
+                marginBottom: "var(--space-5)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "var(--space-4)",
+                border: "1px solid var(--color-accent-gold)",
+                borderRadius: "var(--radius-md)",
+                backgroundColor: "rgba(214, 158, 46, 0.08)",
+                flexWrap: "wrap"
+              }}
+            >
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                  <IconTrophy size={18} style={{ color: "var(--color-accent-gold)" }} />
+                  <strong style={{ fontSize: "var(--text-sm)", color: "var(--color-text-primary)" }}>
+                    Selamat! Cerita {selectedStory.number} Tamat (10/10 Episode Selesai)!
+                  </strong>
+                  <span className="scholar-chip chip-gold" style={{ fontSize: "10px" }}>Tuntas</span>
+                </div>
+                <p style={{ margin: 0, fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
+                  Seluruh episode pada bab ini telah selesai dipelajari. Cerita berikutnya kini telah terbuka dan siap dijelajahi.
+                </p>
+              </div>
+              {selectedStory.number < STORIES_CATALOG.length && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  id="go-to-next-story-btn"
+                  onClick={() => {
+                    const nextStory = STORIES_CATALOG.find((s) => s.number === selectedStory.number + 1);
+                    if (nextStory) {
+                      setSelectedStory(nextStory);
+                    }
+                  }}
+                  style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+                >
+                  Lanjut ke Cerita {selectedStory.number + 1} <IconArrowRight size={14} />
+                </Button>
+              )}
+            </div>
+          )}
 
           {/* 10 EPISODES ROADMAP GRID */}
           <h3 style={{ fontSize: "var(--text-xl)", fontFamily: "var(--font-heading)", marginBottom: "var(--space-3)" }}>
@@ -166,7 +260,7 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
           </h3>
 
           <div className="episode-roadmap-grid">
-            {(STORIES_CONTENT_MAP[selectedStory.id]?.episodes || []).map((ep, idx) => {
+            {(STORIES_CONTENT_MAP[selectedStory.id]?.episodes || []).map((ep) => {
               const isCompleted = completedEpisodes.includes(ep.id);
               // An episode is unlocked if it is Episode 1, OR if the previous episode is completed
               const isPrevCompleted = ep.id === 1 || completedEpisodes.includes(ep.id - 1);
@@ -191,8 +285,29 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
                     <span className="scholar-chip chip-neutral" style={{ fontSize: "10px", padding: "1px 6px" }}>
                       Episode {ep.id}
                     </span>
-                    <span style={{ fontSize: "var(--text-xs)", fontWeight: 800, color: isCompleted ? "var(--color-success)" : isCurrent ? "#744210" : "var(--color-text-secondary)" }}>
-                      {isCompleted ? "✓ Selesai" : isCurrent ? "Tersedia ↗" : "🔒 Terkunci"}
+                    <span
+                      style={{
+                        fontSize: "var(--text-xs)",
+                        fontWeight: 800,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        color: isCompleted ? "var(--color-success)" : isCurrent ? "#744210" : "var(--color-text-secondary)"
+                      }}
+                    >
+                      {isCompleted ? (
+                        <>
+                          <IconCheck size={12} /> Selesai
+                        </>
+                      ) : isCurrent ? (
+                        <>
+                          Tersedia <IconArrowUpRight size={12} />
+                        </>
+                      ) : (
+                        <>
+                          <IconLock size={12} /> Terkunci
+                        </>
+                      )}
                     </span>
                   </div>
 
@@ -204,9 +319,21 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
                   </p>
 
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px dashed var(--border-color)", paddingTop: "var(--space-2)", fontSize: "11px", color: "var(--color-text-secondary)" }}>
-                    <span>⏱ {ep.estimatedMinutes || 10} Menit</span>
-                    <span style={{ fontWeight: 700, color: "var(--color-accent-navy)" }}>
-                      {isCompleted ? "Ulangi ↺" : isCurrent ? "Mulai Baca ↗" : "Belum Terbuka"}
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <IconClock size={12} /> {ep.estimatedMinutes || 10} Menit
+                    </span>
+                    <span style={{ fontWeight: 700, color: "var(--color-accent-navy)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      {isCompleted ? (
+                        <>
+                          <IconRefresh size={12} /> Ulangi
+                        </>
+                      ) : isCurrent ? (
+                        <>
+                          Mulai Baca <IconArrowUpRight size={12} />
+                        </>
+                      ) : (
+                        "Belum Terbuka"
+                      )}
                     </span>
                   </div>
                 </div>
@@ -220,7 +347,7 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
           <div style={{ marginBottom: "var(--space-6)" }}>
             <h2 className="section-title">Petualangan Bahasa Inggris Terapan</h2>
             <p className="section-desc">
-              10 Kisah bersambung (100 Episode) melintasi level A1 hingga C1. Pelajari tata bahasa dan kosakata Oxford 3000 dalam skenario kehidupan nyata yang imersif.
+              10 Kisah bersambung (100 Episode) melintasi level A1 hingga C1. Tuntaskan satu per satu cerita untuk membuka kisah petualangan berikutnya.
             </p>
           </div>
 
@@ -229,9 +356,9 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
             <div className="card stat-card">
               <span className="stat-label">Cerita Terbuka</span>
               <span className="stat-value" id="stat-stories-unlocked">
-                {STORIES_CATALOG.filter((s) => userLevel >= s.levelReq).length} / 10
+                {unlockedStoriesCount} / 10
               </span>
-              <span className="stat-desc">Berdasarkan Level Pengguna (Level {userLevel})</span>
+              <span className="stat-desc">Selesaikan 10 episode per cerita untuk membuka cerita selanjutnya</span>
             </div>
 
             <div className="card stat-card">
@@ -253,26 +380,29 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
 
           {/* 10 Stories Grid */}
           <div className="story-card-grid">
-            {STORIES_CATALOG.map((story) => {
-              const isLevelUnlocked = userLevel >= story.levelReq;
+            {STORIES_CATALOG.map((story, index) => {
+              const isUnlocked = isStoryUnlocked(index);
               const hasContent = Boolean(STORIES_CONTENT_MAP[story.id]);
-              const isStoryAvailable = isLevelUnlocked && (story.number === 1 || hasContent);
+              const storyEpisodes = storyProgressData.progress?.[story.id] || [];
+              const completedCount = storyEpisodes.length;
+              const isStoryFinished = completedCount >= (story.totalEpisodes || 10);
 
               return (
                 <div
                   key={story.id}
                   id={`story-catalog-card-${story.id}`}
-                  className={`story-hub-card ${!isLevelUnlocked ? "is-locked" : ""}`}
+                  className={`story-hub-card ${!isUnlocked ? "is-locked" : ""} ${isStoryFinished ? "is-story-finished" : ""}`}
                   onClick={() => {
-                    if (isLevelUnlocked) {
+                    if (isUnlocked) {
                       setSelectedStory(story);
                     }
                   }}
                   style={{
-                    borderLeft: isStoryAvailable
+                    borderLeft: isUnlocked
                       ? `6px solid ${story.themeColor || "var(--color-accent-navy)"}`
                       : "var(--border-sm)",
-                    cursor: isLevelUnlocked ? "pointer" : "not-allowed"
+                    cursor: isUnlocked ? "pointer" : "not-allowed",
+                    opacity: isUnlocked ? 1 : 0.72
                   }}
                 >
                   <div>
@@ -281,8 +411,34 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
                         <Badge variant="navy">Cerita {story.number}</Badge>
                         <Badge variant="gold">{story.level}</Badge>
                       </div>
-                      <span style={{ fontSize: "var(--text-xs)", fontWeight: 800, color: isLevelUnlocked ? "var(--color-success)" : "var(--color-text-secondary)" }}>
-                        {isLevelUnlocked ? "✓ Terbuka" : `🔒 Butuh Level ${story.levelReq}`}
+                      <span
+                        className="story-lock-status-badge"
+                        style={{
+                          fontSize: "var(--text-xs)",
+                          fontWeight: 800,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          color: isStoryFinished
+                            ? "var(--color-accent-gold)"
+                            : isUnlocked
+                            ? "var(--color-success)"
+                            : "var(--color-text-secondary)"
+                        }}
+                      >
+                        {isStoryFinished ? (
+                          <>
+                            <IconTrophy size={13} /> Tamat (10/10)
+                          </>
+                        ) : isUnlocked ? (
+                          <>
+                            <IconCheck size={13} /> Terbuka
+                          </>
+                        ) : (
+                          <>
+                            <IconLock size={13} /> Butuh Cerita {story.number - 1} Selesai
+                          </>
+                        )}
                       </span>
                     </div>
 
@@ -309,7 +465,7 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
                             height: "100%",
                             objectFit: "cover",
                             display: "block",
-                            filter: isLevelUnlocked ? "none" : "grayscale(80%) opacity(0.6)"
+                            filter: isUnlocked ? "none" : "grayscale(80%) opacity(0.55)"
                           }}
                         />
                       </div>
@@ -329,10 +485,27 @@ export function AdventureHub({ userProfileHook, onRecordWordReview }) {
 
                   <div style={{ borderTop: "var(--border-sm)", paddingTop: "var(--space-3)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--color-text-secondary)" }}>
-                      {story.totalEpisodes} Episode
+                      {completedCount} / {story.totalEpisodes || 10} Episode Selesai
                     </span>
-                    <span style={{ fontSize: "var(--text-xs)", fontWeight: 800, color: isLevelUnlocked ? "var(--color-accent-navy)" : "var(--color-text-secondary)" }}>
-                      {isLevelUnlocked ? "Buka Petualangan ↗" : `Terkunci (Level ${story.levelReq})`}
+                    <span
+                      style={{
+                        fontSize: "var(--text-xs)",
+                        fontWeight: 800,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        color: isUnlocked ? "var(--color-accent-navy)" : "var(--color-text-secondary)"
+                      }}
+                    >
+                      {isUnlocked ? (
+                        <>
+                          Buka Petualangan <IconArrowUpRight size={13} />
+                        </>
+                      ) : (
+                        <>
+                          <IconLock size={13} /> Terkunci (Cerita {story.number - 1})
+                        </>
+                      )}
                     </span>
                   </div>
                 </div>
