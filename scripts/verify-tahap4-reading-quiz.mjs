@@ -17,8 +17,6 @@ async function runVerification() {
     // TEST 1: DESKTOP 1280px - Library, Reader Modal & Quiz Start
     // ----------------------------------------------------
     const page = await browser.newPage({ viewport: { width: 1280, height: 850 } });
-    page.on("console", (msg) => console.log("BROWSER LOG:", msg.text()));
-    page.on("pageerror", (err) => console.error("BROWSER ERR:", err.message));
 
     // Seed session token so user is authenticated
     await page.addInitScript(() => {
@@ -88,27 +86,26 @@ async function runVerification() {
     await toggleDrawerBtn.click();
     await page.waitForTimeout(200);
 
-    // Answer questions 1 through 9
+    // Answer questions 1 through 8
     // Questions:
     // q1: Main Idea (correctIndex: 1) -> select 1
     // q2: Author's Purpose (correctIndex: 1) -> select 1
-    // q3: Detail (correctIndex: 1) -> select 1
+    // q3: Detail (correctIndex: 2) -> select 2
     // q4: Referent (correctIndex: 2) -> select 2
-    // q5: Fact vs Opinion (correctIndex: 0) -> select 0
-    // q6: Inference (correctIndex: 1) -> select 1
-    // q7: Author Tone (correctIndex: 2) -> select 2
-    // q8: Vocabulary "thrive" (correctIndex: 0) -> select 1 (WRONG on purpose to test missed vocab & SRS button!)
-    // q9: Vocabulary "untangle" (correctIndex: 1) -> select 1
-    const choices = [1, 1, 1, 2, 0, 1, 2, 1, 1];
+    // q5: Fact vs Opinion (correctIndex: 1) -> select 1
+    // q6: Inference (correctIndex: 2) -> select 2
+    // q7: Author Tone (correctIndex: 1) -> select 1
+    // q8: Vocabulary "resilience" (correctIndex: 1) -> select 0 (WRONG on purpose to test missed vocab & SRS button!)
+    const choices = [1, 1, 2, 2, 1, 2, 1, 0];
 
-    console.log("5. Answering 9 questions...");
-    for (let i = 0; i < 9; i++) {
+    console.log("5. Answering 8 questions...");
+    for (let i = 0; i < 8; i++) {
       const optIdx = choices[i];
       const optBtn = page.locator(`#option-btn-${optIdx}`);
       await optBtn.click();
       await page.waitForTimeout(150);
 
-      if (i < 8) {
+      if (i < 7) {
         const nextBtn = page.locator("#next-question-btn");
         await nextBtn.click();
         await page.waitForTimeout(250);
@@ -128,7 +125,7 @@ async function runVerification() {
     console.log("✓ Quiz results container displayed");
 
     const scoreText = await page.locator("#quiz-final-score").textContent();
-    console.log(`✓ Evaluated Score: ${scoreText} (8/9 = 89%)`);
+    console.log(`✓ Evaluated Score: ${scoreText} (7/8 = 88%)`);
 
     // Verify explanation cards
     const explanationsList = page.locator("#quiz-explanations-list");
@@ -142,9 +139,9 @@ async function runVerification() {
     });
     console.log("✓ Saved 03-1280px-desktop-results-explanations.png");
 
-    // Test 1-click SRS addition on missed vocabulary (q8 -> "thrive")
+    // Test 1-click SRS addition on missed vocabulary (q8 -> "resilience")
     console.log("7. Testing 1-click Add to SRS on missed vocabulary question...");
-    const addSrsBtn = page.locator("#add-srs-btn-thrive");
+    const addSrsBtn = page.locator("#add-srs-btn-resilience");
     await addSrsBtn.scrollIntoViewIfNeeded();
     await addSrsBtn.waitFor({ state: "visible", timeout: 3000 });
     await addSrsBtn.click();

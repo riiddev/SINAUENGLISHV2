@@ -56,3 +56,4 @@ Object.entries(fileGroups).forEach(([file, list]) => {
 });
 
 console.log(`\nTotal affected files: ${Object.keys(fileGroups).length}`);
+
