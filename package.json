@@ -10,9 +10,12 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test:content": "node scripts/audit-content.mjs"
+    "test:content": "node scripts/verify-v2-data.mjs",
+    "test:logic": "node --experimental-strip-types --test tests/logic.test.mjs",
+    "test": "node scripts/verify-v2-data.mjs && node --experimental-strip-types --test tests/logic.test.mjs"
   },
   "devDependencies": {
     "vite": "^8.3.5"
   }
 }
+
