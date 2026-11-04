@@ -29,7 +29,8 @@ const SHEETS = {
   QUESTS: "Quests",
   CATALOG: "Catalog",
   INVENTORY: "Inventory",
-  TRANSACTIONS: "Transactions"
+  TRANSACTIONS: "Transactions",
+  GRAMMAR_PROGRESS: "GrammarProgress"
 };
 
 /**
@@ -134,6 +135,12 @@ function doPost(e) {
         return handleEquipItem(ss, token, payload);
       case "grantReward":
         return handleGrantReward(ss, token, payload);
+
+      // 9. Grammar Progress & Mastery (Tahap 5)
+      case "getGrammarProgress":
+        return handleGetGrammarProgress(ss, token);
+      case "saveGrammarProgress":
+        return handleSaveGrammarProgress(ss, token, payload);
 
       default:
         return jsonResponse({ success: false, error: "Aksi tidak dikenal: " + action }, 400);
@@ -1642,6 +1649,108 @@ function handleGrantReward(ss, token, payload) {
       totalCoins: nextCoins,
       level: nextLevel,
       isLevelUp: isLevelUp
+    }
+  });
+}
+
+
+/* ==========================================================================
+   GRAMMAR PROGRESS & MASTERY HANDLERS (TAHAP 5)
+   ========================================================================== */
+
+function ensureGrammarSheets(ss) {
+  let sheet = ss.getSheetByName(SHEETS.GRAMMAR_PROGRESS);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEETS.GRAMMAR_PROGRESS);
+    sheet.appendRow(["user_id", "topic_id", "practice_done", "quiz_best", "status", "updated_at"]);
+    const hRange = sheet.getRange(1, 1, 1, 6);
+    hRange.setFontWeight("bold");
+    hRange.setBackground("#4B5E73");
+    hRange.setFontColor("#FFFFFF");
+    sheet.setFrozenRows(1);
+    [180, 160, 120, 100, 120, 200].forEach((w, idx) => sheet.setColumnWidth(idx + 1, w));
+  }
+  return sheet;
+}
+
+function handleGetGrammarProgress(ss, token) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const sheet = ensureGrammarSheets(ss);
+  const data = sheet.getDataRange().getValues();
+  const progress = {};
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === userId) {
+      const topicId = data[i][1];
+      progress[topicId] = {
+        topicId: topicId,
+        practiceDone: Boolean(data[i][2]),
+        quizBest: Number(data[i][3]) || 0,
+        status: data[i][4] || "learning",
+        updatedAt: data[i][5]
+      };
+    }
+  }
+
+  return jsonResponse({
+    success: true,
+    data: { progress }
+  });
+}
+
+function handleSaveGrammarProgress(ss, token, payload) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const topicId = payload.topicId;
+  const practiceDone = Boolean(payload.practiceDone);
+  const quizScore = Number(payload.quizScore) || 0;
+
+  if (!topicId) return jsonResponse({ success: false, error: "Parameter topicId diperlukan." }, 400);
+
+  const sheet = ensureGrammarSheets(ss);
+  const data = sheet.getDataRange().getValues();
+  let rowIdx = -1;
+  let currentQuizBest = 0;
+  let currentPracticeDone = false;
+  let currentStatus = "learning";
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === userId && data[i][1] === topicId) {
+      rowIdx = i + 1;
+      currentPracticeDone = Boolean(data[i][2]);
+      currentQuizBest = Number(data[i][3]) || 0;
+      currentStatus = data[i][4] || "learning";
+      break;
+    }
+  }
+
+  const nextPracticeDone = practiceDone || currentPracticeDone;
+  const nextQuizBest = Math.max(currentQuizBest, quizScore);
+  const isMastered = nextQuizBest >= 80;
+  const nextStatus = isMastered ? "mastered" : (nextPracticeDone ? "learning" : currentStatus);
+  const now = new Date().toISOString();
+
+  if (rowIdx > 0) {
+    sheet.getRange(rowIdx, 3).setValue(nextPracticeDone);
+    sheet.getRange(rowIdx, 4).setValue(nextQuizBest);
+    sheet.getRange(rowIdx, 5).setValue(nextStatus);
+    sheet.getRange(rowIdx, 6).setValue(now);
+  } else {
+    sheet.appendRow([userId, topicId, nextPracticeDone, nextQuizBest, nextStatus, now]);
+  }
+
+  return jsonResponse({
+    success: true,
+    data: {
+      topicId,
+      practiceDone: nextPracticeDone,
+      quizBest: nextQuizBest,
+      status: nextStatus,
+      isMastered,
+      isNewlyMastered: isMastered && currentStatus !== "mastered"
     }
   });
 }

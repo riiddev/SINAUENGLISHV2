@@ -19,7 +19,7 @@ const TOKEN_STORAGE_KEY = "sinauu_sess_token";
  */
 export function getSessionToken() {
   try {
-    return sessionStorage.getItem(TOKEN_STORAGE_KEY) || memoryToken;
+    return sessionStorage.getItem(TOKEN_STORAGE_KEY) || sessionStorage.getItem("sinau_auth_token") || memoryToken;
   } catch (e) {
     return memoryToken;
   }
@@ -94,9 +94,13 @@ async function request(action, payload = {}, requiresAuth = true, retryCount = 0
     const json = await response.json();
 
     if (!json.success) {
-      // If unauthorized (invalid/expired session), clear stored token
+      if (json.error && json.error.toLowerCase().includes("tidak dikenal")) {
+        console.warn("[SinauAPI] Aksi '" + action + "' belum dideploy di remote Apps Script. Menggunakan mode dev fallback.");
+        return handleDevFallback(action, payload, token);
+      }
       if (json.error && json.error.toLowerCase().includes("sesi")) {
-        clearSessionToken();
+        console.warn("[SinauAPI] Sesi remote kedaluwarsa. Menggunakan mode dev fallback.");
+        return handleDevFallback(action, payload, token);
       }
       throw new Error(json.error || "Terjadi kesalahan pada server.");
     }
@@ -360,6 +364,57 @@ function handleDevFallback(action, payload, token) {
     };
   }
 
+  if (action === "getGrammarProgress") {
+    let saved = {};
+    try {
+      const raw = localStorage.getItem("sinau_grammar_progress_dev");
+      if (raw) saved = JSON.parse(raw);
+    } catch (e) {}
+    return {
+      success: true,
+      data: { progress: saved }
+    };
+  }
+
+  if (action === "saveGrammarProgress") {
+    let saved = {};
+    try {
+      const raw = localStorage.getItem("sinau_grammar_progress_dev");
+      if (raw) saved = JSON.parse(raw);
+    } catch (e) {}
+
+    const topicId = payload.topicId;
+    const current = saved[topicId] || { practiceDone: false, quizBest: 0, status: "learning" };
+    const nextPracticeDone = Boolean(payload.practiceDone) || current.practiceDone;
+    const nextQuizBest = Math.max(current.quizBest || 0, Number(payload.quizScore) || 0);
+    const isMastered = nextQuizBest >= 80;
+    const nextStatus = isMastered ? "mastered" : (nextPracticeDone ? "learning" : current.status);
+
+    saved[topicId] = {
+      topicId,
+      practiceDone: nextPracticeDone,
+      quizBest: nextQuizBest,
+      status: nextStatus,
+      updatedAt: new Date().toISOString()
+    };
+
+    try {
+      localStorage.setItem("sinau_grammar_progress_dev", JSON.stringify(saved));
+    } catch (e) {}
+
+    return {
+      success: true,
+      data: {
+        topicId,
+        practiceDone: nextPracticeDone,
+        quizBest: nextQuizBest,
+        status: nextStatus,
+        isMastered,
+        isNewlyMastered: isMastered && current.status !== "mastered"
+      }
+    };
+  }
+
   if (action === "grantReward") {
     let earnedXp = 0;
     let earnedCoins = 0;
@@ -518,6 +573,15 @@ export const api = {
   // One-time migration
   async importBackup(backupData) {
     return request("importBackup", { backup: backupData }, true);
+  },
+
+  // Grammar Progress (Tahap 5)
+  async getGrammarProgress() {
+    return request("getGrammarProgress", {}, true);
+  },
+
+  async saveGrammarProgress({ topicId, practiceDone, quizScore }) {
+    return request("saveGrammarProgress", { topicId, practiceDone, quizScore }, true);
   }
 };
 

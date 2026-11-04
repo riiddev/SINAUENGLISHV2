@@ -1,122 +1,405 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Badge } from "../../components/common/Badge.jsx";
 import { Button } from "../../components/common/Button.jsx";
+import { getGrammarTopic } from "../../data/grammar/grammarRegistry.js";
+import { GrammarPracticeRunner } from "./GrammarPracticeRunner.jsx";
+import { GrammarMasteryQuiz } from "./GrammarMasteryQuiz.jsx";
+import { api } from "../../services/api.js";
+import "../../styles/grammar-deep.css";
 
-export function GrammarDetail({ topic, onBack, onStartQuiz }) {
-  if (!topic) return null;
+export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
+  const [activeTab, setActiveTab] = useState("materi"); // "materi" | "praktik" | "kuis"
+  const [topicProgress, setTopicProgress] = useState(null);
+
+  // Load enhanced 10-part curriculum data if available
+  const detailedTopic = getGrammarTopic(topic?.id) || topic;
+
+  useEffect(() => {
+    let isMounted = true;
+    api.getGrammarProgress().then((res) => {
+      if (isMounted && res.data?.progress?.[topic?.id]) {
+        setTopicProgress(res.data.progress[topic.id]);
+      }
+    }).catch(() => {});
+    return () => { isMounted = false; };
+  }, [topic?.id]);
+
+  if (!detailedTopic) return null;
+
+  const handleSaveProgress = async (data) => {
+    try {
+      const res = await api.saveGrammarProgress(data);
+      if (res && res.data) {
+        setTopicProgress(res.data);
+      }
+    } catch (err) {
+      console.warn("Save grammar progress error:", err);
+    }
+  };
+
+  const isMastered = topicProgress?.status === "mastered" || (topicProgress?.quizBest || 0) >= 80;
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-      <Button variant="secondary" size="sm" onClick={onBack} style={{ marginBottom: "var(--space-4)" }}>
-        ← Kembali ke Daftar Topik
-      </Button>
+    <div className="grammar-deep-container" id="grammar-deep-detail-view">
+      {/* Back button */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-4)" }}>
+        <Button variant="secondary" size="sm" onClick={onBack} id="back-to-grammar-grid-btn">
+          ← Kembali ke 19 Modul Grammar
+        </Button>
 
-      <div className="card card-tint-slate" style={{ padding: "var(--space-8)", marginBottom: "var(--space-8)" }}>
-        <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center", marginBottom: "var(--space-3)" }}>
-          <Badge variant="navy">{topic.level}</Badge>
-          <Badge variant="gold">⏱ {topic.estimatedMinutes} Menit</Badge>
+        {isMastered && (
+          <span className="mastery-status-pill mastered" id="mastered-status-badge">
+            ✓ Topik Dikuasai (Skor: {topicProgress?.quizBest || 80}%)
+          </span>
+        )}
+      </div>
+
+      {/* HEADER CARD */}
+      <div className="grammar-header-card">
+        <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center", marginBottom: "var(--space-3)", flexWrap: "wrap" }}>
+          <Badge variant="navy">{detailedTopic.level}</Badge>
+          <Badge variant="gold">⏱ {detailedTopic.estimatedMinutes || 12} Menit</Badge>
+          <span className="scholar-chip chip-neutral" style={{ fontSize: "10px", padding: "1px 6px" }}>
+            {detailedTopic.category || "Tata Bahasa"}
+          </span>
+          {!detailedTopic.isLegacy && (
+            <span className="scholar-chip chip-gold" style={{ fontSize: "10px", padding: "1px 6px", fontWeight: 800 }}>
+              ★ Kurikulum Mendalam 10 Bagian
+            </span>
+          )}
         </div>
 
-        <h1 style={{ fontSize: "var(--text-3xl)", marginBottom: "var(--space-4)" }}>
-          {topic.title}
+        <h1 style={{ fontSize: "var(--text-3xl)", marginBottom: "var(--space-3)", fontFamily: "var(--font-heading)" }}>
+          {detailedTopic.title}
         </h1>
 
-        <p style={{ fontSize: "var(--text-md)", lineHeight: 1.7, color: "var(--color-text-primary)", marginBottom: "var(--space-6)" }}>
-          {topic.explanation}
+        <p style={{ fontSize: "var(--text-base)", lineHeight: 1.7, color: "var(--color-text-primary)", margin: 0 }}>
+          {detailedTopic.learningObjectives?.goal || detailedTopic.summary}
         </p>
+      </div>
 
-        {/* Pola & Rumus */}
-        <h3 style={{ fontSize: "var(--text-xl)", marginBottom: "var(--space-3)" }}>
-          Pola & Rumus Praktis
-        </h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", marginBottom: "var(--space-6)" }}>
-          {(topic.patterns || []).map((pattern, idx) => (
-            <div
-              key={idx}
-              style={{
-                backgroundColor: "var(--color-bg-surface)",
-                padding: "var(--space-3) var(--space-4)",
-                borderRadius: "var(--radius-md)",
-                border: "var(--border-sm)",
-                fontFamily: "var(--font-mono)",
-                fontWeight: 700,
-                fontSize: "var(--text-sm)"
-              }}
-            >
-              {pattern}
-            </div>
-          ))}
-        </div>
+      {/* TABS NAVIGATION */}
+      <div className="grammar-tabs-nav" role="tablist" aria-label="Navigasi Belajar Grammar">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "materi"}
+          className={`grammar-tab-btn ${activeTab === "materi" ? "is-active" : ""}`}
+          onClick={() => setActiveTab("materi")}
+          id="tab-btn-materi"
+        >
+          <span>📖</span>
+          <span>1. Materi & Kaidah</span>
+        </button>
 
-        {/* Contoh Kalimat */}
-        <h3 style={{ fontSize: "var(--text-xl)", marginBottom: "var(--space-3)" }}>
-          Contoh Pemakaian Kalimat
-        </h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)", marginBottom: "var(--space-6)" }}>
-          {(topic.examples || []).map((ex, idx) => (
-            <div
-              key={idx}
-              style={{
-                backgroundColor: "var(--color-bg-surface)",
-                padding: "var(--space-4)",
-                borderRadius: "var(--radius-md)",
-                border: "var(--border-sm)"
-              }}
-            >
-              <p style={{ fontWeight: 700, margin: "0 0 2px 0", fontSize: "var(--text-base)" }}>
-                {ex.en}
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "praktik"}
+          className={`grammar-tab-btn ${activeTab === "praktik" ? "is-active" : ""}`}
+          onClick={() => setActiveTab("praktik")}
+          id="tab-btn-praktik"
+        >
+          <span>✍️</span>
+          <span>2. Praktik Bertingkat (12 Latihan)</span>
+          {topicProgress?.practiceDone && (
+            <span style={{ fontSize: "10px", color: "var(--color-success)", fontWeight: 800 }}>✓</span>
+          )}
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "kuis"}
+          className={`grammar-tab-btn ${activeTab === "kuis" ? "is-active" : ""}`}
+          onClick={() => setActiveTab("kuis")}
+          id="tab-btn-kuis"
+        >
+          <span>🏆</span>
+          <span>3. Kuis Penguasaan (10 Soal)</span>
+          {isMastered && (
+            <span style={{ fontSize: "10px", color: "var(--color-success)", fontWeight: 800 }}>✓</span>
+          )}
+        </button>
+      </div>
+
+      {/* TAB 1: MATERI & KAIDAH (PEDAGOGY) */}
+      {activeTab === "materi" && (
+        <div id="grammar-tab-materi-content">
+          {/* (a) TUJUAN & KAPAN DIPAKAI */}
+          {detailedTopic.learningObjectives?.whenToUse && (
+            <section className="pedagogy-block">
+              <h3 className="pedagogy-title">
+                🎯 Kapan Harus Digunakan?
+              </h3>
+              <p style={{ fontSize: "var(--text-sm)", color: "var(--color-text-secondary)", margin: "0 0 var(--space-4) 0" }}>
+                Gunakan pola <strong>{detailedTopic.title}</strong> dalam 4 konteks komunikasi nyata berikut:
               </p>
-              <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-sm)", fontStyle: "italic", margin: 0 }}>
-                {ex.id}
-              </p>
-            </div>
-          ))}
-        </div>
 
-        {/* Kesalahan Umum (Common Mistakes) */}
-        {topic.mistakes && topic.mistakes.length > 0 && (
-          <div style={{ marginBottom: "var(--space-8)" }}>
-            <h3 style={{ fontSize: "var(--text-xl)", marginBottom: "var(--space-3)" }}>
-              Kesalahan Umum yang Sering Dilakukan
-            </h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-              {topic.mistakes.map((m, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    backgroundColor: "var(--color-tint-rose)",
-                    padding: "var(--space-4)",
-                    borderRadius: "var(--radius-md)",
-                    border: "var(--border-sm)"
-                  }}
-                >
-                  <div style={{ color: "var(--color-danger)", fontWeight: 700, marginBottom: "2px" }}>
-                    ✗ Salah: {m.wrong}
+              <div className="situation-grid">
+                {detailedTopic.learningObjectives.whenToUse.map((sit, idx) => (
+                  <div key={idx} className="situation-card">
+                    <h4>{idx + 1}. {sit.situation}</h4>
+                    <p>{sit.description}</p>
+                    {sit.triggerWords && sit.triggerWords.length > 0 && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "var(--space-2)" }}>
+                        {sit.triggerWords.map((tw, tIdx) => (
+                          <span key={tIdx} className="scholar-chip chip-neutral" style={{ fontSize: "10px", padding: "1px 6px" }}>
+                            {tw}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <div style={{ color: "var(--color-success)", fontWeight: 700, marginBottom: "4px" }}>
-                    ✓ Benar: {m.right}
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* (b) RUMUS & POLA DALAM TABEL */}
+          {detailedTopic.patternTable && (
+            <section className="pedagogy-block">
+              <h3 className="pedagogy-title">
+                📐 Rumus & Pola Kalimat Praktis
+              </h3>
+              <div className="formula-table-container">
+                <table className="formula-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: "120px" }}>Tipe Kalimat</th>
+                      <th style={{ width: "160px" }}>Kelompok Subjek</th>
+                      <th>Rumus / Pola Struktur</th>
+                      <th>Contoh Kalimat</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detailedTopic.patternTable.map((p, idx) => (
+                      <tr key={idx}>
+                        <td style={{ fontWeight: 800, color: "var(--color-accent-navy)" }}>{p.type}</td>
+                        <td style={{ fontWeight: 600 }}>{p.subjectGroup}</td>
+                        <td className="formula-mono">{p.formula}</td>
+                        <td style={{ fontStyle: "italic", color: "var(--color-text-secondary)" }}>{p.example}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {/* (c) PENJELASAN BERTAHAP (INTUISI -> ATURAN -> EJAAN -> PENGECUALIAN) */}
+          {detailedTopic.progressiveExplanation && (
+            <section className="pedagogy-block">
+              <h3 className="pedagogy-title">
+                🧠 Pemahaman Bertahap: Dari Intuisi ke Kaidah Baku
+              </h3>
+
+              <div className="stepper-list">
+                {/* Langkah 1: Intuisi */}
+                <div className="stepper-item">
+                  <div className="stepper-badge">1</div>
+                  <div className="stepper-content">
+                    <h4>Intuisi Komunikasi</h4>
+                    <p>{detailedTopic.progressiveExplanation.step1_intuition}</p>
                   </div>
-                  <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", margin: 0 }}>
-                    Alasan: {m.why}
+                </div>
+
+                {/* Langkah 2: Kaidah Inti */}
+                <div className="stepper-item">
+                  <div className="stepper-badge">2</div>
+                  <div className="stepper-content">
+                    <h4>Aturan Inti Struktur Kalimat</h4>
+                    <ul style={{ margin: "4px 0 0", paddingLeft: "18px", fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
+                      {(detailedTopic.progressiveExplanation.step2_coreRules || []).map((rule, idx) => (
+                        <li key={idx} style={{ marginBottom: "2px" }}>{rule}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Langkah 3: Kaidah Ejaan & Bunyi */}
+                {(detailedTopic.progressiveExplanation.step3_spellingRules || detailedTopic.progressiveExplanation.step3_regularSpellingAndSound) && (
+                  <div className="stepper-item">
+                    <div className="stepper-badge">3</div>
+                    <div className="stepper-content">
+                      <h4>Kaidah Perubahan Bentuk & Ejaan</h4>
+                      <ul style={{ margin: "4px 0 0", paddingLeft: "18px", fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
+                        {(detailedTopic.progressiveExplanation.step3_spellingRules || detailedTopic.progressiveExplanation.step3_regularSpellingAndSound || []).map((rule, idx) => (
+                          <li key={idx} style={{ marginBottom: "2px" }}>{rule}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+
+                {/* Langkah 4: Pengecualian & Kata Kerja Khusus */}
+                {(detailedTopic.progressiveExplanation.step4_exceptions || detailedTopic.progressiveExplanation.step4_irregularVerbs) && (
+                  <div className="stepper-item">
+                    <div className="stepper-badge">4</div>
+                    <div className="stepper-content">
+                      <h4>Pengecualian Penting yang Sering Menjebak</h4>
+                      <ul style={{ margin: "4px 0 0", paddingLeft: "18px", fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
+                        {(detailedTopic.progressiveExplanation.step4_exceptions || detailedTopic.progressiveExplanation.step4_irregularVerbs || []).map((exc, idx) => (
+                          <li key={idx} style={{ marginBottom: "2px" }}>{exc}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* (d) CONTOH KALIMAT PER KEGUNAAN */}
+          {detailedTopic.useCaseExamples && (
+            <section className="pedagogy-block">
+              <h3 className="pedagogy-title">
+                💬 Contoh Pemakaian Kalimat Nyata
+              </h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+                {detailedTopic.useCaseExamples.map((cat, idx) => (
+                  <div key={idx} style={{ backgroundColor: "#FAF8F5", padding: "var(--space-4)", borderRadius: "var(--radius-md)", border: "var(--border-sm)" }}>
+                    <h4 style={{ fontSize: "var(--text-sm)", margin: "0 0 var(--space-3) 0", color: "var(--color-accent-navy)" }}>
+                      Kategori: {cat.category}
+                    </h4>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+                      {cat.sentences.map((s, sIdx) => (
+                        <div key={sIdx} style={{ backgroundColor: "var(--color-bg-surface)", padding: "var(--space-3) var(--space-4)", borderRadius: "var(--radius-sm)", border: "1px solid var(--border-color)" }}>
+                          <p style={{ fontWeight: 700, margin: 0, fontSize: "var(--text-sm)" }}>{s.en}</p>
+                          <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", fontStyle: "italic", margin: "2px 0 0" }}>{s.id}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* (e) PERBANDINGAN BAHASA INDONESIA (CONTRASTIVE ANALYSIS) */}
+          {detailedTopic.indonesianContrast && (
+            <section className="contrast-card">
+              <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-lg)", fontWeight: 800, margin: "0 0 var(--space-3) 0", color: "#744210" }}>
+                🇮🇩 Kenapa Orang Indonesia Sering Salah di Topik Ini?
+              </h3>
+              <p style={{ fontSize: "var(--text-xs)", lineHeight: 1.6, color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
+                <strong>Perbedaan Mendasar:</strong> {detailedTopic.indonesianContrast.fundamentalDifference}
+              </p>
+              <p style={{ fontSize: "var(--text-xs)", lineHeight: 1.6, color: "var(--color-text-secondary)", marginBottom: "var(--space-4)" }}>
+                <strong>Akar Kesalahan:</strong> {detailedTopic.indonesianContrast.whyIndonesiansStruggle}
+              </p>
+
+              {detailedTopic.indonesianContrast.contrastTable && (
+                <div style={{ borderTop: "1px dashed #D69E2E", paddingTop: "var(--space-3)" }}>
+                  {detailedTopic.indonesianContrast.contrastTable.map((row, idx) => (
+                    <div key={idx} className="contrast-row">
+                      <strong style={{ color: "#744210" }}>{row.concept}</strong>
+                      <span style={{ color: "var(--color-text-secondary)" }}>{row.bahasaIndonesia}</span>
+                      <strong style={{ color: "var(--color-accent-navy)" }}>{row.bahasaInggris}</strong>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* (f) BEDAH KESALAHAN UMUM */}
+          {detailedTopic.commonMistakes && detailedTopic.commonMistakes.length > 0 && (
+            <section className="pedagogy-block">
+              <h3 className="pedagogy-title">
+                ⚠️ Bedah Kesalahan Umum (Salah ➔ Benar)
+              </h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+                {detailedTopic.commonMistakes.map((m, idx) => (
+                  <div key={idx} className="mistake-box">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                      <span className="scholar-chip chip-neutral" style={{ fontSize: "10px", padding: "1px 6px" }}>
+                        {m.trapType || "Jebakan Pola"}
+                      </span>
+                    </div>
+                    <div className="mistake-wrong">✕ Salah: {m.wrong}</div>
+                    <div className="mistake-correct">✓ Benar: {m.correct}</div>
+                    <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", margin: 0, lineHeight: 1.5 }}>
+                      <strong>Alasan:</strong> {m.explanation}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* (g) CHEAT SHEET & GOLDEN RULE */}
+          {detailedTopic.cheatSheet && (
+            <section className="card card-tint-sand" style={{ padding: "var(--space-6)", marginBottom: "var(--space-6)" }}>
+              <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-lg)", fontWeight: 800, margin: "0 0 var(--space-3) 0" }}>
+                ⚡ Ringkasan Cepat (Cheat Sheet)
+              </h3>
+              <ul style={{ margin: "0 0 var(--space-4) 0", paddingLeft: "18px", fontSize: "var(--text-xs)", lineHeight: 1.7, color: "var(--color-text-primary)" }}>
+                {(detailedTopic.cheatSheet.keyTakeaways || []).map((item, idx) => (
+                  <li key={idx} style={{ marginBottom: "2px" }}><strong>{item}</strong></li>
+                ))}
+              </ul>
+              {detailedTopic.cheatSheet.quickGoldenRule && (
+                <div style={{ backgroundColor: "var(--color-bg-surface)", padding: "var(--space-3) var(--space-4)", borderRadius: "var(--radius-md)", border: "1.5px solid #D69E2E" }}>
+                  <span style={{ fontSize: "11px", fontWeight: 800, color: "#744210", textTransform: "uppercase" }}>
+                    ⭐ Golden Rule:
+                  </span>
+                  <p style={{ margin: "2px 0 0", fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-text-primary)" }}>
+                    {detailedTopic.cheatSheet.quickGoldenRule}
                   </p>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              )}
+            </section>
+          )}
 
-        {/* Start Quiz Action */}
-        <div style={{ textAlign: "right", borderTop: "var(--border-sm)", paddingTop: "var(--space-6)" }}>
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={() => onStartQuiz(topic)}
-          >
-            Mulai Kuis Topik Ini ({topic.questions?.length || 3} Soal) ↗
-          </Button>
+          {/* (j) TAUTAN TOPIK PRASYARAT & KELANJUTAN */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "var(--border-sm)", paddingTop: "var(--space-4)", flexWrap: "wrap", gap: "var(--space-3)" }}>
+            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
+              {detailedTopic.prerequisites && detailedTopic.prerequisites.length > 0 && (
+                <span>Prasyarat: <strong>{detailedTopic.prerequisites.join(", ")}</strong> • </span>
+              )}
+              {detailedTopic.nextTopics && detailedTopic.nextTopics.length > 0 && (
+                <span>Lanjutan: <strong>{detailedTopic.nextTopics.join(", ")}</strong></span>
+              )}
+            </div>
+
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => setActiveTab("praktik")}
+              id="goto-practice-tab-btn"
+            >
+              Mulai 12 Praktik Bertingkat ↗
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* TAB 2: PRAKTIK BERTINGKAT */}
+      {activeTab === "praktik" && (
+        <div id="grammar-tab-praktik-content">
+          <GrammarPracticeRunner
+            topic={detailedTopic}
+            onFinishPractice={(result) => {
+              handleSaveProgress(result);
+              setActiveTab("kuis");
+            }}
+          />
+        </div>
+      )}
+
+      {/* TAB 3: KUIS PENGUASAAN (10 SOAL) */}
+      {activeTab === "kuis" && (
+        <div id="grammar-tab-kuis-content">
+          <GrammarMasteryQuiz
+            topic={detailedTopic}
+            onClose={() => setActiveTab("materi")}
+            onSaveProgress={handleSaveProgress}
+            claimReward={userProfileHook?.claimReward}
+            equippedOutfit={userProfileHook?.equippedOutfit}
+          />
+        </div>
+      )}
     </div>
   );
 }
-

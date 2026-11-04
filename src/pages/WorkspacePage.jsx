@@ -285,6 +285,7 @@ export function WorkspacePage() {
                   topic={selectedGrammarTopic}
                   onBack={() => setSelectedGrammarTopic(null)}
                   onStartQuiz={handleStartQuiz}
+                  userProfileHook={userProfile}
                 />
               ) : (
                 <GrammarGrid
