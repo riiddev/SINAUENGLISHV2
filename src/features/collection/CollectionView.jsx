@@ -1,3 +1,7 @@
+import {
+  IconCheck,
+  IconLock
+} from "../../components/common/Icons.jsx";
 import React, { useState } from "react";
 import { CATALOG_ITEMS, getXpProgressForLevel } from "./collectionCatalog.js";
 import { AvatarWithBorder } from "../profile/AvatarWithBorder.jsx";

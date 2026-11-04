@@ -1,3 +1,15 @@
+import {
+  IconArrowLeft,
+  IconArrowRight,
+  IconCheck,
+  IconClose,
+  IconHelp,
+  IconLightbulb,
+  IconPin,
+  IconScroll,
+  IconSparkles,
+  IconVolume
+} from "../../components/common/Icons.jsx";
 import React, { useState } from "react";
 import { KanciMascot } from "../../components/mascot/KanciMascot.jsx";
 import { api } from "../../services/api.js";

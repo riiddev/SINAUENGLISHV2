@@ -1,4 +1,17 @@
-import { IconLightbulb } from "../../components/common/Icons.jsx";
+import {
+  IconArrowLeft,
+  IconBook,
+  IconCheck,
+  IconClock,
+  IconClose,
+  IconEdit,
+  IconHelp,
+  IconLightbulb,
+  IconSparkles,
+  IconStar,
+  IconTarget,
+  IconTrophy
+} from "../../components/common/Icons.jsx";
 import React, { useState, useEffect } from "react";
 import { Badge } from "../../components/common/Badge.jsx";
 import { Button } from "../../components/common/Button.jsx";

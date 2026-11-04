@@ -1,3 +1,8 @@
+import {
+  IconCheck,
+  IconClock,
+  IconGift
+} from "../../components/common/Icons.jsx";
 import React, { useState } from "react";
 import { Badge } from "../../components/common/Badge.jsx";
 import { Modal } from "../../components/common/Modal.jsx";

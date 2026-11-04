@@ -1,3 +1,6 @@
+import {
+  IconRefresh
+} from "../../components/common/Icons.jsx";
 import React, { useState, useMemo } from "react";
 import { VocabCard } from "./VocabCard.jsx";
 import { VocabModal } from "./VocabModal.jsx";

@@ -1,3 +1,6 @@
+import {
+  IconCheck
+} from "../../components/common/Icons.jsx";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { KanciMascot } from "../../components/mascot/KanciMascot.jsx";

@@ -1,3 +1,8 @@
+import {
+  IconCheck,
+  IconClose,
+  IconLightbulb
+} from "../../components/common/Icons.jsx";
 import React, { useState } from "react";
 import { Badge } from "../../components/common/Badge.jsx";
 import { Button } from "../../components/common/Button.jsx";

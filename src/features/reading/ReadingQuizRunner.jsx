@@ -1,4 +1,10 @@
-import { IconClose } from "../../components/common/Icons.jsx";
+import {
+  IconArrowLeft,
+  IconArrowRight,
+  IconCheck,
+  IconClose,
+  IconLightbulb
+} from "../../components/common/Icons.jsx";
 import React, { useState, useEffect, useMemo } from "react";
 import { KanciMascot } from "../../components/mascot/KanciMascot.jsx";
 import "../../styles/reading-quiz.css";
