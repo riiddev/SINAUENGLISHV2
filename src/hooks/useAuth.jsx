@@ -57,6 +57,18 @@ export function AuthProvider({ children }) {
     setError(null);
     setLoading(true);
     try {
+      // Clear any prior cached account data for a clean slate starting strictly from 0
+      try {
+        localStorage.removeItem("sinau_local_profile");
+        localStorage.removeItem("sinau_local_inventory");
+        localStorage.removeItem("sinau_story_progress_dev");
+        localStorage.removeItem("sinau_habit_read_history");
+        localStorage.removeItem("sinau_grammar_history");
+        localStorage.removeItem("sinau_srs_records");
+        localStorage.removeItem("sinau_avatar_url");
+        localStorage.removeItem("sinau_avatar_updated_at");
+      } catch (e) {}
+
       const res = await api.register({ email, password, displayName });
       if (res.success && res.data?.user) {
         setUser(res.data.user);
@@ -76,6 +88,16 @@ export function AuthProvider({ children }) {
     try {
       await api.logout();
     } finally {
+      try {
+        localStorage.removeItem("sinau_local_profile");
+        localStorage.removeItem("sinau_local_inventory");
+        localStorage.removeItem("sinau_story_progress_dev");
+        localStorage.removeItem("sinau_habit_read_history");
+        localStorage.removeItem("sinau_grammar_history");
+        localStorage.removeItem("sinau_srs_records");
+        localStorage.removeItem("sinau_avatar_url");
+        localStorage.removeItem("sinau_avatar_updated_at");
+      } catch (e) {}
       setUser(null);
       setError(null);
       setLoading(false);

@@ -133,6 +133,8 @@ export function WorkspacePage() {
           onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
           isSyncing={isSyncing}
           syncError={syncError}
+          coins={userProfile.profile.coins ?? 0}
+          level={userProfile.calculatedLevel || 1}
         />
 
         {/* Workspace Body */}

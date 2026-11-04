@@ -23,11 +23,11 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
     }
     return {
       displayName: user?.displayName || "Pelajar Sinau",
-      activeTitle: "word_explorer",
+      activeTitle: "",
       avatarKey: "avatar_1",
-      xp: 120,
-      streak: 1,
-      coins: 50,
+      xp: 0,
+      streak: 0,
+      coins: 0,
       lastActiveDate: new Date().toISOString()
     };
   });
@@ -48,7 +48,7 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
     }
   });
 
-  const [unlockedTitleIds, setUnlockedTitleIds] = useState(["word_explorer"]);
+  const [unlockedTitleIds, setUnlockedTitleIds] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
@@ -58,11 +58,7 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
       const saved = localStorage.getItem(LOCAL_INVENTORY_KEY);
       if (saved) return JSON.parse(saved);
     } catch (e) {}
-    const now = new Date().toISOString();
-    return [
-      { itemId: "border_daun", unlockedAt: now, equipped: true },
-      { itemId: "border_tinta", unlockedAt: now, equipped: false }
-    ];
+    return [];
   });
 
   // Derive stats from real vocabulary & progress
@@ -138,26 +134,31 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
       .then(async (res) => {
         if (!isMounted || !res.success || !res.data) return;
         const remoteP = res.data.profile;
-        const remoteTitles = (res.data.unlockedTitles || []).map((t) => t.titleId);
+        let remoteTitles = (res.data.unlockedTitles || []).map((t) => t.titleId);
+
+        // Filter out premature "word_explorer" title if user has not actually reached 50 words started
+        if ((userStats.totalStartedWords || 0) < 50) {
+          remoteTitles = remoteTitles.filter((t) => t !== "word_explorer");
+        }
 
         setProfile((prev) => {
+          // If user has 0 reviews and 0 words started, ensure streak, coins, and xp start strictly from 0
+          const hasStudyActivity = (userStats.totalStartedWords || 0) > 0 || (userStats.totalReviews || 0) > 0;
           const merged = {
             ...prev,
             displayName: remoteP.displayName || user?.displayName || prev.displayName,
-            activeTitle: remoteP.activeTitle || prev.activeTitle,
+            activeTitle: remoteTitles.includes(remoteP.activeTitle) ? remoteP.activeTitle : "",
             avatarKey: remoteP.avatarKey || prev.avatarKey,
-            xp: Math.max(prev.xp, remoteP.xp || 0),
-            streak: Math.max(prev.streak, remoteP.streak || 1),
-            coins: Math.max(prev.coins, remoteP.coins || 50),
+            xp: hasStudyActivity ? Number(remoteP.xp !== undefined ? remoteP.xp : (prev.xp || 0)) : 0,
+            streak: hasStudyActivity ? Number(remoteP.streak !== undefined ? remoteP.streak : (prev.streak || 0)) : 0,
+            coins: hasStudyActivity ? Number(remoteP.coins !== undefined ? remoteP.coins : (prev.coins || 0)) : 0,
             lastActiveDate: remoteP.lastActiveDate || prev.lastActiveDate
           };
           localStorage.setItem(LOCAL_PROFILE_KEY, JSON.stringify(merged));
           return merged;
         });
 
-        if (remoteTitles.length > 0) {
-          setUnlockedTitleIds((prev) => Array.from(new Set([...prev, ...remoteTitles])));
-        }
+        setUnlockedTitleIds((prev) => Array.from(new Set([...prev.filter(t => t !== "word_explorer" || (userStats.totalStartedWords || 0) >= 50), ...remoteTitles])));
 
         // Cache-aware Avatar Fetch
         const remoteAvatarTime = remoteP.avatarUpdatedAt;
@@ -417,8 +418,12 @@ export function useUserProfile({ vocabulary = [], progressMap = {} }) {
   }, [isAuthenticated]);
 
   const activeTitleObj = useMemo(() => {
+    if (!profile.activeTitle) return null;
+    const isUnlocked = unlockedTitleIds.includes(profile.activeTitle) ||
+      evaluatedTitles.some((t) => t.id === profile.activeTitle && t.isUnlocked);
+    if (!isUnlocked) return null;
     return getTitleById(profile.activeTitle);
-  }, [profile.activeTitle]);
+  }, [profile.activeTitle, unlockedTitleIds, evaluatedTitles]);
 
   return {
     profile,

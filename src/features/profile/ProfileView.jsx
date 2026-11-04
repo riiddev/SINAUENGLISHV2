@@ -29,7 +29,7 @@ export function ProfileView({ vocabulary = [], progressMap = {}, userProfileHook
   const [filterMode, setFilterMode] = useState("all"); // "all" | "unlocked" | "locked"
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editName, setEditName] = useState(profile.displayName || "Pelajar Sinau");
-  const [selectedTitleId, setSelectedTitleId] = useState(profile.activeTitle || "word_explorer");
+  const [selectedTitleId, setSelectedTitleId] = useState(profile.activeTitle || "");
 
   // Avatar Upload & Crop State
   const fileInputRef = useRef(null);
@@ -52,7 +52,7 @@ export function ProfileView({ vocabulary = [], progressMap = {}, userProfileHook
 
   const handleOpenEditModal = () => {
     setEditName(profile.displayName || "Pelajar Sinau");
-    setSelectedTitleId(profile.activeTitle || "word_explorer");
+    setSelectedTitleId(profile.activeTitle || "");
     setCropImageSrc(null);
     setAvatarError("");
     setAvatarSuccess("");
@@ -251,7 +251,7 @@ export function ProfileView({ vocabulary = [], progressMap = {}, userProfileHook
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                   </svg>
-                  {activeTitleObj.name}
+                  {activeTitleObj?.name || "Pelajar Baru"}
                 </span>
 
                 <span className="scholar-chip chip-level">
@@ -793,13 +793,17 @@ export function ProfileView({ vocabulary = [], progressMap = {}, userProfileHook
                     onChange={(e) => setSelectedTitleId(e.target.value)}
                     style={{ width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "var(--border-sm)" }}
                   >
-                    {evaluatedTitles
-                      .filter((t) => t.isUnlocked)
-                      .map((t) => (
-                        <option key={t.id} value={t.id}>
-                          {t.name} ({t.englishName})
-                        </option>
-                      ))}
+                    {evaluatedTitles.filter((t) => t.isUnlocked).length === 0 ? (
+                      <option value="">Belum Ada Gelar Terbuka (Pelajar Baru)</option>
+                    ) : (
+                      evaluatedTitles
+                        .filter((t) => t.isUnlocked)
+                        .map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.name} ({t.englishName})
+                          </option>
+                        ))
+                    )}
                   </select>
                 </div>
 

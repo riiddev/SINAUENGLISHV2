@@ -598,10 +598,10 @@ function handleGetProfile(ss, token) {
     userProfile = {
       userId: userId,
       displayName: name,
-      activeTitle: "word_explorer",
-      xp: 50,
-      streak: 1,
-      coins: 50,
+      activeTitle: "",
+      xp: 0,
+      streak: 0,
+      coins: 0,
       lastActiveDate: now,
       avatarKey: "avatar_1"
     };
@@ -616,9 +616,6 @@ function handleGetProfile(ss, token) {
       userProfile.lastActiveDate,
       userProfile.avatarKey
     ]);
-
-    // Unlock default initial starter title
-    titleSheet.appendRow([userId, "word_explorer", now]);
   }
 
   // Fetch unlocked titles for this user
@@ -824,7 +821,7 @@ function handleUploadAvatar(ss, token, payload) {
     profileSheet.getRange(rowIdx, 10).setValue(now);
   } else {
     // User row doesn't exist yet, append
-    profileSheet.appendRow([userId, "Pelajar Sinau", "word_explorer", 50, 1, 50, now, "avatar_1", newFileId, now]);
+    profileSheet.appendRow([userId, "Pelajar Sinau", "", 0, 0, 0, now, "avatar_1", newFileId, now]);
   }
 
   const dataUrl = "data:" + mimeType + ";base64," + base64Data;

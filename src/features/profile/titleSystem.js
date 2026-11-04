@@ -218,13 +218,12 @@ export const AVATAR_PRESETS = [
 ];
 
 export function getTitleById(titleId) {
-  return TITLES_CATALOG.find((t) => t.id === titleId) || TITLES_CATALOG[0];
+  if (!titleId) return null;
+  return TITLES_CATALOG.find((t) => t.id === titleId) || null;
 }
 
 export function evaluateAllTitles(userStats, unlockedTitleIds = []) {
   const unlockedSet = new Set(unlockedTitleIds);
-  // Default title is always available as starter
-  unlockedSet.add("word_explorer");
 
   return TITLES_CATALOG.map((title) => {
     const evalResult = title.evaluate(userStats);

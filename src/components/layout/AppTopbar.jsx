@@ -9,7 +9,7 @@ export function AppTopbar({
   onToggleSidebar,
   isSyncing = false,
   syncError = null,
-  coins = 50,
+  coins = 0,
   level = 1
 }) {
   const { isAuthenticated } = useAuth();

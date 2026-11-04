@@ -181,14 +181,14 @@ function handleDevFallback(action, payload, token) {
         profile: {
           userId: "u_dev_user",
           displayName: "Pelajar Sinau",
-          activeTitle: "word_explorer",
-          xp: 250,
-          streak: 3,
-          coins: 75,
+          activeTitle: "",
+          xp: 0,
+          streak: 0,
+          coins: 0,
           lastActiveDate: new Date().toISOString(),
           avatarKey: "avatar_1"
         },
-        unlockedTitles: [{ titleId: "word_explorer", unlockedAt: new Date().toISOString() }]
+        unlockedTitles: []
       }
     };
   }
@@ -200,7 +200,7 @@ function handleDevFallback(action, payload, token) {
   if (action === "getUserTitles") {
     return {
       success: true,
-      data: { titles: [{ titleId: "word_explorer", unlockedAt: new Date().toISOString() }] }
+      data: { titles: [] }
     };
   }
 
@@ -292,16 +292,6 @@ function handleDevFallback(action, payload, token) {
     try {
       const raw = localStorage.getItem("sinau_local_inventory");
       if (raw) saved = JSON.parse(raw);
-    } catch (e) {}
-
-    const now = new Date().toISOString();
-    const hasDaun = saved.some(it => it.itemId === "border_daun");
-    const hasTinta = saved.some(it => it.itemId === "border_tinta");
-
-    if (!hasDaun) saved.push({ itemId: "border_daun", unlockedAt: now, equipped: false });
-    if (!hasTinta) saved.push({ itemId: "border_tinta", unlockedAt: now, equipped: false });
-    try {
-      localStorage.setItem("sinau_local_inventory", JSON.stringify(saved));
     } catch (e) {}
 
     return {
