@@ -1,0 +1,80 @@
+/* ==========================================================================
+   ADVENTURE HUB — 10 Stories & Episodes Roadmap
+   ========================================================================== */
+
+.adventure-hub-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.story-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.story-hub-card {
+  background-color: var(--color-bg-surface);
+  border: var(--border-lg);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  box-shadow: 3px 3px 0 var(--border-color);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.story-hub-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 var(--border-color);
+}
+
+.story-hub-card.is-locked {
+  opacity: 0.75;
+  background-color: #F7F5F0;
+  cursor: not-allowed;
+}
+
+/* Episode Roadmap Grid */
+.episode-roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.episode-node-card {
+  background-color: var(--color-bg-surface);
+  border: var(--border-md);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: 2px 2px 0 var(--border-color);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.episode-node-card:hover:not(.is-locked) {
+  transform: translateY(-2px);
+  background-color: #FAF8F5;
+}
+
+.episode-node-card.is-locked {
+  background-color: #F7F7F7;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.episode-node-card.is-completed {
+  border-left: 6px solid var(--color-success);
+}
+
+.episode-node-card.is-current {
+  border-left: 6px solid var(--color-accent-gold);
+  background-color: #FFFDF0;
+}

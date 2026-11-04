@@ -175,3 +175,29 @@ Meskipun solusi ini 100% gratis dan mudah dikelola tanpa infrastruktur server, t
 - Pada kartu profil dan modal, elemen avatar disusun dalam struktur modular bertingkat (`scholar-avatar-box`):
   1. Lapisan Dasar: Elemen `img` (foto profil) atau inisial nama.
   2. Lapisan Atas (`z-index: 2`): Bingkai dekoratif (`avatar-border-overlay`) yang akan dihubungkan ke sistem katalog border (Daun, Tinta, Kawung, Emas, Buku, Kanci) pada Tahap 3.
+
+---
+
+## 6. Arsitektur Petualangan & Mesin Cerita (Tahap 6 — StoryProgress)
+
+### A. Skema Tab `StoryProgress`
+Menyimpan riwayat penyelesaian 10 cerita (100 episode) dan kontrol ritme harian (pacing):
+- `user_id`: ID unik pengguna (`u_...`)
+- `story_id`: ID cerita (misal: `story-01`)
+- `episode_id`: Nomor episode yang diselesaikan (`1` s.d. `10`)
+- `completed_at`: Waktu penyelesaian ISO 8601 UTC
+- `wib_date`: Tanggal kalender WIB saat episode diselesaikan (`yyyy-MM-dd` GMT+07:00)
+- `xp_rewarded`: Jumlah EXP yang diberikan (default +50 EXP)
+- `coins_rewarded`: Jumlah Sinau Coin yang diberikan (default +30 Koin)
+
+### B. Mekanisme Daily Pacing Sistematis (WIB)
+1. **Ritme Belajar Harian (Pacing)**:
+   - Pengguna dibatasi untuk membuka maksimal **1 episode baru per hari** kalender Waktu Indonesia Barat (WIB, GMT+07:00).
+   - Tujuannya adalah menjaga retensi memori jangka panjang dan mencegah fenomena *binge-learning* yang tidak efektif.
+2. **Replay Bebas Tanpa Batas**:
+   - Episode yang telah berstatus selesai dapat diakses dan dibaca ulang kapan saja untuk mengulang latihan kosakata, grammar, maupun audio.
+   - Replay tidak memberikan hadiah EXP maupun Koin berulang (`alreadyCompleted: true`).
+3. **Endpoint API**:
+   - `getStoryProgress`: Mengembalikan riwayat episode yang tuntas per cerita dan status `hasUnlockedNewEpisodeToday`.
+   - `completeStoryEpisode`: Memvalidasi penyelesaian episode, mencatat ke tab `StoryProgress`, dan secara idempoten menambahkan +50 EXP dan +30 Koin ke tab `Profiles`.
+

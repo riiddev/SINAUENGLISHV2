@@ -322,6 +322,8 @@ export function WorkspacePage() {
           {(currentView === "adventure" || currentView === "petualangan") && (
             <section className="view-section is-active" id="view-adventure">
               <AdventureHub
+                userProfileHook={userProfile}
+                onRecordWordReview={recordWordReview}
                 stories={stories}
                 dialogues={dialogues}
                 listening={listening}

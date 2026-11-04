@@ -415,6 +415,75 @@ function handleDevFallback(action, payload, token) {
     };
   }
 
+  if (action === "getStoryProgress") {
+    let saved = {};
+    let lastDate = "";
+    try {
+      const raw = localStorage.getItem("sinau_story_progress_dev");
+      if (raw) saved = JSON.parse(raw);
+      lastDate = localStorage.getItem("sinau_story_last_date_wib") || "";
+    } catch (e) {}
+
+    const todayWib = new Date().toISOString().slice(0, 10);
+    const hasUnlockedToday = lastDate === todayWib;
+
+    return {
+      success: true,
+      data: {
+        progress: saved,
+        todayWib,
+        hasUnlockedNewEpisodeToday: hasUnlockedToday
+      }
+    };
+  }
+
+  if (action === "completeStoryEpisode") {
+    let saved = {};
+    let lastDate = "";
+    try {
+      const raw = localStorage.getItem("sinau_story_progress_dev");
+      if (raw) saved = JSON.parse(raw);
+      lastDate = localStorage.getItem("sinau_story_last_date_wib") || "";
+    } catch (e) {}
+
+    const { storyId, episodeId } = payload;
+    const epIdNum = Number(episodeId);
+    if (!saved[storyId]) saved[storyId] = [];
+
+    const isReplay = saved[storyId].includes(epIdNum);
+    const todayWib = new Date().toISOString().slice(0, 10);
+
+    if (isReplay) {
+      return {
+        success: true,
+        alreadyCompleted: true,
+        earnedXp: 0,
+        earnedCoins: 0,
+        message: "Episode selesai diulang (tanpa reward ganda)."
+      };
+    }
+
+    saved[storyId].push(epIdNum);
+    try {
+      localStorage.setItem("sinau_story_progress_dev", JSON.stringify(saved));
+      localStorage.setItem("sinau_story_last_date_wib", todayWib);
+    } catch (e) {}
+
+    return {
+      success: true,
+      data: {
+        storyId,
+        episodeId: epIdNum,
+        earnedXp: 50,
+        earnedCoins: 30,
+        totalXp: 300,
+        totalCoins: 150,
+        level: 5,
+        todayWib
+      }
+    };
+  }
+
   if (action === "grantReward") {
     let earnedXp = 0;
     let earnedCoins = 0;
@@ -582,6 +651,15 @@ export const api = {
 
   async saveGrammarProgress({ topicId, practiceDone, quizScore }) {
     return request("saveGrammarProgress", { topicId, practiceDone, quizScore }, true);
+  },
+
+  // Storytelling & Adventures (Tahap 6)
+  async getStoryProgress() {
+    return request("getStoryProgress", {}, true);
+  },
+
+  async completeStoryEpisode({ storyId, episodeId }) {
+    return request("completeStoryEpisode", { storyId, episodeId }, true);
   }
 };
 

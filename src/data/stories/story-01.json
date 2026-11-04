@@ -1,0 +1,647 @@
+{
+  "id": "story-01",
+  "title": "Kopi Pertama di Kota Baru",
+  "titleEn": "First Coffee in the New City",
+  "level": "A1",
+  "totalEpisodes": 10,
+  "description": "Perjalanan hari pertama tiba di kota baru, mencari sarapan, berinteraksi dengan warga lokal, dan memesan kopi impian.",
+  "episodes": [
+    {
+      "id": 1,
+      "title": "Selamat Pagi, Kota Baru",
+      "titleEn": "Good Morning, New City",
+      "estimatedMinutes": 10,
+      "recap": "Prolog: Kamu baru saja turun dari kereta jarak jauh di Stasiun Pusat. Udara pagi terasa sejuk dan kota asing ini menyambutmu dengan kesibukan orang-orang yang bergegas berangkat kerja. Perutmu mulai lapar, dan kamu memutuskan mencari kedai kopi terdekat.",
+      "dialogue": [
+        {
+          "id": "d1",
+          "speaker": "Narator",
+          "en": "You step onto the busy platform and take a deep breath.",
+          "idText": "Kamu melangkah ke peron yang ramai dan menarik napas panjang."
+        },
+        {
+          "id": "d2",
+          "speaker": "Kanci",
+          "en": "Welcome to the city! Remember, every journey starts with a friendly greeting.",
+          "idText": "Selamat datang di kota baru! Ingat, setiap petualangan dimulai dari sapaan ramah."
+        },
+        {
+          "id": "d3",
+          "speaker": "Narator",
+          "en": "You adjust your heavy backpack and look around for an exit sign.",
+          "idText": "Kamu membetulkan ransel beratmu dan mencari tanda pintu keluar di sekitar."
+        },
+        {
+          "id": "d4",
+          "speaker": "Station Officer",
+          "en": "Good morning! Are you looking for the main exit or the taxi stand?",
+          "idText": "Selamat pagi! Apakah Anda mencari pintu keluar utama atau pangkalan taksi?"
+        },
+        {
+          "id": "choice_point_1",
+          "type": "interactive_choice",
+          "prompt": "Bagaimana caramu membalas sapaan petugas stasiun dengan sopan?",
+          "options": [
+            {
+              "id": "c1_a",
+              "text": "Good morning! The main exit, please. Is there a café nearby?",
+              "speakerReply": "Station Officer",
+              "reactionEn": "Yes, just take the north gate. There is a cozy coffee shop right across the street!",
+              "reactionId": "Ya, ambil saja gerbang utara. Ada kedai kopi nyaman tepat di seberang jalan!"
+            },
+            {
+              "id": "c1_b",
+              "text": "Hello! I am new here. Where can I find a good cup of coffee?",
+              "speakerReply": "Station Officer",
+              "reactionEn": "Welcome! Head through the main doors, and look for 'The Corner Cup'. It's the best!",
+              "reactionId": "Selamat datang! Lewat pintu utama, lalu cari 'The Corner Cup'. Kopinya paling mantap!"
+            }
+          ]
+        },
+        {
+          "id": "d5",
+          "speaker": "You",
+          "en": "Thank you so much for your kind help!",
+          "idText": "Terima kasih banyak atas bantuan baik Anda!"
+        },
+        {
+          "id": "d6",
+          "speaker": "Station Officer",
+          "en": "You are very welcome. Have a wonderful first day in our city!",
+          "idText": "Sama-sama. Semoga hari pertamamu di kota kami menyenangkan!"
+        },
+        {
+          "id": "d7",
+          "speaker": "Narator",
+          "en": "You walk through the north gate into the morning breeze.",
+          "idText": "Kamu berjalan melewati gerbang utara menuju semilir angin pagi."
+        },
+        {
+          "id": "choice_point_2",
+          "type": "interactive_choice",
+          "prompt": "Seorang pejalan kaki tersenyum kepadamu. Apa reaksimu?",
+          "options": [
+            {
+              "id": "c2_a",
+              "text": "Smile and say: 'Good morning!'",
+              "speakerReply": "Pedestrian",
+              "reactionEn": "Morning! Lovely weather today, isn't it?",
+              "reactionId": "Pagi! Cuaca yang indah hari ini, bukan?"
+            },
+            {
+              "id": "c2_b",
+              "text": "Nod politely and say: 'Hello, have a nice day!'",
+              "speakerReply": "Pedestrian",
+              "reactionEn": "Thanks, you too! Welcome to our neighborhood!",
+              "reactionId": "Terima kasih, kamu juga! Selamat datang di lingkungan kami!"
+            }
+          ]
+        },
+        {
+          "id": "d8",
+          "speaker": "Narator",
+          "en": "Across the pedestrian crossing, a warm wooden sign catches your eye: 'The Corner Cup'. The rich scent of roasted coffee beans drifts through the glass door.",
+          "idText": "Di seberang penyeberangan pejalan kaki, plang kayu hangat menarik perhatianmu: 'The Corner Cup'. Aroma semerbak biji kopi panggang tercium lembut lewat pintu kaca."
+        }
+      ],
+      "highlightedVocab": [
+        {
+          "wordId": "a1-hello",
+          "word": "hello",
+          "partOfSpeech": "exclamation",
+          "enDefinition": "Used as a greeting when you meet somebody.",
+          "idMeaning": "halo; sapaan ramah saat bertemu seseorang",
+          "contextSentence": "Hello! I am new here."
+        },
+        {
+          "wordId": "batch-city-noun",
+          "word": "city",
+          "partOfSpeech": "noun",
+          "enDefinition": "A large town with houses, shops, and industries.",
+          "idMeaning": "kota; daerah permukiman besar yang ramai",
+          "contextSentence": "Have a wonderful first day in our city!"
+        },
+        {
+          "wordId": "batch-bag-noun",
+          "word": "bag",
+          "partOfSpeech": "noun",
+          "enDefinition": "A container made of cloth or leather used for carrying things.",
+          "idMeaning": "tas; wadah untuk membawa barang bawaan",
+          "contextSentence": "You adjust your heavy bag and look around."
+        },
+        {
+          "wordId": "a1-arrive",
+          "word": "arrive",
+          "partOfSpeech": "verb",
+          "enDefinition": "To reach a destination at the end of a journey.",
+          "idMeaning": "tiba; sampai di tempat tujuan",
+          "contextSentence": "You arrive at the busy central station."
+        },
+        {
+          "wordId": "batch-coffee-noun",
+          "word": "coffee",
+          "partOfSpeech": "noun",
+          "enDefinition": "A hot drink made from roasted coffee beans.",
+          "idMeaning": "kopi; minuman hangat dari biji sangrai",
+          "contextSentence": "Where can I find a good cup of coffee?"
+        },
+        {
+          "wordId": "batch-cup-noun",
+          "word": "cup",
+          "partOfSpeech": "noun",
+          "enDefinition": "A small bowl-shaped container for drinking hot beverages.",
+          "idMeaning": "cangkir; wadah minum bertangkai",
+          "contextSentence": "Look for 'The Corner Cup' across the street."
+        }
+      ],
+      "grammarFocus": {
+        "title": "Sapaan Santun & Pola Dasar 'Are you...?'",
+        "topicId": "present-simple",
+        "explanation": "Untuk menanyakan kondisi atau arah orang lain secara sopan pada situasi tatap muka, gunakan to be 'Are you...?' diikuti kata kerja -ing atau kata sifat. Contoh: 'Are you looking for the exit?' (Apakah Anda sedang mencari pintu keluar?)",
+        "formula": "Are you + Verb-ing / Adjective + Object?"
+      },
+      "culturalTip": {
+        "title": "Sapaan Pagi & Kontak Mata Hangat",
+        "content": "Di negara-negara berbahasa Inggris, mengucapkan 'Good morning' kepada orang asing yang berpapasan di jalan atau petugas pelayanan publik adalah norma kesopanan dasar. Senyum ringan dan kontak mata singkat menandakan keramahan dan keterbukaan tanpa dianggap mengganggu."
+      },
+      "quiz": [
+        {
+          "id": "s1_q1",
+          "question": "What is the primary reason the main character is looking for an exit in Episode 1?",
+          "options": [
+            "To catch an airplane at the nearby international terminal.",
+            "To find a nearby café and get a warm breakfast after arriving at the station.",
+            "To report a lost passport to the local police department.",
+            "To return an invalid train ticket to the booking office."
+          ],
+          "correctIndex": 1,
+          "explanation": "Di awal cerita dijelaskan bahwa karakter utama baru tiba di stasiun pusat, merasa lapar, dan ingin mencari kedai kopi terdekat untuk sarapan."
+        },
+        {
+          "id": "s1_q2",
+          "question": "Which response is the most natural and polite way to reply when someone says 'Thank you so much'?",
+          "options": [
+            "You are very welcome.",
+            "No problem at all, I want money.",
+            "Please don't speak to me again.",
+            "I am agree with that."
+          ],
+          "correctIndex": 0,
+          "explanation": "Ungkapan standar paling sopan untuk membalas 'Thank you' adalah 'You are very welcome' (Sama-sama / Dengan senang hati)."
+        },
+        {
+          "id": "s1_q3",
+          "question": "According to the station officer, where is 'The Corner Cup' located?",
+          "options": [
+            "Inside the underground train basement on platform 4.",
+            "Right across the street from the north gate exit.",
+            "Ten kilometers away in the industrial suburbs.",
+            "Behind the locked ticket barrier."
+          ],
+          "correctIndex": 1,
+          "explanation": "Petugas stasiun menjelaskan bahwa kedai kopi berada tepat di seberang jalan setelah keluar dari gerbang utara ('right across the street')."
+        },
+        {
+          "id": "s1_q4",
+          "question": "What does the word 'arrive' in 'You arrive at the busy central station' mean?",
+          "options": [
+            "To leave and travel far away.",
+            "To reach a place at the end of a journey.",
+            "To cancel a scheduled train trip.",
+            "To buy an expensive return ticket."
+          ],
+          "correctIndex": 1,
+          "explanation": "'Arrive' berarti tiba atau sampai di tempat tujuan di akhir sebuah perjalanan."
+        },
+        {
+          "id": "s1_q5",
+          "question": "Which question correctly uses Present Simple to ask for directions politely?",
+          "options": [
+            "Where I can finding coffee?",
+            "Where can I find a good cup of coffee?",
+            "Where does can I find coffee?",
+            "Where I am finding a coffee?"
+          ],
+          "correctIndex": 1,
+          "explanation": "Pola modal kalimat tanya yang tepat adalah: Wh-word (Where) + modal (can) + Subject (I) + base verb (find): 'Where can I find a good cup of coffee?'."
+        }
+      ],
+      "summary": {
+        "takeaways": [
+          "Kamu berhasil tiba di kota baru dan berinteraksi dengan petugas stasiun secara percaya diri.",
+          "Menguasai sapaan ramah: 'Good morning', 'Thank you so much', dan 'You are very welcome'.",
+          "Mempelajari 6 kosakata esensial Oxford 3000: hello, city, bag, arrive, coffee, cup."
+        ]
+      },
+      "cliffhanger": "Kamu mendorong pintu kaca 'The Corner Cup'. Di dalam, denting cangkir keramik dan alunan musik jazz menyambutmu. Tapi begitu kamu menatap papan menu di atas kasir, ada puluhan istilah kopi asing yang belum pernah kamu dengar sebelumnya. Bisakah kamu memesan dengan tepat?"
+    },
+    {
+      "id": 2,
+      "title": "Aroma di Sudut Jalan",
+      "titleEn": "Aroma on the Corner",
+      "estimatedMinutes": 10,
+      "recap": "Pada Episode 1, kamu tiba di Stasiun Pusat dan mendapat petunjuk dari petugas ramah untuk mengunjungi 'The Corner Cup' di seberang gerbang utara.",
+      "dialogue": [
+        {
+          "id": "ep2_d1",
+          "speaker": "Narator",
+          "en": "A small brass bell chimes above you as you open the café door.",
+          "idText": "Sebuah lonceng kuningan kecil berdenting di atas kepalamu saat kamu membuka pintu kafe."
+        },
+        {
+          "id": "ep2_d2",
+          "speaker": "Barista",
+          "en": "Hi there! Welcome in. Take your time looking at the menu board.",
+          "idText": "Halo! Selamat datang. Silakan lihat-lihat papan menunya dengan santai."
+        },
+        {
+          "id": "ep2_d3",
+          "speaker": "Kanci",
+          "en": "Look at the sizes: Small, Medium, Large. Don't be nervous; ordering coffee in English is fun!",
+          "idText": "Lihat ukurannya: Small, Medium, Large. Jangan gugup; memesan kopi dalam bahasa Inggris itu seru!"
+        },
+        {
+          "id": "ep2_d4",
+          "speaker": "Narator",
+          "en": "You step up to the wooden counter. The barista smiles warmly, waiting for your order.",
+          "idText": "Kamu melangkah ke meja kasir kayu. Sang barista tersenyum hangat, menanti pesananmu."
+        },
+        {
+          "id": "choice_point_2_1",
+          "type": "interactive_choice",
+          "prompt": "Bagaimana caramu memesan kopi dengan sopan menggunakan frasa 'I would like'?",
+          "options": [
+            {
+              "id": "c21_a",
+              "text": "Hi! I would like a hot cappuccino with oat milk, please.",
+              "speakerReply": "Barista",
+              "reactionEn": "Excellent choice! That's one of our house favorites. What size would you prefer?",
+              "reactionId": "Pilihan yang sangat bagus! Itu favorit kafe kami. Ukuran apa yang kamu inginkan?"
+            },
+            {
+              "id": "c21_b",
+              "text": "Hello, can I get a cold black coffee and a fresh butter croissant?",
+              "speakerReply": "Barista",
+              "reactionEn": "Sure thing! Our cold brew is brewed fresh every single morning.",
+              "reactionId": "Tentu saja! Kopi seduh dingin kami diseduh segar setiap pagi."
+            }
+          ]
+        },
+        {
+          "id": "ep2_d5",
+          "speaker": "You",
+          "en": "A medium size, please. Is the pastry fresh from the oven?",
+          "idText": "Ukuran medium. Apakah kuenya baru matang dari oven?"
+        },
+        {
+          "id": "ep2_d6",
+          "speaker": "Barista",
+          "en": "Yes! The cinnamon rolls came out just ten minutes ago.",
+          "idText": "Ya! Cinnamon roll-nya baru saja keluar sepuluh menit yang lalu."
+        },
+        {
+          "id": "choice_point_2_2",
+          "type": "interactive_choice",
+          "prompt": "Barista bertanya metode pembayaran. Bagaimana kamu menjawab?",
+          "options": [
+            {
+              "id": "c22_a",
+              "text": "Can I pay by card, or do you prefer cash?",
+              "speakerReply": "Barista",
+              "reactionEn": "Both are great, but contactless card is super quick! Just tap right here.",
+              "reactionId": "Keduanya bisa, tapi kartu nirsentuh sangat cepat! Cukup tap di sini."
+            },
+            {
+              "id": "c22_b",
+              "text": "I will pay with cash. Here is twenty dollars.",
+              "speakerReply": "Barista",
+              "reactionEn": "Thank you! Here is your change and receipt. Take seat number four!",
+              "reactionId": "Terima kasih! Ini uang kembalian dan strukmu. Silakan duduk di meja nomor empat!"
+            }
+          ]
+        },
+        {
+          "id": "ep2_d7",
+          "speaker": "Narator",
+          "en": "You take your seat by the sunlit window. The warm cup warms your cold fingers, and the bustling city street outside looks alive with energy.",
+          "idText": "Kamu duduk di samping jendela berlumur sinar matahari. Cangkir hangat menghangatkan jemarimu yang dingin, dan jalanan kota yang ramai di luar tampak hidup penuh energi."
+        }
+      ],
+      "highlightedVocab": [
+        {
+          "wordId": "batch-drink-verb",
+          "word": "drink",
+          "partOfSpeech": "verb",
+          "enDefinition": "To take liquid into your mouth and swallow it.",
+          "idMeaning": "minum; meneguk cairan",
+          "contextSentence": "What would you like to drink this morning?"
+        },
+        {
+          "wordId": "batch-eat-verb",
+          "word": "eat",
+          "partOfSpeech": "verb",
+          "enDefinition": "To put food into your mouth and swallow it.",
+          "idMeaning": "makan; mengonsumsi makanan",
+          "contextSentence": "Would you like something to eat with your coffee?"
+        },
+        {
+          "wordId": "batch-bread-noun",
+          "word": "bread",
+          "partOfSpeech": "noun",
+          "enDefinition": "A common food made from flour, water, and yeast baked in an oven.",
+          "idMeaning": "roti; makanan pokok dari tepung dan ragi",
+          "contextSentence": "The bakery makes fresh bread and croissants daily."
+        },
+        {
+          "wordId": "batch-cold-adjective",
+          "word": "cold",
+          "partOfSpeech": "adjective",
+          "enDefinition": "Having a low temperature; not warm or hot.",
+          "idMeaning": "dingin; bersuhu rendah",
+          "contextSentence": "The warm cup warms your cold fingers."
+        },
+        {
+          "wordId": "batch-card-noun",
+          "word": "card",
+          "partOfSpeech": "noun",
+          "enDefinition": "A small plastic card used to pay for goods or services.",
+          "idMeaning": "kartu; kartu pembayaran bank atau debit",
+          "contextSentence": "Can I pay by credit card?"
+        },
+        {
+          "wordId": "batch-cash-noun",
+          "word": "cash",
+          "partOfSpeech": "noun",
+          "enDefinition": "Money in the form of physical coins or paper notes.",
+          "idMeaning": "uang tunai; uang kertas atau koin fisik",
+          "contextSentence": "Do you accept cash or card only?"
+        }
+      ],
+      "grammarFocus": {
+        "title": "Frasa Kesantunan: 'I would like...' vs 'I want...'",
+        "topicId": "present-simple",
+        "explanation": "Dalam bahasa Inggris, mengatakan 'I want coffee' di tempat umum terdengar terlalu menuntut atau kasar. Gunakan frasa santun 'I would like a coffee, please' atau singkatannya 'I'd like...'.",
+        "formula": "I would like (I'd like) + Noun / to Verb + please."
+      },
+      "culturalTip": {
+        "title": "Kustomisasi Minuman Kopi di Kafe",
+        "content": "Di kafe modern, barista akan menanyakan tiga hal: Ukuran (Small/Medium/Large), Jenis Susu (Whole milk/Skim/Oat/Almond), dan Suhu (Hot/Iced). Memahami urutan ini akan membuat proses pemesanan terasa sangat lancar."
+      },
+      "quiz": [
+        {
+          "id": "s1_ep2_q1",
+          "question": "Why is 'I would like a cappuccino, please' preferred over 'I want a cappuccino'?",
+          "options": [
+            "Because 'I would like' is much more polite and respectful in customer service situations.",
+            "Because 'I want' is grammatically incorrect in all English sentences.",
+            "Because 'I would like' is only used for cold beverages.",
+            "Because 'I want' can only be spoken by children."
+          ],
+          "correctIndex": 0,
+          "explanation": "'I would like' adalah bentuk permohonan santun (polite request) standar dalam bahasa Inggris, sedangkan 'I want' terdengar menuntut."
+        },
+        {
+          "id": "s1_ep2_q2",
+          "question": "Which question politely asks the barista about accepted payment methods?",
+          "options": [
+            "You give me free coffee now?",
+            "Can I pay by card, or do you prefer cash?",
+            "Why is coffee having price?",
+            "I am pay money to you."
+          ],
+          "correctIndex": 1,
+          "explanation": "Pertanyaan santun standar pembayaran adalah 'Can I pay by card, or do you prefer cash?'."
+        },
+        {
+          "id": "s1_ep2_q3",
+          "question": "What is the meaning of the word 'cash' in the dialogue?",
+          "options": [
+            "An online cryptocurrency transaction.",
+            "Money in the physical form of paper notes and coins.",
+            "A receipt printed by a cash register.",
+            "A discount voucher for regular visitors."
+          ],
+          "correctIndex": 1,
+          "explanation": "'Cash' merujuk pada uang tunai fisik (kertas atau koin)."
+        },
+        {
+          "id": "s1_ep2_q4",
+          "question": "Which sentence correctly uses the adjective 'cold'?",
+          "options": [
+            "He is cold coffee every day.",
+            "I prefer cold iced tea during hot summer afternoons.",
+            "She colds her hands by the fireplace.",
+            "Cold you please help me with the order?"
+          ],
+          "correctIndex": 1,
+          "explanation": "'Cold' berfungsi sebagai kata sifat (adjective) yang menerangkan kata benda iced tea: 'cold iced tea'."
+        },
+        {
+          "id": "s1_ep2_q5",
+          "question": "What table number did the barista assign to the main character?",
+          "options": [
+            "Table number one by the entrance.",
+            "Table number four by the sunlit window.",
+            "Table number ten on the outdoor terrace.",
+            "No table was assigned; it was strictly takeaway."
+          ],
+          "correctIndex": 1,
+          "explanation": "Barista menginstruksikan: 'Take seat number four!' yang berada di samping jendela bermandikan cahaya matahari."
+        }
+      ],
+      "summary": {
+        "takeaways": [
+          "Kamu berhasil memesan minuman dan makanan kecil di kafe lokal tanpa rasa canggung.",
+          "Menguasai pemesanan santun: 'I would like a hot cappuccino, please.'",
+          "Memahami perbedaan metode bayar: 'pay by card' vs 'pay with cash'.",
+          "Mempelajari 6 kosakata Oxford 3000: drink, eat, bread, cold, card, cash."
+        ]
+      },
+      "cliffhanger": "Saat kamu menikmati tegukan pertama kopimu, seorang pemuda berambut ikal dengan ransel kamera tebal mendekati tokomu. Ia melihat semua meja kafe sudah terisi penuh kecuali satu kursi kosong persis di hadapanmu. Ia menatapmu ragu-ragu..."
+    },
+    {
+      "id": 3,
+      "title": "Boleh Saya Duduk di Sini?",
+      "titleEn": "May I Sit Here?",
+      "estimatedMinutes": 10,
+      "recap": "Pada Episode 2, kamu berhasil memesan secangkir cappuccino hangat di meja nomor empat dekat jendela 'The Corner Cup'.",
+      "dialogue": [
+        {
+          "id": "ep3_d1",
+          "speaker": "Narator",
+          "en": "The young man with the camera clears his throat politely.",
+          "idText": "Pemuda pembawa kamera berdeham sopan."
+        },
+        {
+          "id": "ep3_d2",
+          "speaker": "Stranger",
+          "en": "Excuse me, is this seat taken? The café is quite crowded this morning.",
+          "idText": "Permisi, apakah kursi ini sudah ada yang menempati? Kafe cukup padat pagi ini."
+        },
+        {
+          "id": "choice_point_3_1",
+          "type": "interactive_choice",
+          "prompt": "Bagaimana caramu mengizinkannya duduk dengan ramah?",
+          "options": [
+            {
+              "id": "c31_a",
+              "text": "Not at all, please go ahead and take a seat!",
+              "speakerReply": "Stranger",
+              "reactionEn": "Thank you so much! My name is Leo, by the way.",
+              "reactionId": "Terima kasih banyak! Ngomong-ngomong, namaku Leo."
+            },
+            {
+              "id": "c31_b",
+              "text": "Sure, it is completely free. Please join me!",
+              "speakerReply": "Stranger",
+              "reactionEn": "Appreciate it! I was worried I'd have to drink my espresso standing up.",
+              "reactionId": "Terima kasih banyak! Tadinya kukira aku harus minum espresso sambil berdiri."
+            }
+          ]
+        }
+      ],
+      "highlightedVocab": [
+        {
+          "wordId": "batch-boyfriend-noun",
+          "word": "friend",
+          "partOfSpeech": "noun",
+          "enDefinition": "A person you know well and like.",
+          "idMeaning": "teman; sahabat",
+          "contextSentence": "It is nice to make a new friend in the city."
+        }
+      ],
+      "grammarFocus": {
+        "title": "Izin Sopan: 'Excuse me, is this seat taken?'",
+        "topicId": "present-simple",
+        "explanation": "Frasa 'Is this seat taken?' adalah cara paling umum dan berkelas untuk bertanya apakah sebuah kursi umum kosong.",
+        "formula": "Is this seat taken? / May I sit here?"
+      },
+      "culturalTip": {
+        "title": "Etika Berbagi Meja (Table Sharing)",
+        "content": "Di kedai kopi kota metropolitan yang sibuk, berbagi meja bersama orang asing (table sharing) adalah hal lumrah. Kuncinya adalah meminta izin terlebih dahulu dengan sopan."
+      },
+      "quiz": [
+        {
+          "id": "s1_ep3_q1",
+          "question": "What is the natural English phrase to ask if a chair is free in a crowded café?",
+          "options": [
+            "Are you sitting here or leave?",
+            "Excuse me, is this seat taken?",
+            "Why you stand near my table?",
+            "I want this chair immediately."
+          ],
+          "correctIndex": 1,
+          "explanation": "'Excuse me, is this seat taken?' adalah ungkapan standar sopan."
+        }
+      ],
+      "summary": {
+        "takeaways": [
+          "Belajar etika berbagi meja di kafe umum.",
+          "Berkenalan dengan teman baru bernama Leo."
+        ]
+      },
+      "cliffhanger": "Leo meletakkan kameranya di meja dan melihat tiket kereta apimu yang tergeletak di samping cangkir. 'Kamu baru tiba dari luar kota ya? Mau dengar rahasia tempat terbaik di kota ini?'"
+    },
+    {
+      "id": 4,
+      "title": "Dari Mana Asalmu?",
+      "titleEn": "Where Are You From?",
+      "estimatedMinutes": 10,
+      "recap": "Episode 3: Kamu berbagi meja dengan Leo, seorang fotografer lokal ramah.",
+      "dialogue": [{ "id": "ep4_d1", "speaker": "Leo", "en": "So, where are you from?", "idText": "Jadi, dari mana kamu berasal?" }],
+      "highlightedVocab": [{ "wordId": "batch-address-noun", "word": "address", "partOfSpeech": "noun", "enDefinition": "Details of where someone lives.", "idMeaning": "alamat", "contextSentence": "What is your accommodation address?" }],
+      "grammarFocus": { "title": "Wh- Questions: Where are you from?", "topicId": "wh-questions", "explanation": "Gunakan Where + to be + Subject + from untuk menanyakan asal daerah.", "formula": "Where are you from?" },
+      "culturalTip": { "title": "Obrolan Ringan (Small Talk)", "content": "Membahas asal daerah dan cuaca adalah pintu masuk obrolan ramah paling aman." },
+      "quiz": [{ "id": "s1_ep4_q1", "question": "Which question correctly asks someone's origin?", "options": ["Where do you from?", "Where are you from?", "Where you are from?", "Where from are you?"], "correctIndex": 1, "explanation": "'Where are you from?' adalah rumus yang benar." }],
+      "summary": { "takeaways": ["Menceritakan identitas diri dan asal daerah."] },
+      "cliffhanger": "Leo terpesona mendengar ceritamu, lalu membuka peta kota di tabletnya..."
+    },
+    {
+      "id": 5,
+      "title": "Peta dan Rencana",
+      "titleEn": "The Map and the Plan",
+      "estimatedMinutes": 10,
+      "recap": "Episode 4: Berbagi cerita tentang latar belakang dan alasan mengunjungi kota baru.",
+      "dialogue": [{ "id": "ep5_d1", "speaker": "Leo", "en": "Let me show you three hidden gems in this city.", "idText": "Biar kutunjukkan tiga tempat istimewa tersembunyi di kota ini." }],
+      "highlightedVocab": [{ "wordId": "batch-afternoon-noun", "word": "afternoon", "partOfSpeech": "noun", "enDefinition": "The time between midday and evening.", "idMeaning": "siang/sore", "contextSentence": "We can visit the old library this afternoon." }],
+      "grammarFocus": { "title": "Preposisi Waktu: in the afternoon", "topicId": "prepositions-place-time", "explanation": "Gunakan 'in the morning/afternoon/evening', tetapi 'at night'.", "formula": "in the + time of day" },
+      "culturalTip": { "title": "Rekomendasi Warga Lokal", "content": "Rekomendasi warga lokal sering kali jauh lebih berkesan daripada brosur turis komersial." },
+      "quiz": [{ "id": "s1_ep5_q1", "question": "Which preposition is correct for 'the afternoon'?", "options": ["at", "on", "in", "by"], "correctIndex": 2, "explanation": "'in the afternoon' adalah kolokasi preposisi waktu yang baku." }],
+      "summary": { "takeaways": ["Mempelajari preposisi waktu dan penunjuk arah pada peta."] },
+      "cliffhanger": "Tiba-tiba koneksi internet di ponselmu terputus, padahal kamu perlu mengirim pesan ke tempat penginapanmu..."
+    },
+    {
+      "id": 6,
+      "title": "Koneksi Wi-Fi yang Hilang",
+      "titleEn": "The Lost Wi-Fi Signal",
+      "estimatedMinutes": 10,
+      "recap": "Episode 5: Leo menandai beberapa tempat menarik di peta, namun internetmu mendadak padam.",
+      "dialogue": [{ "id": "ep6_d1", "speaker": "You", "en": "Excuse me, what is the Wi-Fi password here?", "idText": "Permisi, apa kata sandi Wi-Fi di sini?" }],
+      "highlightedVocab": [{ "wordId": "a1-borrow", "word": "borrow", "partOfSpeech": "verb", "enDefinition": "To take something temporarily.", "idMeaning": "meminjam", "contextSentence": "Can I borrow your pen to write down the code?" }],
+      "grammarFocus": { "title": "Permintaan Bantuan dengan Can/Could", "topicId": "can-cant-ability", "explanation": "Gunakan 'Could you please help me...?' untuk permohonan yang lebih sopan.", "formula": "Could you please + base verb?" },
+      "culturalTip": { "title": "Etika Menanyakan Wi-Fi di Kafe", "content": "Biasanya kata sandi Wi-Fi tercetak di bagian bawah struk belanjaan kasir." },
+      "quiz": [{ "id": "s1_ep6_q1", "question": "Where is the café Wi-Fi password commonly printed?", "options": ["At the bottom of the purchase receipt.", "On the front glass window.", "On the back of the coffee cup.", "Nowhere, it is strictly forbidden."], "correctIndex": 0, "explanation": "Kata sandi Wi-Fi kafe umumnya tercetak pada struk belanjaan (receipt)." }],
+      "summary": { "takeaways": ["Mengatasi kendala teknis dan menanyakan kata sandi secara sopan."] },
+      "cliffhanger": "Sinyal menyala kembali, dan ada pesan darurat dari pemilik kos: 'Kunci pintu masuk diubah ke kode rahasia baru...'"
+    },
+    {
+      "id": 7,
+      "title": "Nomor dan Alamat Rahasia",
+      "titleEn": "Numbers and the Secret Code",
+      "estimatedMinutes": 10,
+      "recap": "Episode 6: Pemilik penginapan mengirim instruksi kode pintu masuk digital.",
+      "dialogue": [{ "id": "ep7_d1", "speaker": "Narator", "en": "You read the instructions: 'Press star, then the four digits of the street address.'", "idText": "Kamu membaca instruksi: 'Tekan bintang, lalu empat angka nomor jalan.'" }],
+      "highlightedVocab": [{ "wordId": "batch-add-verb", "word": "add", "partOfSpeech": "verb", "enDefinition": "To put together with something else.", "idMeaning": "menambahkan", "contextSentence": "Add the entrance code to your digital notes." }],
+      "grammarFocus": { "title": "Kalimat Perintah (Imperative Sentences)", "topicId": "present-simple", "explanation": "Gunakan kata kerja dasar di awal kalimat tanpa subjek untuk instruksi: 'Press the button', 'Enter the code'.", "formula": "Base Verb + Object." },
+      "culturalTip": { "title": "Self Check-in di Penginapan Modern", "content": "Banyak penginapan modern menggunakan sistem smart lock digital tanpa resepsionis fisik." },
+      "quiz": [{ "id": "s1_ep7_q1", "question": "Which of the following is an imperative instruction sentence?", "options": ["You should to press the button.", "Press the green button to open the door.", "Are you pressing the button?", "Button is press by you."], "correctIndex": 1, "explanation": "Kalimat perintah (imperative) diawali langsung dengan kata kerja dasar: 'Press the green button'." }],
+      "summary": { "takeaways": ["Memahami kalimat instruksi numerik dan sistem check-in mandiri."] },
+      "cliffhanger": "Kamu selesai sarapan dan bersiap meninggalkan kafe, namun Leo mengajakmu singgah ke sebuah toko buku tua di samping kafe..."
+    },
+    {
+      "id": 8,
+      "title": "Toko Buku di Samping Kafe",
+      "titleEn": "The Bookshop Next Door",
+      "estimatedMinutes": 10,
+      "recap": "Episode 7: Setelah menyelesaikan kode pintu masuk, kamu dan Leo melangkah keluar kafe.",
+      "dialogue": [{ "id": "ep8_d1", "speaker": "Leo", "en": "Before you head to your lodging, let's step into this vintage bookshop.", "idText": "Sebelum kamu ke penginapan, ayo mampir ke toko buku antik ini." }],
+      "highlightedVocab": [{ "wordId": "a1-choose", "word": "choose", "partOfSpeech": "verb", "enDefinition": "To pick out from a number of alternatives.", "idMeaning": "memilih", "contextSentence": "You can choose a paperback novel for your trip." }],
+      "grammarFocus": { "title": "Ajakan Santai: Let's + Verb", "topicId": "present-simple", "explanation": "Gunakan 'Let's' (singkatan dari Let us) diikuti kata kerja dasar untuk ajakan ramah.", "formula": "Let's + base verb!" },
+      "culturalTip": { "title": "Komunitas Toko Buku Independen", "content": "Toko buku independen di kota-kota tua sering menjadi ruang kumpul komunitas dan pusat informasi sejarah lokal." },
+      "quiz": [{ "id": "s1_ep8_q1", "question": "Complete the friendly suggestion: '___ take a short walk in the garden.'", "options": ["Let's", "Lets to", "Let are", "We letting"], "correctIndex": 0, "explanation": "'Let's' diikuti base verb 'take' adalah rumus ajakan yang tepat." }],
+      "summary": { "takeaways": ["Menguasai kalimat ajakan ramah dan kosakata literasi."] },
+      "cliffhanger": "Di rak buku paling pojok, sebuah buku tebal tua bersampul kulit bertuliskan 'The Forgotten Explorer' terbuka sendiri tertiup angin..."
+    },
+    {
+      "id": 9,
+      "title": "Janji Bertemu Esok Hari",
+      "titleEn": "A Promise to Meet Tomorrow",
+      "estimatedMinutes": 10,
+      "recap": "Episode 8: Menemukan buku antik menarik di toko buku samping kedai kopi.",
+      "dialogue": [{ "id": "ep9_d1", "speaker": "Leo", "en": "I have to rush to my photography studio now. Shall we meet again tomorrow morning?", "idText": "Aku harus segera ke studio fotoku sekarang. Maukah kita bertemu lagi besok pagi?" }],
+      "highlightedVocab": [{ "wordId": "batch-again-adverb", "word": "again", "partOfSpeech": "adverb", "enDefinition": "One more time; on another occasion.", "idMeaning": "lagi; sekali lagi", "contextSentence": "Shall we meet again tomorrow morning?" }],
+      "grammarFocus": { "title": "Janji Temu di Masa Depan: Future Arrangements", "topicId": "future-plans-predictions", "explanation": "Gunakan 'Shall we meet at 9 AM?' atau 'See you tomorrow' untuk menyepakati janji.", "formula": "Shall we + base verb?" },
+      "culturalTip": { "title": "Ketepatan Waktu (Punctuality)", "content": "Di budaya profesional barat, menyepakati jam janji temu berarti wajib hadir tepat waktu atau 5 menit sebelumnya." },
+      "quiz": [{ "id": "s1_ep9_q1", "question": "Which expression is appropriate to conclude an agreement to meet tomorrow?", "options": ["See you tomorrow morning at nine!", "I don't know you anymore.", "Yesterday we met here.", "Goodbye forever."], "correctIndex": 0, "explanation": "'See you tomorrow morning at nine!' adalah ucapan perpisahan berjanji yang alami." }],
+      "summary": { "takeaways": ["Membuat janji temu dan bertukar kontak secara profesional."] },
+      "cliffhanger": "Leo melambaikan tangan lalu berbelok di tikungan jalan. Kamu melangkah sendirian menuju alamat penginapanmu. Hari pertama di kota baru ini berjalan jauh lebih hangat dari yang kamu bayangkan..."
+    },
+    {
+      "id": 10,
+      "title": "Melangkah Menuju Penginapan",
+      "titleEn": "Stepping Toward the Lodging",
+      "estimatedMinutes": 10,
+      "recap": "Episode 9: Kamu bertukar kontak dengan Leo dan berjanji bertemu kembali esok hari.",
+      "dialogue": [
+        { "id": "ep10_d1", "speaker": "Kanci", "en": "You did it! You survived your first morning in the new city and made a wonderful friend.", "idText": "Kamu berhasil! Kamu melewati pagi pertamamu di kota baru dan mendapat teman yang luar biasa." },
+        { "id": "ep10_d2", "speaker": "Narator", "en": "You stand before the doorway of your new lodging. You insert the key, turn the lock, and smile.", "idText": "Kamu berdiri di depan pintu penginapan barumu. Kamu memasukkan kunci, memutar gembok, dan tersenyum." }
+      ],
+      "highlightedVocab": [{ "wordId": "a1-improve", "word": "improve", "partOfSpeech": "verb", "enDefinition": "To become better at something.", "idMeaning": "meningkat; menjadi lebih baik", "contextSentence": "Your English speaking confidence will improve every day." }],
+      "grammarFocus": { "title": "Refleksi Selesai: Tuntasnya Cerita 1", "topicId": "present-simple", "explanation": "Gunakan Present Simple untuk merangkum kepercayaan diri baru yang kamu peroleh.", "formula": "Subject + Verb 1 + with confidence." },
+      "culturalTip": { "title": "Merayakan Keberanian Belajar", "content": "Berbicara bahasa asing di lingkungan baru membutuhkan keberanian besar. Hargai setiap kemajuan kecil yang kamu buat hari ini!" },
+      "quiz": [{ "id": "s1_ep10_q1", "question": "What is the primary moral of the story 'First Coffee in the New City'?", "options": ["Traveling alone is dangerous and should be avoided.", "Courage, polite greetings, and curiosity can turn a strange city into a welcoming home.", "Coffee is the only food available in big cities.", "Never talk to station officers."], "correctIndex": 1, "explanation": "Pesan utama cerita adalah keberanian menyapa dan keramahan membuat kota asing terasa seperti rumah." }],
+      "summary": { "takeaways": ["Menyelesaikan seluruh 10 episode Cerita 1!", "Mendapatkan lencana kelulusan cerita dan reward ekonomi."] },
+      "cliffhanger": "Malam harinya, ponselmu berdering. Sebuah tiket penerbangan darurat untuk tugas berikutnya tiba di emailmu. Destinasimu berikutnya: Bandara Internasional Metropolitan (Cerita 2: Tersesat di Bandara)!"
+    }
+  ]
+}

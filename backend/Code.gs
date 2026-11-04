@@ -30,7 +30,8 @@ const SHEETS = {
   CATALOG: "Catalog",
   INVENTORY: "Inventory",
   TRANSACTIONS: "Transactions",
-  GRAMMAR_PROGRESS: "GrammarProgress"
+  GRAMMAR_PROGRESS: "GrammarProgress",
+  STORY_PROGRESS: "StoryProgress"
 };
 
 /**
@@ -141,6 +142,12 @@ function doPost(e) {
         return handleGetGrammarProgress(ss, token);
       case "saveGrammarProgress":
         return handleSaveGrammarProgress(ss, token, payload);
+
+      // 10. Storytelling & Adventures (Tahap 6)
+      case "getStoryProgress":
+        return handleGetStoryProgress(ss, token, payload);
+      case "completeStoryEpisode":
+        return handleCompleteStoryEpisode(ss, token, payload);
 
       default:
         return jsonResponse({ success: false, error: "Aksi tidak dikenal: " + action }, 400);
@@ -1751,6 +1758,174 @@ function handleSaveGrammarProgress(ss, token, payload) {
       status: nextStatus,
       isMastered,
       isNewlyMastered: isMastered && currentStatus !== "mastered"
+    }
+  });
+}
+
+
+/* ==========================================================================
+   STORY PROGRESS & EPISODE HANDLERS (TAHAP 6)
+   ========================================================================== */
+
+function ensureStoriesSheets(ss) {
+  let sheet = ss.getSheetByName(SHEETS.STORY_PROGRESS);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEETS.STORY_PROGRESS);
+    sheet.appendRow(["user_id", "story_id", "episode_id", "completed_at", "date_wib"]);
+    const hRange = sheet.getRange(1, 1, 1, 5);
+    hRange.setFontWeight("bold");
+    hRange.setBackground("#4B5E73");
+    hRange.setFontColor("#FFFFFF");
+    sheet.setFrozenRows(1);
+    [180, 140, 140, 200, 140].forEach((w, idx) => sheet.setColumnWidth(idx + 1, w));
+  }
+  return sheet;
+}
+
+function getTodayWibDateString() {
+  const now = new Date();
+  return Utilities.formatDate(now, "GMT+07:00", "yyyy-MM-dd");
+}
+
+function handleGetStoryProgress(ss, token, payload) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const sheet = ensureStoriesSheets(ss);
+  const data = sheet.getDataRange().getValues();
+  const progress = {}; // { [storyId]: Set of completed episodeIds }
+  const completedTodayWib = [];
+  const todayWib = getTodayWibDateString();
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === userId) {
+      const sId = data[i][1];
+      const epId = Number(data[i][2]);
+      const dateWib = String(data[i][4]);
+
+      if (!progress[sId]) progress[sId] = [];
+      if (!progress[sId].includes(epId)) progress[sId].push(epId);
+
+      if (dateWib === todayWib) {
+        completedTodayWib.push({ storyId: sId, episodeId: epId });
+      }
+    }
+  }
+
+  return jsonResponse({
+    success: true,
+    data: {
+      progress,
+      todayWib,
+      hasUnlockedNewEpisodeToday: completedTodayWib.length > 0,
+      completedTodayWib
+    }
+  });
+}
+
+function handleCompleteStoryEpisode(ss, token, payload) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const storyId = payload.storyId;
+  const episodeId = Number(payload.episodeId);
+
+  if (!storyId || !episodeId) {
+    return jsonResponse({ success: false, error: "Parameter storyId dan episodeId diperlukan." }, 400);
+  }
+
+  const sheet = ensureStoriesSheets(ss);
+  const data = sheet.getDataRange().getValues();
+  const todayWib = getTodayWibDateString();
+  let alreadyCompletedThisEpisode = false;
+  let newEpisodesCompletedToday = 0;
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === userId) {
+      const rowStory = data[i][1];
+      const rowEp = Number(data[i][2]);
+      const rowDateWib = String(data[i][4]);
+
+      if (rowStory === storyId && rowEp === episodeId) {
+        alreadyCompletedThisEpisode = true;
+      }
+
+      if (rowDateWib === todayWib) {
+        newEpisodesCompletedToday++;
+      }
+    }
+  }
+
+  // If this episode was ALREADY completed previously: allow replay without reward
+  if (alreadyCompletedThisEpisode) {
+    return jsonResponse({
+      success: true,
+      alreadyCompleted: true,
+      earnedXp: 0,
+      earnedCoins: 0,
+      message: "Episode selesai diulang (tanpa reward ganda)."
+    });
+  }
+
+  // DAILY PACING CHECK: Only 1 NEW episode per calendar day (WIB)
+  if (newEpisodesCompletedToday >= 1) {
+    return jsonResponse({
+      success: false,
+      error: "Batas harian: Anda hanya dapat membuka 1 episode baru per hari (WIB). Episode berikutnya akan terbuka esok hari!"
+    }, 429);
+  }
+
+  // First time completing this episode: grant reward
+  const eventId = "story_ep_" + storyId + "_" + episodeId + "_" + Date.now();
+  const nowIso = new Date().toISOString();
+
+  // Record completion
+  sheet.appendRow([userId, storyId, episodeId, nowIso, todayWib]);
+
+  // Grant reward via economy calculation (+50 EXP, +30 Coins)
+  const xpReward = 50;
+  const coinsReward = 30;
+
+  const { profileSheet } = ensureProfilesAndTitlesSheets(ss);
+  const pData = profileSheet.getDataRange().getValues();
+  let pRowIdx = -1;
+  let currentXp = 0;
+  let currentCoins = 0;
+
+  for (let i = 1; i < pData.length; i++) {
+    if (pData[i][0] === userId) {
+      pRowIdx = i + 1;
+      currentXp = Number(pData[i][3]) || 0;
+      currentCoins = Number(pData[i][5]) || 0;
+      break;
+    }
+  }
+
+  const nextXp = currentXp + xpReward;
+  const nextCoins = currentCoins + coinsReward;
+  const nextLevel = Math.max(1, Math.floor(Math.sqrt(nextXp / 15)) + 1);
+
+  if (pRowIdx > 0) {
+    profileSheet.getRange(pRowIdx, 4).setValue(nextXp);
+    profileSheet.getRange(pRowIdx, 6).setValue(nextCoins);
+    profileSheet.getRange(pRowIdx, 7).setValue(nowIso);
+  }
+
+  const { txSheet } = ensureEconomySheets(ss);
+  const txId = "tx_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
+  txSheet.appendRow([userId, txId, "credit", coinsReward, "story_episode", eventId, nowIso]);
+
+  return jsonResponse({
+    success: true,
+    data: {
+      storyId,
+      episodeId,
+      earnedXp: xpReward,
+      earnedCoins: coinsReward,
+      totalXp: nextXp,
+      totalCoins: nextCoins,
+      level: nextLevel,
+      todayWib
     }
   });
 }
