@@ -11,6 +11,7 @@ import { ReadingLibrary } from "../features/reading/ReadingLibrary.jsx";
 import { AdventureHub } from "../features/adventure/AdventureHub.jsx";
 import { ReviewQueue } from "../features/review/ReviewQueue.jsx";
 import { ProgressStats } from "../features/progress/ProgressStats.jsx";
+import { ProfileView } from "../features/profile/ProfileView.jsx";
 import { SettingsPanel } from "../features/settings/SettingsPanel.jsx";
 import { useProgressSync } from "../hooks/useProgressSync.js";
 
@@ -31,6 +32,24 @@ export function WorkspacePage() {
   const currentView = routeView || "overview";
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem("sinau_sidebar_collapsed") === "true";
+    } catch (e) {
+      return false;
+    }
+  });
+
+  const handleToggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("sinau_sidebar_collapsed", String(next));
+      } catch (e) {}
+      return next;
+    });
+  };
+
   const [selectedGrammarTopic, setSelectedGrammarTopic] = useState(null);
   const [quizTopic, setQuizTopic] = useState(null);
   const [activeStudyWord, setActiveStudyWord] = useState(() => location.state?.word || null);
@@ -60,7 +79,8 @@ export function WorkspacePage() {
     reading: "Materi Bacaan",
     adventure: "Cerita & Dialog",
     review: "Spaced Review & Jurnal",
-    progress: "Statistik & Progres",
+    progress: "Profil & Progres Belajar",
+    profile: "Profil & Progres Belajar",
     settings: "Pengaturan Akun"
   };
 
@@ -89,6 +109,8 @@ export function WorkspacePage() {
       <AppSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={handleToggleCollapse}
       />
 
       {/* Main Content Area */}
@@ -96,6 +118,7 @@ export function WorkspacePage() {
         {/* Topbar */}
         <AppTopbar
           title={viewTitles[currentView] || "Ruang Belajar"}
+          isSidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
           isSyncing={isSyncing}
           syncError={syncError}
@@ -272,10 +295,10 @@ export function WorkspacePage() {
             </section>
           )}
 
-          {/* VIEW 9: PROGRESS */}
-          {currentView === "progress" && (
+          {/* VIEW 9: PROGRESS & PROFILE */}
+          {(currentView === "progress" || currentView === "profile") && (
             <section className="view-section is-active" id="view-progress">
-              <ProgressStats
+              <ProfileView
                 vocabulary={vocabulary}
                 progressMap={progressMap}
               />
