@@ -1,16 +1,19 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { api } from "../services/api.js";
 import { useAuth } from "./useAuth.jsx";
 
 const SETTINGS_PWA_KEY = "sinau_pwa_settings";
+const PWAContext = createContext(null);
 
-export function usePWA() {
+export function PWAProvider({ children }) {
   const { isAuthenticated } = useAuth();
 
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [canInstall, setCanInstall] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [swRegistration, setSwRegistration] = useState(null);
+  const [activeInAppReminder, setActiveInAppReminder] = useState(null);
+
   const [notificationPermission, setNotificationPermission] = useState(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
       return Notification.permission;
@@ -34,7 +37,6 @@ export function usePWA() {
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
 
-    // Detect standalone display mode
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       window.navigator.standalone === true;
@@ -49,7 +51,6 @@ export function usePWA() {
         console.warn("[PWA] Service Worker gagal didaftarkan:", err);
       });
 
-    // 2. Capture beforeinstallprompt
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -71,7 +72,7 @@ export function usePWA() {
     };
   }, []);
 
-  // 3. Prompt PWA Installation
+  // 2. Prompt PWA Installation
   const promptInstall = useCallback(async () => {
     if (!deferredPrompt) return false;
 
@@ -87,7 +88,86 @@ export function usePWA() {
     return false;
   }, [deferredPrompt]);
 
-  // 4. Request Notification Permission
+  // 3. Dismiss Active In-App Floating Reminder
+  const dismissInAppReminder = useCallback(() => {
+    setActiveInAppReminder(null);
+  }, []);
+
+  // 4. Trigger Reminder Dual Channel (System Notification + In-App Top Floating Banner)
+  const triggerReminder = useCallback(({ title, body, url = "/belajar/missions" } = {}) => {
+    const notifTitle = title || "Waktunya Belajar SinauEnglish!";
+    const notifBody = body || "3 misi harian menunggumu hari ini. Jaga streak dan raih Sinau Coin!";
+
+    // A. Send system notification if permitted
+    try {
+      if (notificationPermission === "granted") {
+        if (swRegistration && "showNotification" in swRegistration) {
+          swRegistration.showNotification(notifTitle, {
+            body: notifBody,
+            icon: "/icons/icon-192x192.png",
+            badge: "/icons/favicon.svg",
+            data: { url },
+            tag: "sinau-study-reminder"
+          });
+        } else if ("Notification" in window) {
+          new Notification(notifTitle, {
+            body: notifBody,
+            icon: "/icons/icon-192x192.png"
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("[PWA] System notification error:", err);
+    }
+
+    // B. Trigger in-app top floating banner (melayang masuk di atas layar)
+    setActiveInAppReminder({
+      id: Date.now(),
+      title: notifTitle,
+      body: notifBody,
+      url
+    });
+  }, [notificationPermission, swRegistration]);
+
+  // 5. Background / Foreground Timer Tick Check for Scheduled Reminders
+  useEffect(() => {
+    if (!reminderConfig.enabled) return;
+
+    const checkReminderSchedule = () => {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+      const currentHHMM = `${hh}:${mm}`;
+      const todayDate = now.toISOString().slice(0, 10);
+
+      const lastFiredSlot = localStorage.getItem("sinau_last_reminder_slot");
+
+      if (currentHHMM === reminderConfig.morningHour && lastFiredSlot !== `${todayDate}_morning`) {
+        localStorage.setItem("sinau_last_reminder_slot", `${todayDate}_morning`);
+        triggerReminder({
+          title: "Pengingat Pagi SinauEnglish",
+          body: "Awali harimu dengan kosakata baru dan selesaikan misi harianmu!",
+          url: "/belajar/missions"
+        });
+      } else if (currentHHMM === reminderConfig.eveningHour && lastFiredSlot !== `${todayDate}_evening`) {
+        localStorage.setItem("sinau_last_reminder_slot", `${todayDate}_evening`);
+        triggerReminder({
+          title: "Amankan Streak Belajarmu Malam Ini",
+          body: "Hari ini hampir selesai. Review kata yang jatuh tempo agar ingatanmu tetap tajam!",
+          url: "/belajar/review"
+        });
+      }
+    };
+
+    // Run immediate check
+    checkReminderSchedule();
+
+    // Check every 20 seconds
+    const intervalId = setInterval(checkReminderSchedule, 20000);
+    return () => clearInterval(intervalId);
+  }, [reminderConfig, triggerReminder]);
+
+  // 6. Request Notification Permission
   const requestNotificationPermission = useCallback(async () => {
     if (typeof window === "undefined" || !("Notification" in window)) {
       alert("Browser ini belum mendukung fitur Web Notification.");
@@ -121,33 +201,16 @@ export function usePWA() {
     }
   }, [isAuthenticated, reminderConfig]);
 
-  // 5. Send Immediate Test Notification
+  // 7. Send Immediate Test Notification (triggers both system and in-app banner)
   const sendTestNotification = useCallback(({ title, body, url = "/belajar/missions" } = {}) => {
-    if (notificationPermission !== "granted") {
-      alert("Silakan izinkan notifikasi terlebih dahulu.");
-      return;
-    }
+    triggerReminder({
+      title: title || "Uji Coba Pengingat SinauEnglish",
+      body: body || "Notifikasi pengingat belajar berhasil aktif! Ini contoh tampilan pengingat di ponselmu.",
+      url
+    });
+  }, [triggerReminder]);
 
-    const notifTitle = title || "Pengingat Misi SinauEnglish";
-    const notifBody = body || "3 misi harian menunggumu di SinauEnglish! Jaga streak belajarmu hari ini.";
-
-    if (swRegistration && "showNotification" in swRegistration) {
-      swRegistration.showNotification(notifTitle, {
-        body: notifBody,
-        icon: "/icons/icon-192x192.png",
-        badge: "/icons/favicon.svg",
-        data: { url },
-        tag: "sinau-mission-test"
-      });
-    } else if ("Notification" in window) {
-      new Notification(notifTitle, {
-        body: notifBody,
-        icon: "/icons/icon-192x192.png"
-      });
-    }
-  }, [notificationPermission, swRegistration]);
-
-  // 6. Update Reminder Config
+  // 8. Update Reminder Config
   const updateReminderConfig = useCallback((newConfig) => {
     setReminderConfig((prev) => {
       const next = { ...prev, ...newConfig };
@@ -164,14 +227,40 @@ export function usePWA() {
     }
   }, [isAuthenticated, reminderConfig]);
 
-  return {
+  const value = {
     canInstall,
     isInstalled,
     notificationPermission,
     reminderConfig,
+    activeInAppReminder,
     promptInstall,
     requestNotificationPermission,
     sendTestNotification,
+    triggerReminder,
+    dismissInAppReminder,
     updateReminderConfig
   };
+
+  return React.createElement(PWAContext.Provider, { value }, children);
+}
+
+export function usePWA() {
+  const context = useContext(PWAContext);
+  if (!context) {
+    // Graceful fallback for isolated testing
+    return {
+      canInstall: false,
+      isInstalled: false,
+      notificationPermission: "default",
+      reminderConfig: { enabled: false, morningHour: "08:00", eveningHour: "19:00" },
+      activeInAppReminder: null,
+      promptInstall: async () => false,
+      requestNotificationPermission: async () => "denied",
+      sendTestNotification: () => {},
+      triggerReminder: () => {},
+      dismissInAppReminder: () => {},
+      updateReminderConfig: () => {}
+    };
+  }
+  return context;
 }

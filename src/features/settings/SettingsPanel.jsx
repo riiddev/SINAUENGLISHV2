@@ -194,91 +194,92 @@ export function SettingsPanel({ onProgressReload }) {
           </span>
         </div>
 
-        {notificationPermission !== "granted" ? (
-          <div>
-            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginBottom: "var(--space-3)" }}>
-              Notifikasi hanya dikirim untuk mengingatkan sasaran belajar harianmu dan dapat dinonaktifkan kapan saja.
-            </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+          {notificationPermission !== "granted" && (
+            <div style={{ padding: "var(--space-3) var(--space-4)", backgroundColor: "var(--color-bg-subtle)", borderRadius: "var(--radius-md)", border: "var(--border-sm)", marginBottom: "var(--space-2)" }}>
+              <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", margin: "0 0 var(--space-2)" }}>
+                Aktifkan izin notifikasi sistem agar pengingat tetap masuk saat browser ditutup:
+              </p>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={handleEnableNotifications}
+                id="enable-notif-btn"
+                style={{ minHeight: "36px", display: "inline-flex", alignItems: "center", gap: "8px" }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                </svg>
+                Izinkan Notifikasi Sistem Browser
+              </button>
+            </div>
+          )}
+
+          {/* Time Pickers */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-4)" }}>
+            <div>
+              <label
+                htmlFor="morning-hour-select"
+                style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 700, marginBottom: "4px" }}
+              >
+                Pengingat Pagi (Mulai Misi):
+              </label>
+              <select
+                id="morning-hour-select"
+                value={reminderConfig.morningHour}
+                onChange={(e) => updateReminderConfig({ morningHour: e.target.value, enabled: true })}
+                className="form-input"
+                style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-md)", border: "var(--border-sm)" }}
+              >
+                <option value="06:00">06:00 Pagi</option>
+                <option value="07:00">07:00 Pagi</option>
+                <option value="08:00">08:00 Pagi (Rekomendasi)</option>
+                <option value="09:00">09:00 Pagi</option>
+                <option value="10:00">10:00 Pagi</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="evening-hour-select"
+                style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 700, marginBottom: "4px" }}
+              >
+                Pengingat Malam (Amankan Streak):
+              </label>
+              <select
+                id="evening-hour-select"
+                value={reminderConfig.eveningHour}
+                onChange={(e) => updateReminderConfig({ eveningHour: e.target.value, enabled: true })}
+                className="form-input"
+                style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-md)", border: "var(--border-sm)" }}
+              >
+                <option value="18:00">18:00 Sore</option>
+                <option value="19:00">19:00 Malam (Rekomendasi)</option>
+                <option value="20:00">20:00 Malam</option>
+                <option value="21:00">21:00 Malam</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Test Notification Button */}
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", flexWrap: "wrap", marginTop: "var(--space-2)" }}>
             <button
               type="button"
               className="btn btn-primary btn-sm"
-              onClick={handleEnableNotifications}
-              id="enable-notif-btn"
-              style={{ minHeight: "44px", display: "inline-flex", alignItems: "center", gap: "8px" }}
+              onClick={handleTestNotification}
+              id="test-notif-btn"
+              style={{ minHeight: "44px" }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
-                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
-              </svg>
-              Aktifkan Pengingat Misi Harian
+              Uji Coba Pengingat (Melayang di HP) ↗
             </button>
+
+            <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
+              Pengingat melayang masuk otomatis di atas layar pada jam yang kamu tentukan.
+            </span>
           </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-            {/* Time Pickers */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-4)" }}>
-              <div>
-                <label
-                  htmlFor="morning-hour-select"
-                  style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 700, marginBottom: "4px" }}
-                >
-                  Pengingat Pagi (Mulai Misi):
-                </label>
-                <select
-                  id="morning-hour-select"
-                  value={reminderConfig.morningHour}
-                  onChange={(e) => updateReminderConfig({ morningHour: e.target.value })}
-                  className="form-input"
-                  style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-md)", border: "var(--border-sm)" }}
-                >
-                  <option value="06:00">06:00 Pagi</option>
-                  <option value="07:00">07:00 Pagi</option>
-                  <option value="08:00">08:00 Pagi (Rekomendasi)</option>
-                  <option value="09:00">09:00 Pagi</option>
-                  <option value="10:00">10:00 Pagi</option>
-                </select>
-              </div>
+        </div>
 
-              <div>
-                <label
-                  htmlFor="evening-hour-select"
-                  style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 700, marginBottom: "4px" }}
-                >
-                  Pengingat Malam (Amankan Streak):
-                </label>
-                <select
-                  id="evening-hour-select"
-                  value={reminderConfig.eveningHour}
-                  onChange={(e) => updateReminderConfig({ eveningHour: e.target.value })}
-                  className="form-input"
-                  style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-md)", border: "var(--border-sm)" }}
-                >
-                  <option value="18:00">18:00 Sore</option>
-                  <option value="19:00">19:00 Malam (Rekomendasi)</option>
-                  <option value="20:00">20:00 Malam</option>
-                  <option value="21:00">21:00 Malam</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Test Notification Button */}
-            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", flexWrap: "wrap", marginTop: "var(--space-2)" }}>
-              <button
-                type="button"
-                className="btn btn-outline btn-sm"
-                onClick={handleTestNotification}
-                id="test-notif-btn"
-                style={{ minHeight: "44px" }}
-              >
-                Kirim Notifikasi Uji Coba
-              </button>
-
-              <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
-                Pilihan jadwal pengingat tersinkronisasi ke akun belajarmu.
-              </span>
-            </div>
-          </div>
-        )}
 
         {notifFeedback && (
           <p
