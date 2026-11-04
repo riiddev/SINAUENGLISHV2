@@ -12,6 +12,7 @@
     "preview": "vite preview --host 0.0.0.0",
     "test:content": "node scripts/verify-v2-data.mjs",
     "test:logic": "node --experimental-strip-types --test tests/logic.test.mjs",
+    "test:e2e": "node scripts/test-browser-interactions.mjs",
     "test": "node scripts/verify-v2-data.mjs && node --experimental-strip-types --test tests/logic.test.mjs"
   },
   "devDependencies": {
