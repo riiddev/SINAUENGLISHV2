@@ -1,14 +1,23 @@
 import { defineConfig } from "vite";
-import { resolve } from "path";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  base: "./",
+  plugins: [react()],
+  base: "/",
   build: {
     rollupOptions: {
-      input: {
-        main: resolve(import.meta.dirname, "index.html"),
-        belajar: resolve(import.meta.dirname, "belajar.html"),
-        designSystem: resolve(import.meta.dirname, "design-system.html")
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("react") || id.includes("react-router-dom")) {
+              return "vendor-react";
+            }
+            if (id.includes("gsap") || id.includes("lenis") || id.includes("framer-motion")) {
+              return "vendor-motion";
+            }
+            return "vendor";
+          }
+        }
       }
     }
   },
