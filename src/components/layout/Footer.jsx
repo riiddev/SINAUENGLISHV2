@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { BrandLogo } from "../common/BrandLogo.jsx";
 
 export function Footer() {
   return (
@@ -7,10 +8,7 @@ export function Footer() {
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">
-            <Link className="brand" to="/">
-              <span className="brand-badge">S</span>
-              <span className="brand-text">sinauu<span>english</span></span>
-            </Link>
+            <BrandLogo />
             <p>Belajar kosakata dan grammar bahasa Inggris secara terstruktur dengan metode spaced repetition dan materi kontekstual.</p>
           </div>
 

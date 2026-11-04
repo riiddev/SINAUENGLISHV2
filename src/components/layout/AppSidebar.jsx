@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth.jsx";
+import { BrandLogo } from "../common/BrandLogo.jsx";
 
 export function AppSidebar({ isOpen, onClose }) {
   const location = useLocation();
@@ -24,10 +25,7 @@ export function AppSidebar({ isOpen, onClose }) {
 
       <aside className={`app-sidebar ${isOpen ? "mobile-open" : ""}`} id="app-sidebar" aria-label="Navigasi Ruang Belajar">
         <div className="sidebar-header">
-          <Link className="brand" to="/" aria-label="SinauEnglish V2 Beranda">
-            <span className="brand-badge">S</span>
-            <span className="brand-text">sinauu<span>english</span></span>
-          </Link>
+          <BrandLogo />
         </div>
 
         <nav className="sidebar-nav">
