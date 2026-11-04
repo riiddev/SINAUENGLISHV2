@@ -105,7 +105,7 @@ export function ProfileView({ vocabulary = [], progressMap = {} }) {
                 </span>
 
                 <span className="scholar-chip chip-neutral">
-                  {isAuthenticated ? "Akun Cloud Aktif" : "Sesi Lokal"}
+                  {isAuthenticated ? "Akun Cloud Aktif" : "Mode Tamu"}
                 </span>
               </div>
             </div>

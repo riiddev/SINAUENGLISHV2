@@ -237,10 +237,10 @@ class WorkspaceApp {
     if (dot && text) {
       if (this.storage.mode === "indexedDB") {
         dot.style.backgroundColor = "var(--color-success)";
-        text.textContent = "Tersimpan di perangkat (IndexedDB)";
+        text.textContent = "Tersimpan Aman (IndexedDB)";
       } else {
         dot.style.backgroundColor = "var(--color-accent-gold)";
-        text.textContent = "Penyimpanan cadangan (localStorage)";
+        text.textContent = "Penyimpanan Cadangan (localStorage)";
       }
     }
   }
