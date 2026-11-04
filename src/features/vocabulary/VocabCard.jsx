@@ -56,7 +56,7 @@ export function VocabCard({ word, status = "fresh", onSelect, onAudio }) {
 
       <div style={{ marginTop: "var(--space-3)", textAlign: "right" }}>
         <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", fontWeight: 700 }}>
-          Detail Kata ↗
+          Detail Kata
         </span>
       </div>
     </div>

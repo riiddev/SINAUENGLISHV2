@@ -20,7 +20,7 @@ export function Navbar() {
               className={`nav-link ${location.pathname.startsWith("/belajar") ? "is-active" : ""}`}
               to="/belajar"
             >
-              Ruang Belajar ↗
+              Ruang Belajar
             </Link>
           ) : (
             <Link
@@ -43,7 +43,7 @@ export function Navbar() {
                 <span>{user?.displayName || "Pelajar"}</span>
               </Link>
               <Link className="btn btn-primary btn-sm" to="/belajar">
-                Ruang Belajar ↗
+                Ruang Belajar
               </Link>
             </>
           ) : (

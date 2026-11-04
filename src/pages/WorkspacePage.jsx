@@ -173,7 +173,7 @@ export function WorkspacePage() {
                       handleStartStudy(wordToStudy);
                     }}
                   >
-                    Lanjutkan Belajar Sekarang ↗
+                    Lanjutkan Belajar Sekarang
                   </button>
                 </div>
 

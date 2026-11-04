@@ -34,7 +34,7 @@ export function ReviewQueue({ vocabulary = [], progressMap = {}, onStartStudy })
           </h3>
           {dueWords.length > 0 && (
             <Button size="sm" variant="primary" onClick={() => onStartStudy(dueWords[0])}>
-              Mulai Review Cepat ↗
+              Mulai Review Cepat
             </Button>
           )}
         </div>
@@ -70,7 +70,7 @@ export function ReviewQueue({ vocabulary = [], progressMap = {}, onStartStudy })
                   <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>{w.meaning}</span>
                 </div>
                 <Button size="sm" variant="secondary" onClick={() => onStartStudy(w)}>
-                  Review ↗
+                  Review
                 </Button>
               </div>
             ))}
@@ -111,7 +111,7 @@ export function ReviewQueue({ vocabulary = [], progressMap = {}, onStartStudy })
                   <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>{w.meaning}</span>
                 </div>
                 <Button size="sm" variant="secondary" onClick={() => onStartStudy(w)}>
-                  Latih Ulang ↗
+                  Latih Ulang
                 </Button>
               </div>
             ))}

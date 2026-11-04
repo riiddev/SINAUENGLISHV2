@@ -176,7 +176,7 @@ export function ProfileView({ vocabulary = [], progressMap = {}, userProfileHook
     });
 
     if (res.success) {
-      setAvatarSuccess("✓ Foto profil berhasil disimpan ke cloud storage!");
+      setAvatarSuccess("Foto profil berhasil disimpan ke cloud storage!");
       setCropImageSrc(null);
       setTimeout(() => setAvatarSuccess(""), 4000);
     } else {
@@ -497,7 +497,7 @@ export function ProfileView({ vocabulary = [], progressMap = {}, userProfileHook
                   {item.isUnlocked ? (
                     isActive ? (
                       <span className="active-badge" id={`active-badge-${item.id}`}>
-                        ✓ Gelar Aktif
+                        <><IconCheck size={12} style={{ marginRight: 3 }} /> Gelar Aktif</>
                       </span>
                     ) : (
                       <button
@@ -680,7 +680,7 @@ export function ProfileView({ vocabulary = [], progressMap = {}, userProfileHook
                     style={{ minHeight: "44px" }}
                     id="save-cropped-avatar-btn"
                   >
-                    {isUploadingAvatar ? "Menyimpan ke Cloud..." : "Potong & Simpan Foto ↗"}
+                    {isUploadingAvatar ? "Menyimpan ke Cloud..." : "Potong & Simpan Foto"}
                   </button>
                 </div>
               </div>
@@ -740,7 +740,7 @@ export function ProfileView({ vocabulary = [], progressMap = {}, userProfileHook
                         id="choose-avatar-gallery-btn"
                         style={{ minHeight: "40px" }}
                       >
-                        Pilih dari Galeri / Kamera ↗
+                        Pilih dari Galeri / Kamera
                       </button>
 
                       {avatarUrl && (

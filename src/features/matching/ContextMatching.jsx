@@ -433,7 +433,7 @@ export function ContextMatching({ vocabulary = [], onRecordMatchComplete }) {
               id="next-matching-round-btn"
               style={{ minHeight: "44px" }}
             >
-              Putaran Berikutnya ↻
+              <><IconRefresh size={13} style={{ marginRight: 4 }} /> Putaran Berikutnya</>
             </button>
 
             <Link
@@ -441,7 +441,7 @@ export function ContextMatching({ vocabulary = [], onRecordMatchComplete }) {
               className="btn btn-outline"
               style={{ minHeight: "44px", display: "inline-flex", alignItems: "center" }}
             >
-              Kembali ke Misi Harian ↗
+              Kembali ke Misi Harian
             </Link>
           </div>
         </section>

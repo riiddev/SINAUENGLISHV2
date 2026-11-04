@@ -125,7 +125,7 @@ export function GrammarPracticeRunner({ topic, onFinishPractice }) {
                 </span>
                 {isDone && (
                   <span style={{ fontSize: "var(--text-xs)", fontWeight: 800, color: isCorrect ? "var(--color-success)" : "var(--color-danger)" }}>
-                    {isCorrect ? "✓ Jawaban Benar" : "✕ Belum Tepat"}
+                    {isCorrect ? <><IconCheck size={13} style={{ marginRight: 4 }} /> Jawaban Benar</> : <><IconClose size={13} style={{ marginRight: 4 }} /> Belum Tepat</>}
                   </span>
                 )}
               </div>
@@ -193,7 +193,7 @@ export function GrammarPracticeRunner({ topic, onFinishPractice }) {
                     disabled={isDone || !textInputs[ex.id]}
                     style={{ minHeight: "42px" }}
                   >
-                    Periksa Jawaban ↗
+                    Periksa Jawaban
                   </button>
                 </div>
               )}
@@ -224,7 +224,7 @@ export function GrammarPracticeRunner({ topic, onFinishPractice }) {
                       disabled={isDone || !textInputs[ex.id]}
                       style={{ minHeight: "42px" }}
                     >
-                      Koreksi ↗
+                      Koreksi
                     </button>
                   </div>
                 </div>
@@ -246,7 +246,7 @@ export function GrammarPracticeRunner({ topic, onFinishPractice }) {
                           onClick={() => handleToggleScrambleWord(ex.id, item.word, item.idx)}
                           title="Klik untuk menghapus kata ini"
                         >
-                          {item.word} ✕
+                          <>{item.word} <IconClose size={10} style={{ marginLeft: 2 }} /></>
                         </span>
                       ))
                     )}
@@ -277,7 +277,7 @@ export function GrammarPracticeRunner({ topic, onFinishPractice }) {
                       onClick={() => handleCheckScramble(ex.id, ex.targetSentence)}
                       disabled={(scrambleSelections[ex.id] || []).length === 0}
                     >
-                      Periksa Urutan Kalimat ↗
+                      Periksa Urutan Kalimat
                     </button>
                   )}
                 </div>
@@ -297,7 +297,7 @@ export function GrammarPracticeRunner({ topic, onFinishPractice }) {
                   }}
                 >
                   <p style={{ margin: 0, fontWeight: 700, color: isCorrect ? "#22543D" : "#742A2A" }}>
-                    💡 Pembahasan: {ex.explanation}
+                    <IconLightbulb size={13} style={{ marginRight: 4 }} /> Pembahasan: {ex.explanation}
                   </p>
                 </div>
               )}
@@ -321,7 +321,7 @@ export function GrammarPracticeRunner({ topic, onFinishPractice }) {
           onClick={handleFinishAll}
           disabled={evaluatedCount < 6}
         >
-          {isCompleted ? "✓ Sesi Praktik Tersimpan di Cloud" : "Simpan Sesi Praktik & Lanjut ke Kuis ↗"}
+          {isCompleted ? <><IconCheck size={12} style={{ marginRight: 4 }} /> Sesi Praktik Tersimpan di Cloud</> : "Simpan Sesi Praktik & Lanjut ke Kuis"}
         </button>
       </div>
     </div>

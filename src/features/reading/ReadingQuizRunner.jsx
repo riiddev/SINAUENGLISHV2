@@ -1,3 +1,4 @@
+import { IconClose } from "../../components/common/Icons.jsx";
 import React, { useState, useEffect, useMemo } from "react";
 import { KanciMascot } from "../../components/mascot/KanciMascot.jsx";
 import "../../styles/reading-quiz.css";
@@ -173,7 +174,7 @@ export function ReadingQuizRunner({
               id="close-quiz-btn"
               style={{ width: "36px", height: "36px", minWidth: "36px", minHeight: "36px", borderRadius: "50%", padding: 0 }}
             >
-              ✕
+              <IconClose size={16} />
             </button>
           </div>
         </div>
@@ -258,7 +259,7 @@ export function ReadingQuizRunner({
                   disabled={currentIndex === 0}
                   style={{ minHeight: "44px" }}
                 >
-                  ← Sebelumnya
+                  <><IconArrowLeft size={13} style={{ marginRight: 4 }} /> Sebelumnya</>
                 </button>
 
                 {isLastQuestion ? (
@@ -270,7 +271,7 @@ export function ReadingQuizRunner({
                     id="submit-quiz-btn"
                     style={{ minHeight: "44px" }}
                   >
-                    Selesaikan & Lihat Pembahasan ↗
+                    Selesaikan & Lihat Pembahasan
                   </button>
                 ) : (
                   <button
@@ -281,7 +282,7 @@ export function ReadingQuizRunner({
                     id="next-question-btn"
                     style={{ minHeight: "44px" }}
                   >
-                    Berikutnya →
+                    <>Berikutnya <IconArrowRight size={13} style={{ marginLeft: 4 }} /></>
                   </button>
                 )}
               </div>
@@ -379,7 +380,7 @@ export function ReadingQuizRunner({
                   }}
                 >
                   <h4 style={{ fontSize: "var(--text-sm)", margin: "0 0 4px", fontWeight: 800 }}>
-                    💡 Saran Fokus Belajar: Area {stats.weakestCat}
+                    <IconLightbulb size={13} style={{ marginRight: 4 }} /> Saran Fokus Belajar: Area {stats.weakestCat}
                   </h4>
                   <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", margin: 0, lineHeight: 1.5 }}>
                     {stats.weakestCat === "General Info"
@@ -418,7 +419,7 @@ export function ReadingQuizRunner({
                           {q.category} • {q.subType}
                         </span>
                         <span style={{ fontSize: "var(--text-xs)", fontWeight: 800, color: isCorrect ? "var(--color-success)" : "var(--color-danger)" }}>
-                          {isCorrect ? "✓ Jawaban Benar" : `✕ Salah (Pilihanmu: ${optionLetters[userAnswer]})`}
+                          {isCorrect ? <><IconCheck size={12} style={{ marginRight: 3 }} /> Jawaban Benar</> : <><IconClose size={12} style={{ marginRight: 3 }} /> Salah (Pilihanmu: {optionLetters[userAnswer]})</>}
                         </span>
                       </div>
 
@@ -475,9 +476,9 @@ export function ReadingQuizRunner({
                             id={`add-srs-btn-${targetWord}`}
                           >
                             {isWordAdded ? (
-                              <span>✓ Tersimpan di Antrean Review (SRS)</span>
+                              <span><IconCheck size={12} style={{ marginRight: 4 }} /> Tersimpan di Antrean Review (SRS)</span>
                             ) : (
-                              <span>+ Tambahkan "{targetWord}" ke Review (SRS) ↗</span>
+                              <span>+ Tambahkan "{targetWord}" ke Review (SRS)</span>
                             )}
                           </button>
                           <span style={{ display: "block", fontSize: "11px", color: "var(--color-text-secondary)", marginTop: "4px" }}>
@@ -499,7 +500,7 @@ export function ReadingQuizRunner({
                   id="finish-review-close-btn"
                   style={{ minWidth: "220px" }}
                 >
-                  Selesai & Kembali ke Perpustakaan ↗
+                  Selesai & Kembali ke Perpustakaan
                 </button>
               </div>
             </div>

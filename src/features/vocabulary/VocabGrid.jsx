@@ -108,7 +108,7 @@ export function VocabGrid({ vocabulary = [], progressMap = {}, onStartStudy }) {
             type="button"
             onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
           >
-            Muat Lebih Banyak Kata ↺
+            <>Muat Lebih Banyak Kata <IconRefresh size={13} style={{ marginLeft: 4 }} /></>
           </button>
         </div>
       )}

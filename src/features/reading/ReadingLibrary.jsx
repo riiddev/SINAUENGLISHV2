@@ -91,7 +91,7 @@ export function ReadingLibrary({ passages = [], onRecordWordReview, userProfileH
                       </span>
                     )}
                     <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", fontWeight: 700 }}>
-                      ⏱ {p.estimatedMinutes || 3} MENIT
+                      <><IconClock size={11} style={{ marginRight: 3 }} /> {p.estimatedMinutes || 3} MENIT</>
                     </span>
                   </div>
                 </div>
@@ -110,7 +110,7 @@ export function ReadingLibrary({ passages = [], onRecordWordReview, userProfileH
                   {p.wordCount} KATA
                 </span>
                 <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent-navy)" }}>
-                  Baca Teks ↗
+                  Baca Teks
                 </span>
               </div>
             </div>
@@ -128,7 +128,7 @@ export function ReadingLibrary({ passages = [], onRecordWordReview, userProfileH
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-3)" }}>
             <Badge variant="sage">{selectedPassage.category || "HABIT Reading"}</Badge>
             <span style={{ fontSize: "var(--text-xs)", fontWeight: 700 }}>
-              ⏱ {selectedPassage.estimatedMinutes || 3} Menit · {selectedPassage.wordCount} Kata
+              <><IconClock size={12} style={{ marginRight: 3 }} /> {selectedPassage.estimatedMinutes || 3} Menit</> · {selectedPassage.wordCount} Kata
             </span>
           </div>
 
@@ -174,13 +174,13 @@ export function ReadingLibrary({ passages = [], onRecordWordReview, userProfileH
               onClick={() => setSelectedPassage(null)}
               id="finish-reading-btn"
             >
-              Selesai Membaca ✓
+              <>Selesai Membaca <IconCheck size={13} style={{ marginLeft: 4 }} /></>
             </Button>
 
             {availableQuizzes[selectedPassage.id] ? (
               <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
                 <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", fontWeight: 700 }}>
-                  🎁 Hadiah: +30 EXP · +20 Koin
+                  <IconGift size={13} style={{ marginRight: 4 }} /> Hadiah: +30 EXP · +20 Koin
                 </span>
                 <button
                   type="button"
@@ -192,7 +192,7 @@ export function ReadingLibrary({ passages = [], onRecordWordReview, userProfileH
                   }}
                   style={{ minHeight: "44px" }}
                 >
-                  Kerjakan Kuis Pemahaman (8-10 Soal) ↗
+                  Kerjakan Kuis Pemahaman (8-10 Soal)
                 </button>
               </div>
             ) : (

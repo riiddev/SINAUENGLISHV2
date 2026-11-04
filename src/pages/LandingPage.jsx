@@ -77,11 +77,11 @@ export function LandingPage() {
               <div id="hero-cta-group" style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-3)", alignItems: "center", marginBottom: "var(--space-6)" }}>
                 {isAuthenticated ? (
                   <Link className="btn btn-primary btn-lg" to="/belajar" style={{ minHeight: "44px" }}>
-                    Lanjut ke Ruang Belajar ↗
+                    Lanjut ke Ruang Belajar
                   </Link>
                 ) : (
                   <Link className="btn btn-primary btn-lg" to="/daftar" style={{ minHeight: "44px" }}>
-                    Buat Akun & Mulai Belajar ↗
+                    Buat Akun & Mulai Belajar
                   </Link>
                 )}
                 <a className="btn btn-secondary btn-lg" href="#materi" style={{ minHeight: "44px" }}>
@@ -142,15 +142,15 @@ export function LandingPage() {
                     onClick={cycleSpecimen}
                     style={{ flex: 1, minHeight: "44px" }}
                   >
-                    Ganti Contoh Kata ↻
+                    <>Ganti Contoh Kata <IconRefresh size={13} style={{ marginLeft: 4 }} /></>
                   </button>
                   {isAuthenticated ? (
                     <Link className="btn btn-primary btn-sm" to="/belajar/vocabulary" style={{ minHeight: "44px" }}>
-                      Pelajari di Workspace ↗
+                      Pelajari di Workspace
                     </Link>
                   ) : (
                     <Link className="btn btn-primary btn-sm" to="/daftar" style={{ minHeight: "44px" }}>
-                      Daftar Akun ↗
+                      Daftar Akun
                     </Link>
                   )}
                 </div>
@@ -211,11 +211,11 @@ export function LandingPage() {
               </p>
               {isAuthenticated ? (
                 <Link className="btn btn-secondary btn-sm" to="/belajar/vocabulary" style={{ minHeight: "44px" }}>
-                  Buka Kosakata ↗
+                  Buka Kosakata
                 </Link>
               ) : (
                 <Link className="btn btn-secondary btn-sm" to="/daftar" style={{ minHeight: "44px" }}>
-                  Daftar untuk Membuka ↗
+                  Daftar untuk Membuka
                 </Link>
               )}
             </div>
@@ -228,11 +228,11 @@ export function LandingPage() {
               </p>
               {isAuthenticated ? (
                 <Link className="btn btn-secondary btn-sm" to="/belajar/grammar" style={{ minHeight: "44px" }}>
-                  Buka Grammar ↗
+                  Buka Grammar
                 </Link>
               ) : (
                 <Link className="btn btn-secondary btn-sm" to="/daftar" style={{ minHeight: "44px" }}>
-                  Daftar untuk Membuka ↗
+                  Daftar untuk Membuka
                 </Link>
               )}
             </div>
@@ -245,11 +245,11 @@ export function LandingPage() {
               </p>
               {isAuthenticated ? (
                 <Link className="btn btn-secondary btn-sm" to="/belajar/reading" style={{ minHeight: "44px" }}>
-                  Buka Bacaan ↗
+                  Buka Bacaan
                 </Link>
               ) : (
                 <Link className="btn btn-secondary btn-sm" to="/daftar" style={{ minHeight: "44px" }}>
-                  Daftar untuk Membuka ↗
+                  Daftar untuk Membuka
                 </Link>
               )}
             </div>
@@ -262,11 +262,11 @@ export function LandingPage() {
               </p>
               {isAuthenticated ? (
                 <Link className="btn btn-secondary btn-sm" to="/belajar/adventure" style={{ minHeight: "44px" }}>
-                  Mulai Petualangan ↗
+                  Mulai Petualangan
                 </Link>
               ) : (
                 <Link className="btn btn-secondary btn-sm" to="/daftar" style={{ minHeight: "44px" }}>
-                  Daftar untuk Membuka ↗
+                  Daftar untuk Membuka
                 </Link>
               )}
             </div>
@@ -284,11 +284,11 @@ export function LandingPage() {
             </p>
             {isAuthenticated ? (
               <Link className="btn btn-primary btn-lg" to="/belajar" style={{ minHeight: "44px" }}>
-                Buka Ruang Belajar Sekarang ↗
+                Buka Ruang Belajar Sekarang
               </Link>
             ) : (
               <Link className="btn btn-primary btn-lg" to="/daftar" style={{ minHeight: "44px" }}>
-                Buat Akun Gratis Sekarang ↗
+                Buat Akun Gratis Sekarang
               </Link>
             )}
           </div>

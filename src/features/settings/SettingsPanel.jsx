@@ -42,13 +42,13 @@ export function SettingsPanel({ onProgressReload }) {
       const res = await api.importBackup(backupData);
 
       if (res.success) {
-        setImportStatus(`✓ Berhasil mengimpor ${res.count || 0} riwayat kata ke akun Anda!`);
+        setImportStatus(`Berhasil mengimpor ${res.count || 0} riwayat kata ke akun Anda!`);
         if (onProgressReload) onProgressReload();
       } else {
         throw new Error(res.error || "Gagal mengimpor.");
       }
     } catch (err) {
-      setImportStatus(`✗ Gagal mengimpor: ${err.message}`);
+      setImportStatus(`Gagal mengimpor: ${err.message}`);
     } finally {
       setIsImporting(false);
       e.target.value = "";
@@ -58,7 +58,7 @@ export function SettingsPanel({ onProgressReload }) {
   const handleEnableNotifications = async () => {
     const perm = await requestNotificationPermission();
     if (perm === "granted") {
-      setNotifFeedback("✓ Izin notifikasi berhasil diaktifkan! Pengingat misi harian akan dikirim otomatis.");
+      setNotifFeedback("Izin notifikasi berhasil diaktifkan! Pengingat misi harian akan dikirim otomatis.");
       setTimeout(() => setNotifFeedback(""), 4000);
     } else if (perm === "denied") {
       setNotifFeedback("Izin notifikasi diblokir oleh browser. Silakan izinkan melalui pengaturan situs di browsermu.");
@@ -71,7 +71,7 @@ export function SettingsPanel({ onProgressReload }) {
       body: "3 misi harian menunggumu hari ini! Selesaikan sekarang untuk mengamankan streak belajarmu.",
       url: "/belajar/missions"
     });
-    setNotifFeedback("✓ Notifikasi pengingat uji coba berhasil dikirim!");
+    setNotifFeedback("Notifikasi pengingat uji coba berhasil dikirim!");
     setTimeout(() => setNotifFeedback(""), 4000);
   };
 
@@ -113,7 +113,7 @@ export function SettingsPanel({ onProgressReload }) {
               Saat ini kamu berada dalam Mode Tamu. Kemajuan belajarmu tersimpan sementara pada browser aktif.
             </p>
             <a href="/login" className="btn btn-primary btn-sm" style={{ minHeight: "44px", display: "inline-flex", alignItems: "center" }}>
-              Masuk atau Buat Akun Baru ↗
+              Masuk atau Buat Akun Baru
             </a>
           </div>
         )}
@@ -139,7 +139,7 @@ export function SettingsPanel({ onProgressReload }) {
               border: "var(--border-sm)"
             }}
           >
-            {isInstalled ? "✓ Terpasang di Layar Utama" : "Mode Browser"}
+            {isInstalled ? <><IconCheck size={12} style={{ marginRight: 3 }} /> Terpasang di Layar Utama</> : "Mode Browser"}
           </span>
         </div>
 
@@ -156,11 +156,11 @@ export function SettingsPanel({ onProgressReload }) {
               <polyline points="7 10 12 15 17 10"/>
               <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            Pasang Aplikasi Sekarang ↗
+            Pasang Aplikasi Sekarang
           </button>
         ) : isInstalled ? (
           <p style={{ margin: 0, fontSize: "var(--text-xs)", color: "var(--color-success)", fontWeight: 700 }}>
-            ✓ Kamu sedang menggunakan SinauEnglish dalam mode aplikasi mandiri.
+            Kamu sedang menggunakan SinauEnglish dalam mode aplikasi mandiri.
           </p>
         ) : (
           <p style={{ margin: 0, fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
@@ -190,7 +190,7 @@ export function SettingsPanel({ onProgressReload }) {
               border: "var(--border-sm)"
             }}
           >
-            {notificationPermission === "granted" ? "✓ Izin Aktif" : "Izin Belum Aktif"}
+            {notificationPermission === "granted" ? <><IconCheck size={12} style={{ marginRight: 3 }} /> Izin Aktif</> : "Izin Belum Aktif"}
           </span>
         </div>
 
@@ -271,7 +271,7 @@ export function SettingsPanel({ onProgressReload }) {
               id="test-notif-btn"
               style={{ minHeight: "44px" }}
             >
-              Uji Coba Pengingat (Melayang di HP) ↗
+              Uji Coba Pengingat (Melayang di HP)
             </button>
 
             <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
@@ -287,7 +287,7 @@ export function SettingsPanel({ onProgressReload }) {
               marginTop: "var(--space-3)",
               fontSize: "var(--text-xs)",
               fontWeight: 700,
-              color: notifFeedback.startsWith("✓") ? "var(--color-success)" : "var(--color-accent-gold)"
+              color: !notifFeedback.toLowerCase().includes("gagal") ? "var(--color-success)" : "var(--color-accent-gold)"
             }}
           >
             {notifFeedback}
@@ -332,7 +332,7 @@ export function SettingsPanel({ onProgressReload }) {
           className={`btn btn-secondary btn-sm ${isImporting ? "disabled" : ""}`}
           style={{ cursor: "pointer", display: "inline-block", minHeight: "44px", lineHeight: "30px" }}
         >
-          {isImporting ? "Mengimpor Data..." : "Pilih File Backup (.json) ↗"}
+          {isImporting ? "Mengimpor Data..." : "Pilih File Backup (.json)"}
         </label>
         <input
           id="backup-file-input"
@@ -349,7 +349,7 @@ export function SettingsPanel({ onProgressReload }) {
               marginTop: "var(--space-3)",
               fontSize: "var(--text-xs)",
               fontWeight: 600,
-              color: importStatus.startsWith("✓") ? "var(--color-success)" : "var(--color-text-secondary)"
+              color: !importStatus.toLowerCase().includes("gagal") ? "var(--color-success)" : "var(--color-text-secondary)"
             }}
           >
             {importStatus}

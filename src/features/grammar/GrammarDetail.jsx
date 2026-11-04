@@ -1,3 +1,4 @@
+import { IconLightbulb } from "../../components/common/Icons.jsx";
 import React, { useState, useEffect } from "react";
 import { Badge } from "../../components/common/Badge.jsx";
 import { Button } from "../../components/common/Button.jsx";
@@ -44,12 +45,12 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
       {/* Back button */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-4)" }}>
         <Button variant="secondary" size="sm" onClick={onBack} id="back-to-grammar-grid-btn">
-          ← Kembali ke 19 Modul Grammar
+          <><IconArrowLeft size={13} style={{ marginRight: 4 }} /> Kembali ke 19 Modul Grammar</>
         </Button>
 
         {isMastered && (
           <span className="mastery-status-pill mastered" id="mastered-status-badge">
-            ✓ Topik Dikuasai (Skor: {topicProgress?.quizBest || 80}%)
+            <><IconCheck size={13} style={{ marginRight: 4 }} /> Topik Dikuasai</> (Skor: {topicProgress?.quizBest || 80}%)
           </span>
         )}
       </div>
@@ -58,13 +59,13 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
       <div className="grammar-header-card">
         <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center", marginBottom: "var(--space-3)", flexWrap: "wrap" }}>
           <Badge variant="navy">{detailedTopic.level}</Badge>
-          <Badge variant="gold">⏱ {detailedTopic.estimatedMinutes || 12} Menit</Badge>
+          <Badge variant="gold"><><IconClock size={12} style={{ marginRight: 3 }} /> {detailedTopic.estimatedMinutes || 12} Menit</></Badge>
           <span className="scholar-chip chip-neutral" style={{ fontSize: "10px", padding: "1px 6px" }}>
             {detailedTopic.category || "Tata Bahasa"}
           </span>
           {!detailedTopic.isLegacy && (
             <span className="scholar-chip chip-gold" style={{ fontSize: "10px", padding: "1px 6px", fontWeight: 800 }}>
-              ★ Kurikulum Mendalam 10 Bagian
+              <><IconStar size={12} style={{ marginRight: 4 }} /> Kurikulum Mendalam 10 Bagian</>
             </span>
           )}
         </div>
@@ -88,7 +89,7 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
           onClick={() => setActiveTab("materi")}
           id="tab-btn-materi"
         >
-          <span>📖</span>
+          <IconBook size={14} />
           <span>1. Materi & Kaidah</span>
         </button>
 
@@ -100,10 +101,10 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
           onClick={() => setActiveTab("praktik")}
           id="tab-btn-praktik"
         >
-          <span>✍️</span>
+          <IconEdit size={14} />
           <span>2. Praktik Bertingkat (12 Latihan)</span>
           {topicProgress?.practiceDone && (
-            <span style={{ fontSize: "10px", color: "var(--color-success)", fontWeight: 800 }}>✓</span>
+            <IconCheck size={12} style={{ color: "var(--color-success)" }} />
           )}
         </button>
 
@@ -115,10 +116,10 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
           onClick={() => setActiveTab("kuis")}
           id="tab-btn-kuis"
         >
-          <span>🏆</span>
+          <IconTrophy size={14} />
           <span>3. Kuis Penguasaan (10 Soal)</span>
           {isMastered && (
-            <span style={{ fontSize: "10px", color: "var(--color-success)", fontWeight: 800 }}>✓</span>
+            <IconCheck size={12} style={{ color: "var(--color-success)" }} />
           )}
         </button>
       </div>
@@ -130,7 +131,7 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
           {detailedTopic.learningObjectives?.whenToUse && (
             <section className="pedagogy-block">
               <h3 className="pedagogy-title">
-                🎯 Kapan Harus Digunakan?
+                <IconTarget size={14} style={{ marginRight: 4 }} /> Kapan Harus Digunakan?
               </h3>
               <p style={{ fontSize: "var(--text-sm)", color: "var(--color-text-secondary)", margin: "0 0 var(--space-4) 0" }}>
                 Gunakan pola <strong>{detailedTopic.title}</strong> dalam 4 konteks komunikasi nyata berikut:
@@ -160,7 +161,7 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
           {detailedTopic.patternTable && (
             <section className="pedagogy-block">
               <h3 className="pedagogy-title">
-                📐 Rumus & Pola Kalimat Praktis
+                <IconTarget size={14} style={{ marginRight: 4 }} /> Rumus & Pola Kalimat Praktis
               </h3>
               <div className="formula-table-container">
                 <table className="formula-table">
@@ -191,7 +192,7 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
           {detailedTopic.progressiveExplanation && (
             <section className="pedagogy-block">
               <h3 className="pedagogy-title">
-                🧠 Pemahaman Bertahap: Dari Intuisi ke Kaidah Baku
+                <IconSparkles size={14} style={{ marginRight: 4 }} /> Pemahaman Bertahap: Dari Intuisi ke Kaidah Baku
               </h3>
 
               <div className="stepper-list">
@@ -254,7 +255,7 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
           {detailedTopic.useCaseExamples && (
             <section className="pedagogy-block">
               <h3 className="pedagogy-title">
-                💬 Contoh Pemakaian Kalimat Nyata
+                <IconBook size={14} style={{ marginRight: 4 }} /> Contoh Pemakaian Kalimat Nyata
               </h3>
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
                 {detailedTopic.useCaseExamples.map((cat, idx) => (
@@ -280,7 +281,7 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
           {detailedTopic.indonesianContrast && (
             <section className="contrast-card">
               <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-lg)", fontWeight: 800, margin: "0 0 var(--space-3) 0", color: "#744210" }}>
-                🇮🇩 Kenapa Orang Indonesia Sering Salah di Topik Ini?
+                <IconHelp size={14} style={{ marginRight: 4 }} /> Kenapa Orang Indonesia Sering Salah di Topik Ini?
               </h3>
               <p style={{ fontSize: "var(--text-xs)", lineHeight: 1.6, color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
                 <strong>Perbedaan Mendasar:</strong> {detailedTopic.indonesianContrast.fundamentalDifference}
@@ -307,7 +308,7 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
           {detailedTopic.commonMistakes && detailedTopic.commonMistakes.length > 0 && (
             <section className="pedagogy-block">
               <h3 className="pedagogy-title">
-                ⚠️ Bedah Kesalahan Umum (Salah ➔ Benar)
+                <IconClose size={14} style={{ marginRight: 4, color: 'var(--color-danger)' }} /> Bedah Kesalahan Umum (Salah ke Benar)
               </h3>
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
                 {detailedTopic.commonMistakes.map((m, idx) => (
@@ -317,8 +318,8 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
                         {m.trapType || "Jebakan Pola"}
                       </span>
                     </div>
-                    <div className="mistake-wrong">✕ Salah: {m.wrong}</div>
-                    <div className="mistake-correct">✓ Benar: {m.correct}</div>
+                    <div className="mistake-wrong"><IconClose size={12} style={{ marginRight: 4 }} /> Salah: {m.wrong}</div>
+                    <div className="mistake-correct"><IconCheck size={12} style={{ marginRight: 4 }} /> Benar: {m.correct}</div>
                     <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", margin: 0, lineHeight: 1.5 }}>
                       <strong>Alasan:</strong> {m.explanation}
                     </p>
@@ -332,7 +333,7 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
           {detailedTopic.cheatSheet && (
             <section className="card card-tint-sand" style={{ padding: "var(--space-6)", marginBottom: "var(--space-6)" }}>
               <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-lg)", fontWeight: 800, margin: "0 0 var(--space-3) 0" }}>
-                ⚡ Ringkasan Cepat (Cheat Sheet)
+                <IconSparkles size={14} style={{ marginRight: 4, color: 'var(--color-accent-gold)' }} /> Ringkasan Cepat (Cheat Sheet)
               </h3>
               <ul style={{ margin: "0 0 var(--space-4) 0", paddingLeft: "18px", fontSize: "var(--text-xs)", lineHeight: 1.7, color: "var(--color-text-primary)" }}>
                 {(detailedTopic.cheatSheet.keyTakeaways || []).map((item, idx) => (
@@ -342,7 +343,7 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
               {detailedTopic.cheatSheet.quickGoldenRule && (
                 <div style={{ backgroundColor: "var(--color-bg-surface)", padding: "var(--space-3) var(--space-4)", borderRadius: "var(--radius-md)", border: "1.5px solid #D69E2E" }}>
                   <span style={{ fontSize: "11px", fontWeight: 800, color: "#744210", textTransform: "uppercase" }}>
-                    ⭐ Golden Rule:
+                    <IconStar size={12} style={{ marginRight: 4, color: 'var(--color-accent-gold)' }} /> Golden Rule:
                   </span>
                   <p style={{ margin: "2px 0 0", fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-text-primary)" }}>
                     {detailedTopic.cheatSheet.quickGoldenRule}
@@ -369,7 +370,7 @@ export function GrammarDetail({ topic, onBack, onStartQuiz, userProfileHook }) {
               onClick={() => setActiveTab("praktik")}
               id="goto-practice-tab-btn"
             >
-              Mulai 12 Praktik Bertingkat ↗
+              Mulai 12 Praktik Bertingkat
             </Button>
           </div>
         </div>

@@ -148,7 +148,7 @@ export function MissionsView({ onRewardClaimed }) {
                 </div>
                 <span className="mission-progress-label">
                   {quest.isCompleted ? (
-                    <span style={{ color: "var(--color-success)" }}>✓ Tercapai</span>
+                    <span style={{ color: "var(--color-success)" }}><IconCheck size={12} style={{ marginRight: 3 }} /> Tercapai</span>
                   ) : (
                     `${quest.progress} / ${quest.target} ${quest.unit} (${quest.percentage}%)`
                   )}
@@ -222,7 +222,7 @@ export function MissionsView({ onRewardClaimed }) {
             className="btn btn-primary btn-sm"
             style={{ minHeight: "44px", display: "inline-flex", alignItems: "center" }}
           >
-            Lihat Progres Profil ↗
+            Lihat Progres Profil
           </Link>
         </section>
       )}

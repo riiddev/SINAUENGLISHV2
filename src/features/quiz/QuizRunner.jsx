@@ -21,7 +21,7 @@ export function QuizRunner({ topic, onFinish, onRetry }) {
           Kuis dirancang untuk menguji pemahaman konsep tata bahasa secara langsung.
         </p>
         <Button variant="primary" onClick={onFinish}>
-          Lihat Modul Grammar ↗
+          Lihat Modul Grammar
         </Button>
       </div>
     );
@@ -111,7 +111,7 @@ export function QuizRunner({ topic, onFinish, onRetry }) {
               if (onRetry) onRetry(topic);
             }}
           >
-            Ulangi Kuis ↺
+            <><IconRefresh size={13} style={{ marginRight: 4 }} /> Ulangi Kuis</>
           </Button>
         </div>
       </div>
@@ -183,8 +183,8 @@ export function QuizRunner({ topic, onFinish, onRetry }) {
             }}
           >
             {selectedOption === currentQ.answer
-              ? `✓ Benar! ${currentQ.explanation}`
-              : `✗ Kurang tepat. ${currentQ.explanation}`}
+              ? `Benar! ${currentQ.explanation}`
+              : `Kurang tepat. ${currentQ.explanation}`}
           </div>
         )}
       </div>

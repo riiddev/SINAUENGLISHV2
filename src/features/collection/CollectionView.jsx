@@ -258,11 +258,11 @@ export function CollectionView({ userProfileHook }) {
 
                 {isEquipped ? (
                   <span className="catalog-badge-equipped">
-                    ✓ Digunakan
+                    <><IconCheck size={12} style={{ marginRight: 3 }} /> Digunakan</>
                   </span>
                 ) : isOwned ? (
                   <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-success)" }}>
-                    ✓ Dimiliki
+                    <><IconCheck size={12} style={{ marginRight: 3 }} /> Dimiliki</>
                   </span>
                 ) : (
                   <span style={{ fontSize: "var(--text-xs)", fontWeight: 800, color: "#744210" }}>
@@ -320,7 +320,7 @@ export function CollectionView({ userProfileHook }) {
                     disabled
                     style={{ width: "100%", opacity: 0.6, minHeight: "40px" }}
                   >
-                    🔒 Terkunci (Butuh Lvl {item.levelReq})
+                    <><IconLock size={12} style={{ marginRight: 3 }} /> Terkunci (Butuh Lvl {item.levelReq})</>
                   </button>
                 ) : isEquipped ? (
                   <button
@@ -340,7 +340,7 @@ export function CollectionView({ userProfileHook }) {
                     style={{ width: "100%", minHeight: "40px" }}
                     id={`btn-equip-${item.id}`}
                   >
-                    Gunakan Sekarang ↗
+                    Gunakan Sekarang
                   </button>
                 ) : (
                   <button
@@ -441,7 +441,7 @@ export function CollectionView({ userProfileHook }) {
                 id="confirm-buy-submit-btn"
                 style={{ minHeight: "44px" }}
               >
-                {isProcessing ? "Menyimpan ke Cloud..." : "Beli Sekarang ↗"}
+                {isProcessing ? "Menyimpan ke Cloud..." : "Beli Sekarang"}
               </button>
             </div>
           </div>
@@ -507,7 +507,7 @@ export function CollectionView({ userProfileHook }) {
               id="celebration-equip-now-btn"
               style={{ width: "100%" }}
             >
-              Gunakan Sekarang ↗
+              Gunakan Sekarang
             </button>
           </div>
         </div>

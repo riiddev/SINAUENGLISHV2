@@ -23,7 +23,7 @@ export function NotFoundPage() {
             Alamat yang kamu tuju tidak tersedia atau telah dipindahkan.
           </p>
           <Link to="/">
-            <Button variant="primary">Kembali ke Beranda ↗</Button>
+            <Button variant="primary">Kembali ke Beranda</Button>
           </Link>
         </div>
       </main>

@@ -1,3 +1,4 @@
+import { IconCheck, IconClose } from "../../components/common/Icons.jsx";
 import React, { useState, useMemo } from "react";
 import { KanciMascot } from "../../components/mascot/KanciMascot.jsx";
 import { api } from "../../services/api.js";
@@ -174,7 +175,7 @@ export function GrammarMasteryQuiz({
               onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
               disabled={currentIndex === 0}
             >
-              ← Sebelumnya
+              <><IconArrowLeft size={13} style={{ marginRight: 4 }} /> Sebelumnya</>
             </button>
 
             {isLastQuestion ? (
@@ -185,7 +186,7 @@ export function GrammarMasteryQuiz({
                 disabled={selectedAnswers[currentQ.id] === undefined}
                 id="submit-mastery-quiz-btn"
               >
-                Selesaikan Kuis & Uji Penguasaan ↗
+                Selesaikan Kuis & Uji Penguasaan
               </button>
             ) : (
               <button
@@ -195,7 +196,7 @@ export function GrammarMasteryQuiz({
                 disabled={selectedAnswers[currentQ.id] === undefined}
                 id="next-mastery-quiz-btn"
               >
-                Berikutnya →
+                <>Berikutnya <IconArrowRight size={13} style={{ marginLeft: 4 }} /></>
               </button>
             )}
           </div>
@@ -215,7 +216,7 @@ export function GrammarMasteryQuiz({
           />
 
           <h3 style={{ fontSize: "var(--text-2xl)", margin: "var(--space-3) 0 var(--space-2)" }}>
-            {stats.isMastered ? "Status: Topik Dikuasai! 🎉" : "Perlu Penguatan Materi"}
+            {stats.isMastered ? "Status: Topik Dikuasai!" : "Perlu Penguatan Materi"}
           </h3>
 
           <div className="quiz-score-circle" style={{ borderColor: stats.isMastered ? "var(--color-success)" : "var(--color-danger)" }}>
@@ -231,7 +232,7 @@ export function GrammarMasteryQuiz({
 
           <div style={{ marginBottom: "var(--space-4)" }}>
             <span className={`mastery-status-pill ${stats.isMastered ? "mastered" : "learning"}`}>
-              {stats.isMastered ? "✓ Status: Dikuasai (Mastered)" : "Status: Sedang Dipelajari"}
+              {stats.isMastered ? "Status: Dikuasai (Mastered)" : "Status: Sedang Dipelajari"}
             </span>
           </div>
 
@@ -278,7 +279,7 @@ export function GrammarMasteryQuiz({
                       Soal {qIdx + 1}
                     </span>
                     <span style={{ fontSize: "var(--text-xs)", fontWeight: 800, color: isCorrect ? "var(--color-success)" : "var(--color-danger)" }}>
-                      {isCorrect ? "✓ Jawaban Tepat" : `✕ Salah (Pilihanmu: ${optionLetters[userAnswer] || "-"})`}
+                      {isCorrect ? <><IconCheck size={12} style={{ marginRight: 3 }} /> Jawaban Tepat</> : <><IconClose size={12} style={{ marginRight: 3 }} /> Salah (Pilihanmu: {optionLetters[userAnswer] || "-"})</>}
                     </span>
                   </div>
 
@@ -336,7 +337,7 @@ export function GrammarMasteryQuiz({
               onClick={handleRetake}
               id="retake-grammar-quiz-btn"
             >
-              Ulangi Kuis ↺
+              <><IconRefresh size={13} style={{ marginRight: 4 }} /> Ulangi Kuis</>
             </button>
             <button
               type="button"
@@ -344,7 +345,7 @@ export function GrammarMasteryQuiz({
               onClick={onClose}
               id="finish-grammar-quiz-btn"
             >
-              Kembali ke Modul Grammar ↗
+              Kembali ke Modul Grammar
             </button>
           </div>
         </div>

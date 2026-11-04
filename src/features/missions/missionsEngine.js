@@ -19,7 +19,7 @@ export const QUEST_POOL = {
       xpReward: 40,
       coinsReward: 15,
       actionUrl: "/belajar/vocabulary",
-      actionText: "Buka Daftar Kata ↗",
+      actionText: "Buka Daftar Kata",
       iconType: "book"
     },
     {
@@ -33,7 +33,7 @@ export const QUEST_POOL = {
       xpReward: 45,
       coinsReward: 20,
       actionUrl: "/belajar/review",
-      actionText: "Buka Antrean Review ↗",
+      actionText: "Buka Antrean Review",
       iconType: "refresh"
     }
   ],
@@ -51,7 +51,7 @@ export const QUEST_POOL = {
       xpReward: 50,
       coinsReward: 20,
       actionUrl: "/belajar/grammar",
-      actionText: "Pilih Modul Grammar ↗",
+      actionText: "Pilih Modul Grammar",
       iconType: "award"
     },
     {
@@ -65,7 +65,7 @@ export const QUEST_POOL = {
       xpReward: 45,
       coinsReward: 15,
       actionUrl: "/belajar/reading",
-      actionText: "Buka Perpustakaan ↗",
+      actionText: "Buka Perpustakaan",
       iconType: "book-open"
     }
   ],
@@ -83,7 +83,7 @@ export const QUEST_POOL = {
       xpReward: 40,
       coinsReward: 15,
       actionUrl: "/belajar/vocabulary",
-      actionText: "Mulai Sesi Fokus ↗",
+      actionText: "Mulai Sesi Fokus",
       iconType: "target"
     },
     {
@@ -97,7 +97,7 @@ export const QUEST_POOL = {
       xpReward: 50,
       coinsReward: 20,
       actionUrl: "/belajar/adventure",
-      actionText: "Mulai Petualangan ↗",
+      actionText: "Mulai Petualangan",
       iconType: "compass"
     }
   ]

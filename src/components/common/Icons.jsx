@@ -13,6 +13,7 @@ export function IconBase({ size = 16, className = "", children, ...props }) {
       strokeLinejoin="round"
       className={`sinau-svg-icon ${className}`}
       aria-hidden="true"
+      style={{ verticalAlign: "middle", display: "inline-block", ...props.style }}
       {...props}
     >
       {children}
@@ -84,6 +85,17 @@ export function IconCheckCircle({ size = 16, className = "", ...props }) {
     </IconBase>
   );
 }
+
+export function IconClose({ size = 16, className = "", ...props }) {
+  return (
+    <IconBase size={size} className={className} {...props}>
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </IconBase>
+  );
+}
+
+export const IconX = IconClose;
 
 export function IconArrowRight({ size = 16, className = "", ...props }) {
   return (
@@ -211,15 +223,6 @@ export function IconCoin({ size = 16, className = "", ...props }) {
   );
 }
 
-export function IconClose({ size = 16, className = "", ...props }) {
-  return (
-    <IconBase size={size} className={className} {...props}>
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </IconBase>
-  );
-}
-
 export function IconChevronDown({ size = 16, className = "", ...props }) {
   return (
     <IconBase size={size} className={className} {...props}>
@@ -245,3 +248,53 @@ export function IconCompass({ size = 16, className = "", ...props }) {
   );
 }
 
+export function IconEdit({ size = 16, className = "", ...props }) {
+  return (
+    <IconBase size={size} className={className} {...props}>
+      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+    </IconBase>
+  );
+}
+
+export function IconGift({ size = 16, className = "", ...props }) {
+  return (
+    <IconBase size={size} className={className} {...props}>
+      <polyline points="20 12 20 22 4 22 4 12" />
+      <rect x="2" y="7" width="20" height="5" />
+      <line x1="12" y1="22" x2="12" y2="7" />
+      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+    </IconBase>
+  );
+}
+
+export function IconScroll({ size = 16, className = "", ...props }) {
+  return (
+    <IconBase size={size} className={className} {...props}>
+      <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <polyline points="10 9 9 9 8 9" />
+    </IconBase>
+  );
+}
+
+export function IconHelp({ size = 16, className = "", ...props }) {
+  return (
+    <IconBase size={size} className={className} {...props}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <line x1="12" y1="17" x2="12.01" y2="17" />
+    </IconBase>
+  );
+}
+
+export function IconPin({ size = 16, className = "", ...props }) {
+  return (
+    <IconBase size={size} className={className} {...props}>
+      <line x1="12" y1="17" x2="12" y2="22" />
+      <path d="M5 17h14v-1.76l-1.92-3.84A2 2 0 0 1 17 10.5V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v6.5a2 2 0 0 1-.08.89L5 15.24V17z" />
+    </IconBase>
+  );
+}

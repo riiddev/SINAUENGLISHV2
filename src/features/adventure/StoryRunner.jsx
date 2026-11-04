@@ -132,7 +132,7 @@ export function StoryRunner({
             id="close-story-runner-btn"
             style={{ width: "36px", height: "36px", borderRadius: "50%", padding: 0 }}
           >
-            ✕
+            <IconClose size={16} />
           </button>
         </div>
 
@@ -183,7 +183,7 @@ export function StoryRunner({
               {episode.recap && (
                 <div className="card card-tint-sand" style={{ padding: "var(--space-4)", marginBottom: "var(--space-6)" }}>
                   <span style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", color: "#744210" }}>
-                    📜 Latar Cerita
+                    <IconScroll size={13} style={{ marginRight: 4 }} /> Latar Cerita
                   </span>
                   <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, margin: "4px 0 0" }}>
                     {episode.recap}
@@ -201,7 +201,7 @@ export function StoryRunner({
                       <div key={item.id} className="interactive-choice-box" id={`choice-box-${item.id}`}>
                         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-2)" }}>
                           <span style={{ fontSize: "11px", fontWeight: 800, color: "#744210", textTransform: "uppercase" }}>
-                            🤔 Pilihan Responmu:
+                            <IconHelp size={13} style={{ marginRight: 4 }} /> Pilihan Responmu:
                           </span>
                         </div>
                         <p style={{ fontSize: "var(--text-xs)", fontWeight: 700, margin: "0 0 var(--space-2) 0" }}>
@@ -263,7 +263,7 @@ export function StoryRunner({
                             title="Dengarkan pengucapan audio"
                             id={`audio-btn-${item.id}`}
                           >
-                            🔊 Audio
+                            <><IconVolume size={13} style={{ marginRight: 4 }} /> Audio</>
                           </button>
                           <button
                             type="button"
@@ -294,7 +294,7 @@ export function StoryRunner({
                   onClick={() => setActiveStep("vocab")}
                   id="goto-vocab-step-btn"
                 >
-                  Lanjut ke Kosakata & Grammar ↗
+                  Lanjut ke Kosakata & Grammar
                 </button>
               </div>
             </div>
@@ -307,7 +307,7 @@ export function StoryRunner({
               <div style={{ marginBottom: "var(--space-8)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <h4 style={{ fontSize: "var(--text-lg)", fontFamily: "var(--font-heading)", margin: 0 }}>
-                    ✨ Kosakata Pilihan Oxford 3000 ({episode.highlightedVocab?.length || 0} Kata)
+                    <IconSparkles size={16} style={{ marginRight: 6, color: 'var(--color-accent-gold)' }} /> Kosakata Pilihan Oxford 3000 ({episode.highlightedVocab?.length || 0} Kata)
                   </h4>
                   <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
                     Tersambung langsung ke kamus V2
@@ -341,7 +341,7 @@ export function StoryRunner({
                           id={`story-srs-btn-${v.word}`}
                           style={{ width: "100%", justifyContent: "center" }}
                         >
-                          {isAdded ? "✓ Tersimpan di SRS" : `+ Simpan "${v.word}" ke SRS ↗`}
+                          {isAdded ? <><IconCheck size={12} style={{ marginRight: 4 }} /> Tersimpan di SRS</> : `+ Simpan "${v.word}" ke SRS`}
                         </button>
                       </div>
                     );
@@ -371,7 +371,7 @@ export function StoryRunner({
               {episode.culturalTip && (
                 <div className="card card-tint-sand" style={{ padding: "var(--space-5)", marginBottom: "var(--space-6)" }}>
                   <span style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", color: "#744210" }}>
-                    💡 Tip Budaya & Situasi Nyata
+                    <IconLightbulb size={13} style={{ marginRight: 4, color: 'var(--color-accent-gold)' }} /> Tip Budaya & Situasi Nyata
                   </span>
                   <h4 style={{ fontSize: "var(--text-sm)", margin: "4px 0 var(--space-2) 0" }}>
                     {episode.culturalTip.title}
@@ -389,7 +389,7 @@ export function StoryRunner({
                   className="btn btn-outline"
                   onClick={() => setActiveStep("story")}
                 >
-                  ← Kembali ke Cerita
+                  <><IconArrowLeft size={13} style={{ marginRight: 4 }} /> Kembali ke Cerita</>
                 </button>
                 <button
                   type="button"
@@ -397,7 +397,7 @@ export function StoryRunner({
                   onClick={() => setActiveStep("quiz")}
                   id="goto-quiz-step-btn"
                 >
-                  Uji Pemahaman (5 Soal Kuis) ↗
+                  <>Uji Pemahaman (5 Soal Kuis) <IconArrowRight size={13} style={{ marginLeft: 4 }} /></>
                 </button>
               </div>
             </div>
@@ -477,7 +477,7 @@ export function StoryRunner({
                       {isQuizSubmitted && (
                         <div style={{ marginTop: "var(--space-3)", paddingTop: "var(--space-2)", borderTop: "1px dashed var(--border-color)", fontSize: "var(--text-xs)", lineHeight: 1.5 }}>
                           <strong style={{ color: isCorrect ? "var(--color-success)" : "var(--color-danger)" }}>
-                            {isCorrect ? "✓ Jawaban Benar! " : "✕ Belum Tepat. "}
+                            {isCorrect ? <><IconCheck size={13} style={{ marginRight: 4 }} /> Jawaban Benar! </> : <><IconClose size={13} style={{ marginRight: 4 }} /> Belum Tepat. </>}
                           </strong>
                           {q.explanation}
                         </div>
@@ -494,7 +494,7 @@ export function StoryRunner({
                   className="btn btn-outline"
                   onClick={() => setActiveStep("vocab")}
                 >
-                  ← Kembali ke Kosakata
+                  <><IconArrowLeft size={13} style={{ marginRight: 4 }} /> Kembali ke Kosakata</>
                 </button>
 
                 {!isQuizSubmitted ? (
@@ -505,7 +505,7 @@ export function StoryRunner({
                     disabled={Object.keys(quizAnswers).length < quizQuestions.length}
                     id="submit-story-quiz-btn"
                   >
-                    Periksa Jawaban Kuis ↗
+                    <>Periksa Jawaban Kuis <IconArrowRight size={13} style={{ marginLeft: 4 }} /></>
                   </button>
                 ) : (
                   <button
@@ -514,7 +514,7 @@ export function StoryRunner({
                     onClick={() => setActiveStep("summary")}
                     id="goto-summary-step-btn"
                   >
-                    Lihat Rangkuman & Selesaikan ↗
+                    <>Lihat Rangkuman & Selesaikan <IconArrowRight size={13} style={{ marginLeft: 4 }} /></>
                   </button>
                 )}
               </div>
@@ -560,7 +560,7 @@ export function StoryRunner({
               {/* Takeaways Card */}
               <div className="card card-tint-sand" style={{ padding: "var(--space-6)", textAlign: "left", marginBottom: "var(--space-6)" }}>
                 <h4 style={{ fontSize: "var(--text-base)", fontFamily: "var(--font-heading)", margin: "0 0 var(--space-3) 0" }}>
-                  📌 Yang Telah Kamu Pelajari Hari Ini:
+                  <IconPin size={13} style={{ marginRight: 4 }} /> Yang Telah Kamu Pelajari Hari Ini:
                 </h4>
                 <ul style={{ margin: 0, paddingLeft: "18px", fontSize: "var(--text-xs)", lineHeight: 1.7 }}>
                   {(episode.summary?.takeaways || []).map((t, idx) => (
@@ -573,7 +573,7 @@ export function StoryRunner({
               {episode.cliffhanger && (
                 <div className="card card-tint-slate" style={{ padding: "var(--space-5)", textAlign: "left", marginBottom: "var(--space-8)" }}>
                   <span style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", color: "var(--color-accent-navy)" }}>
-                    🔮 Cuplikan Episode Berikutnya:
+                    <IconSparkles size={13} style={{ marginRight: 4 }} /> Cuplikan Episode Berikutnya:
                   </span>
                   <p style={{ fontSize: "var(--text-xs)", fontStyle: "italic", lineHeight: 1.6, margin: "4px 0 0" }}>
                     "{episode.cliffhanger}"
@@ -594,8 +594,8 @@ export function StoryRunner({
                   {isFinishing
                     ? "Menyimpan ke Cloud..."
                     : completionFeedback
-                    ? "Kembali ke Daftar Episode ↗"
-                    : "Tandai Selesai & Klaim Reward (+50 EXP) ↗"}
+                    ? "Kembali ke Daftar Episode"
+                    : "Tandai Selesai & Klaim Reward (+50 EXP)"}
                 </button>
               </div>
             </div>

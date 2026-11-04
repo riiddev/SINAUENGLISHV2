@@ -1,3 +1,4 @@
+import { IconCheck } from "../../components/common/Icons.jsx";
 import React, { useState } from "react";
 import { useSpeech } from "../../hooks/useSpeech.js";
 
@@ -20,7 +21,7 @@ export function StudySession({ word, onFinish, onNextWord, onRecordReview }) {
           Buka menu Kosakata atau klik tombol di bawah untuk melatih kata berikutnya.
         </p>
         <button className="btn btn-primary" type="button" onClick={onFinish}>
-          Buka Daftar Kosakata ↗
+          Buka Daftar Kosakata
         </button>
       </div>
     );
@@ -99,7 +100,7 @@ export function StudySession({ word, onFinish, onNextWord, onRecordReview }) {
                   type="button"
                   onClick={() => setIsMeaningRevealed(true)}
                 >
-                  Buka Arti Kata ↗
+                  Buka Arti Kata
                 </button>
               )}
             </div>
@@ -113,7 +114,7 @@ export function StudySession({ word, onFinish, onNextWord, onRecordReview }) {
                 disabled={!isMeaningRevealed}
                 onClick={() => setStage(2)}
               >
-                Lanjut ke Konteks ↗
+                Lanjut ke Konteks
               </button>
             </div>
           </div>
@@ -148,7 +149,7 @@ export function StudySession({ word, onFinish, onNextWord, onRecordReview }) {
             </div>
             {selectedOption !== null && (
               <div style={{ marginTop: "var(--space-4)", fontWeight: 700, color: isCorrect ? "var(--color-success)" : "var(--color-danger)" }}>
-                {isCorrect ? "✓ Jawaban Benar! Pemahaman konteks berhasil." : "✗ Jawaban kurang tepat. Interval review direset ke 1 hari."}
+                {isCorrect ? "Jawaban Benar! Pemahaman konteks berhasil." : "Jawaban kurang tepat. Interval review direset ke 1 hari."}
               </div>
             )}
           </div>
@@ -186,7 +187,7 @@ export function StudySession({ word, onFinish, onNextWord, onRecordReview }) {
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span>Sinkronisasi:</span>
-                <span style={{ color: "var(--color-success)", fontWeight: 700 }}>✓ Tersimpan Otomatis</span>
+                <span style={{ color: "var(--color-success)", fontWeight: 700 }}><IconCheck size={12} style={{ marginRight: 3 }} /> Tersimpan Otomatis</span>
               </div>
             </div>
 
@@ -204,7 +205,7 @@ export function StudySession({ word, onFinish, onNextWord, onRecordReview }) {
                   onNextWord();
                 }}
               >
-                Latih Kata Selanjutnya ↗
+                Latih Kata Selanjutnya
               </button>
             </div>
           </div>

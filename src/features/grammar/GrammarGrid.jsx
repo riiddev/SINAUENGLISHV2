@@ -63,17 +63,17 @@ export function GrammarGrid({ topics = [], onSelectTopic }) {
                     <Badge variant="navy">{t.level}</Badge>
                     {isMastered && (
                       <span className="scholar-chip chip-level" style={{ fontSize: "10px", padding: "1px 6px", fontWeight: 800 }}>
-                        ✓ Dikuasai
+                        <><IconCheck size={12} style={{ marginRight: 3 }} /> Dikuasai</>
                       </span>
                     )}
                     {isEnhanced && !isMastered && (
                       <span className="scholar-chip chip-gold" style={{ fontSize: "10px", padding: "1px 6px", fontWeight: 800 }}>
-                        ★ 10 Bagian
+                        <><IconStar size={11} style={{ marginRight: 3 }} /> 10 Bagian</>
                       </span>
                     )}
                   </div>
                   <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", fontWeight: 700 }}>
-                    ⏱ {t.estimatedMinutes || 12} MENIT
+                    <><IconClock size={11} style={{ marginRight: 3 }} /> {t.estimatedMinutes || 12} MENIT</>
                   </span>
                 </div>
 
@@ -91,7 +91,7 @@ export function GrammarGrid({ topics = [], onSelectTopic }) {
                   {isEnhanced ? "12 Latihan + 10 Soal" : `${t.questions ? t.questions.length : 3} Soal Kuis`}
                 </span>
                 <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent-navy)" }}>
-                  Pelajari Modul ↗
+                  Pelajari Modul
                 </span>
               </div>
             </div>

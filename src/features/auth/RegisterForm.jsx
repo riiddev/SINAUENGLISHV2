@@ -123,7 +123,7 @@ export function RegisterForm() {
           loading={submitting}
           style={{ width: "100%", marginBottom: "var(--space-4)" }}
         >
-          Daftar Akun Baru ↗
+          Daftar Akun Baru
         </Button>
       </form>
 

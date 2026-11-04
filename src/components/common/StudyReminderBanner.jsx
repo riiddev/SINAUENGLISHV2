@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAssetUrl } from "../../data/assets.js";
+import { IconArrowUpRight } from "./Icons.jsx";
 
 /**
  * In-App Floating Top Reminder Banner
@@ -125,7 +126,7 @@ export function StudyReminderBanner({ reminder, onDismiss }) {
               borderRadius: "20px"
             }}
           >
-            Mulai Belajar Sekarang ↗
+            Mulai Belajar Sekarang <IconArrowUpRight size={13} style={{ marginLeft: 4 }} />
           </button>
           <button
             type="button"

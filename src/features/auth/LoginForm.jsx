@@ -103,7 +103,7 @@ export function LoginForm() {
           loading={submitting}
           style={{ width: "100%", marginBottom: "var(--space-4)" }}
         >
-          Masuk Sekarang ↗
+          Masuk Sekarang
         </Button>
       </form>
 
