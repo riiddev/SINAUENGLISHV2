@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 export function Modal({
   isOpen,
@@ -7,6 +7,8 @@ export function Modal({
   children,
   maxWidth = "580px"
 }) {
+  const closeBtnRef = useRef(null);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -16,6 +18,10 @@ export function Modal({
 
     document.addEventListener("keydown", handleKeyDown);
     document.body.style.overflow = "hidden";
+
+    setTimeout(() => {
+      closeBtnRef.current?.focus();
+    }, 50);
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
@@ -27,7 +33,7 @@ export function Modal({
 
   return (
     <div
-      className="modal-overlay"
+      className="modal-overlay is-open"
       role="dialog"
       aria-modal="true"
       onClick={(e) => {
@@ -35,34 +41,43 @@ export function Modal({
       }}
     >
       <div
-        className="modal-content"
-        style={{ maxInlineSize: maxWidth }}
+        className="modal-sheet modal-content"
+        style={{ maxInlineSize: maxWidth, width: "100%" }}
       >
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Tutup jendela modal"
-          style={{
-            position: "absolute",
-            top: "var(--space-4)",
-            right: "var(--space-4)",
-            fontSize: "var(--text-lg)",
-            fontWeight: "700",
-            padding: "4px 8px",
-            borderRadius: "var(--radius-sm)",
-            lineHeight: 1
-          }}
-        >
-          ✕
-        </button>
-        {title && (
-          <h2 style={{ fontSize: "var(--text-2xl)", marginBottom: "var(--space-4)" }}>
-            {title}
-          </h2>
-        )}
-        {children}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-4)", gap: "var(--space-2)" }}>
+          {title ? (
+            <h2 style={{ fontSize: "var(--text-2xl)", margin: 0 }}>
+              {title}
+            </h2>
+          ) : <div />}
+
+          <button
+            ref={closeBtnRef}
+            type="button"
+            className="btn btn-outline btn-icon"
+            onClick={onClose}
+            aria-label="Tutup jendela modal"
+            style={{
+              width: "44px",
+              height: "44px",
+              minWidth: "44px",
+              minHeight: "44px",
+              borderRadius: "var(--radius-pill)",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <div className="modal-body">
+          {children}
+        </div>
       </div>
     </div>
   );
 }
-

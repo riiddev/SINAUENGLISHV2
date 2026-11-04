@@ -31,6 +31,24 @@ export function WorkspacePage() {
   const currentView = routeView || "overview";
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem("sinau_sidebar_collapsed") === "true";
+    } catch (e) {
+      return false;
+    }
+  });
+
+  const handleToggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("sinau_sidebar_collapsed", String(next));
+      } catch (e) {}
+      return next;
+    });
+  };
+
   const [selectedGrammarTopic, setSelectedGrammarTopic] = useState(null);
   const [quizTopic, setQuizTopic] = useState(null);
   const [activeStudyWord, setActiveStudyWord] = useState(() => location.state?.word || null);
@@ -89,6 +107,8 @@ export function WorkspacePage() {
       <AppSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={handleToggleCollapse}
       />
 
       {/* Main Content Area */}
@@ -96,6 +116,7 @@ export function WorkspacePage() {
         {/* Topbar */}
         <AppTopbar
           title={viewTitles[currentView] || "Ruang Belajar"}
+          isSidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
           isSyncing={isSyncing}
           syncError={syncError}

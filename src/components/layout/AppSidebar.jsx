@@ -1,40 +1,146 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { BrandLogo } from "../common/BrandLogo.jsx";
 
-export function AppSidebar({ isOpen, onClose }) {
+export function AppSidebar({
+  isOpen,
+  onClose,
+  isCollapsed = false,
+  onToggleCollapse
+}) {
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
+  const sidebarRef = useRef(null);
+  const closeBtnRef = useRef(null);
+  const touchStartXRef = useRef(0);
+  const touchCurrentXRef = useRef(0);
 
   const isView = (v) => {
     if (v === "overview") return location.pathname === "/belajar" || location.pathname === "/belajar/";
     return location.pathname === `/belajar/${v}`;
   };
 
+  // Keyboard Escape & Focus Management
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+        document.getElementById("mobile-menu-btn")?.focus();
+      }
+
+      // Focus trap within sidebar on mobile drawer
+      if (e.key === "Tab" && sidebarRef.current) {
+        const focusables = sidebarRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+
+        const firstElement = focusables[0];
+        const lastElement = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            lastElement.focus();
+            e.preventDefault();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            firstElement.focus();
+            e.preventDefault();
+          }
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Auto focus close button or first item when opened
+    setTimeout(() => {
+      closeBtnRef.current?.focus();
+    }, 60);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  // Touch Swipe Left to Dismiss Drawer
+  const handleTouchStart = (e) => {
+    touchStartXRef.current = e.touches[0].clientX;
+    touchCurrentXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchCurrentXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const diffX = touchCurrentXRef.current - touchStartXRef.current;
+    if (diffX < -50) {
+      onClose();
+      document.getElementById("mobile-menu-btn")?.focus();
+    }
+  };
+
   return (
     <>
-      {/* Mobile Backdrop */}
-      {isOpen && (
-        <div
-          className="modal-overlay is-open"
-          style={{ zIndex: 95 }}
-          onClick={onClose}
-        />
-      )}
+      {/* Mobile Drawer Backdrop */}
+      <div
+        className={`sidebar-backdrop ${isOpen ? "is-open" : ""}`}
+        onClick={() => {
+          onClose();
+          document.getElementById("mobile-menu-btn")?.focus();
+        }}
+        aria-hidden="true"
+      />
 
-      <aside className={`app-sidebar ${isOpen ? "mobile-open" : ""}`} id="app-sidebar" aria-label="Navigasi Ruang Belajar">
+      <aside
+        ref={sidebarRef}
+        className={`app-sidebar ${isOpen ? "is-open mobile-open" : ""} ${isCollapsed ? "is-collapsed" : ""}`}
+        id="app-sidebar"
+        role="dialog"
+        aria-modal={isOpen ? "true" : undefined}
+        aria-label="Navigasi Ruang Belajar"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         <div className="sidebar-header">
           <BrandLogo />
+
+          {/* Close button on mobile (< 1024px) */}
+          <button
+            ref={closeBtnRef}
+            className="btn btn-outline btn-icon sidebar-close-btn"
+            type="button"
+            onClick={() => {
+              onClose();
+              document.getElementById("mobile-menu-btn")?.focus();
+            }}
+            aria-label="Tutup navigasi samping"
+            title="Tutup (Esc)"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
 
-        <nav className="sidebar-nav">
+        <nav className="sidebar-nav" aria-label="Menu Belajar">
           <Link
             to="/belajar"
             onClick={onClose}
             className={`sidebar-link ${isView("overview") ? "is-active" : ""}`}
+            title="Beranda Belajar"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
             <span>Beranda</span>
           </Link>
 
@@ -42,8 +148,13 @@ export function AppSidebar({ isOpen, onClose }) {
             to="/belajar/vocabulary"
             onClick={onClose}
             className={`sidebar-link ${isView("vocabulary") ? "is-active" : ""}`}
+            title="Daftar Kosakata"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+              <path d="M6 6h10"/>
+              <path d="M6 10h10"/>
+            </svg>
             <span>Kosakata</span>
             <span className="sidebar-count" id="sidebar-vocab-count">2.971</span>
           </Link>
@@ -52,8 +163,12 @@ export function AppSidebar({ isOpen, onClose }) {
             to="/belajar/study"
             onClick={onClose}
             className={`sidebar-link ${isView("study") ? "is-active" : ""}`}
+            title="Latihan Fokus"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <polygon points="10 8 16 12 10 16 10 8"/>
+            </svg>
             <span>Latihan Fokus</span>
           </Link>
 
@@ -61,8 +176,13 @@ export function AppSidebar({ isOpen, onClose }) {
             to="/belajar/grammar"
             onClick={onClose}
             className={`sidebar-link ${isView("grammar") ? "is-active" : ""}`}
+            title="Kurikulum Grammar"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <path d="m9 15 2 2 4-4"/>
+            </svg>
             <span>Grammar</span>
             <span className="sidebar-count" id="sidebar-grammar-count">19</span>
           </Link>
@@ -71,8 +191,12 @@ export function AppSidebar({ isOpen, onClose }) {
             to="/belajar/reading"
             onClick={onClose}
             className={`sidebar-link ${isView("reading") ? "is-active" : ""}`}
+            title="HABIT Reading"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
             <span>HABIT Reading</span>
             <span className="sidebar-count" id="sidebar-reading-count">156</span>
           </Link>
@@ -81,8 +205,12 @@ export function AppSidebar({ isOpen, onClose }) {
             to="/belajar/adventure"
             onClick={onClose}
             className={`sidebar-link ${isView("adventure") ? "is-active" : ""}`}
+            title="Petualangan"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+            </svg>
             <span>Petualangan</span>
           </Link>
 
@@ -90,8 +218,14 @@ export function AppSidebar({ isOpen, onClose }) {
             to="/belajar/review"
             onClick={onClose}
             className={`sidebar-link ${isView("review") ? "is-active" : ""}`}
+            title="Review (SRS)"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+              <path d="M16 21h5v-5"/>
+            </svg>
             <span>Review (SRS)</span>
           </Link>
 
@@ -99,8 +233,12 @@ export function AppSidebar({ isOpen, onClose }) {
             to="/belajar/progress"
             onClick={onClose}
             className={`sidebar-link ${isView("progress") ? "is-active" : ""}`}
+            title="Progres Penguasaan"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+              <polyline points="16 7 22 7 22 13"/>
+            </svg>
             <span>Progres</span>
           </Link>
 
@@ -108,8 +246,13 @@ export function AppSidebar({ isOpen, onClose }) {
             to="/belajar/settings"
             onClick={onClose}
             className={`sidebar-link ${isView("settings") ? "is-active" : ""}`}
+            title="Pengaturan"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            {/* Standard 8-tooth gear SVG */}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
             <span>Pengaturan</span>
           </Link>
         </nav>
@@ -137,6 +280,26 @@ export function AppSidebar({ isOpen, onClose }) {
             </div>
           )}
         </div>
+
+        {/* Desktop Collapse Toggle Button (≥ 1024px) */}
+        {onToggleCollapse && (
+          <button
+            className="sidebar-collapse-btn"
+            type="button"
+            onClick={onToggleCollapse}
+            aria-label={isCollapsed ? "Perlebar navigasi" : "Ciutkan navigasi"}
+            title={isCollapsed ? "Buka panel samping" : "Ciutkan panel samping"}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              {isCollapsed ? (
+                <polyline points="9 18 15 12 9 6" />
+              ) : (
+                <polyline points="15 18 9 12 15 6" />
+              )}
+            </svg>
+            {!isCollapsed && <span>Ciutkan</span>}
+          </button>
+        )}
       </aside>
     </>
   );

@@ -29,3 +29,8 @@ dist-ssr
 .env.*
 !.env.example
 
+
+test-results/
+
+public/screenshots/
+
