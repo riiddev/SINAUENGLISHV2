@@ -18,6 +18,7 @@ export function AppSidebar({
 
   const isView = (v) => {
     if (v === "overview") return location.pathname === "/belajar" || location.pathname === "/belajar/";
+    if (v === "progress") return location.pathname === "/belajar/progress" || location.pathname === "/belajar/profile";
     return location.pathname === `/belajar/${v}`;
   };
 
@@ -233,13 +234,13 @@ export function AppSidebar({
             to="/belajar/progress"
             onClick={onClose}
             className={`sidebar-link ${isView("progress") ? "is-active" : ""}`}
-            title="Progres Penguasaan"
+            title="Profil & Progres Belajar"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
-              <polyline points="16 7 22 7 22 13"/>
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
             </svg>
-            <span>Progres</span>
+            <span>Profil & Progres</span>
           </Link>
 
           <Link

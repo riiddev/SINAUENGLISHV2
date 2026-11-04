@@ -23,7 +23,9 @@ const SHEETS = {
   SESSIONS: "Sessions",
   PROGRESS: "Progress",
   QUIZ: "QuizAttempts",
-  SETTINGS: "Settings"
+  SETTINGS: "Settings",
+  PROFILES: "Profiles",
+  TITLES: "Titles"
 };
 
 /**
@@ -87,7 +89,17 @@ function doPost(e) {
       case "updateSettings":
         return handleUpdateSettings(ss, token, payload);
 
-      // 5. One-time Migration from V1/V2 JSON Backup
+      // 5. Profiles & Titles
+      case "getProfile":
+        return handleGetProfile(ss, token);
+      case "updateProfile":
+        return handleUpdateProfile(ss, token, payload);
+      case "getUserTitles":
+        return handleGetUserTitles(ss, token);
+      case "unlockTitle":
+        return handleUnlockTitle(ss, token, payload);
+
+      // 6. One-time Migration from V1/V2 JSON Backup
       case "importBackup":
         return handleImportBackup(ss, token, payload);
 
@@ -466,6 +478,232 @@ function handleImportBackup(ss, token, payload) {
 }
 
 /* ==========================================================================
+   PROFILES & TITLES HANDLERS (NON-DESTRUCTIVE MIGRATION)
+   ========================================================================== */
+
+function ensureProfilesAndTitlesSheets(ss) {
+  let profileSheet = ss.getSheetByName(SHEETS.PROFILES);
+  if (!profileSheet) {
+    profileSheet = ss.insertSheet(SHEETS.PROFILES);
+    profileSheet.appendRow(["user_id", "display_name", "active_title", "xp", "streak", "coins", "last_active_date", "avatar_key"]);
+    const hRange = profileSheet.getRange(1, 1, 1, 8);
+    hRange.setFontWeight("bold");
+    hRange.setBackground("#4B5E73");
+    hRange.setFontColor("#FFFFFF");
+    profileSheet.setFrozenRows(1);
+    [180, 180, 200, 100, 80, 100, 200, 120].forEach((w, idx) => profileSheet.setColumnWidth(idx + 1, w));
+  }
+
+  let titleSheet = ss.getSheetByName(SHEETS.TITLES);
+  if (!titleSheet) {
+    titleSheet = ss.insertSheet(SHEETS.TITLES);
+    titleSheet.appendRow(["user_id", "title_id", "unlocked_at"]);
+    const hRange = titleSheet.getRange(1, 1, 1, 3);
+    hRange.setFontWeight("bold");
+    hRange.setBackground("#4B5E73");
+    hRange.setFontColor("#FFFFFF");
+    titleSheet.setFrozenRows(1);
+    [180, 180, 200].forEach((w, idx) => titleSheet.setColumnWidth(idx + 1, w));
+  }
+
+  return { profileSheet, titleSheet };
+}
+
+function handleGetProfile(ss, token) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const { profileSheet, titleSheet } = ensureProfilesAndTitlesSheets(ss);
+  const pData = profileSheet.getDataRange().getValues();
+  let userProfile = null;
+
+  for (let i = 1; i < pData.length; i++) {
+    if (pData[i][0] === userId) {
+      userProfile = {
+        userId: pData[i][0],
+        displayName: pData[i][1],
+        activeTitle: pData[i][2],
+        xp: Number(pData[i][3]) || 0,
+        streak: Number(pData[i][4]) || 1,
+        coins: Number(pData[i][5]) || 0,
+        lastActiveDate: pData[i][6],
+        avatarKey: pData[i][7] || "avatar_1"
+      };
+      break;
+    }
+  }
+
+  const now = new Date().toISOString();
+
+  // If profile not yet created in Profiles table, generate default profile
+  if (!userProfile) {
+    let name = "Pelajar Sinau";
+    const userSheet = ss.getSheetByName(SHEETS.USERS);
+    if (userSheet) {
+      const uData = userSheet.getDataRange().getValues();
+      for (let i = 1; i < uData.length; i++) {
+        if (uData[i][0] === userId) {
+          name = uData[i][2] || name;
+          break;
+        }
+      }
+    }
+
+    userProfile = {
+      userId: userId,
+      displayName: name,
+      activeTitle: "word_explorer",
+      xp: 50,
+      streak: 1,
+      coins: 50,
+      lastActiveDate: now,
+      avatarKey: "avatar_1"
+    };
+
+    profileSheet.appendRow([
+      userId,
+      userProfile.displayName,
+      userProfile.activeTitle,
+      userProfile.xp,
+      userProfile.streak,
+      userProfile.coins,
+      userProfile.lastActiveDate,
+      userProfile.avatarKey
+    ]);
+
+    // Unlock default initial starter title
+    titleSheet.appendRow([userId, "word_explorer", now]);
+  }
+
+  // Fetch unlocked titles for this user
+  const tData = titleSheet.getDataRange().getValues();
+  const unlockedTitles = [];
+  for (let i = 1; i < tData.length; i++) {
+    if (tData[i][0] === userId) {
+      unlockedTitles.push({
+        titleId: tData[i][1],
+        unlockedAt: tData[i][2]
+      });
+    }
+  }
+
+  return jsonResponse({
+    success: true,
+    data: {
+      profile: userProfile,
+      unlockedTitles: unlockedTitles
+    }
+  });
+}
+
+function handleUpdateProfile(ss, token, payload) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const { profileSheet } = ensureProfilesAndTitlesSheets(ss);
+  const pData = profileSheet.getDataRange().getValues();
+  let rowIdx = -1;
+
+  for (let i = 1; i < pData.length; i++) {
+    if (pData[i][0] === userId) {
+      rowIdx = i + 1;
+      break;
+    }
+  }
+
+  const now = new Date().toISOString();
+
+  if (rowIdx > 0) {
+    if (payload.displayName) profileSheet.getRange(rowIdx, 2).setValue(String(payload.displayName).trim());
+    if (payload.activeTitle) profileSheet.getRange(rowIdx, 3).setValue(String(payload.activeTitle));
+    if (payload.xp !== undefined) profileSheet.getRange(rowIdx, 4).setValue(Number(payload.xp));
+    if (payload.streak !== undefined) profileSheet.getRange(rowIdx, 5).setValue(Number(payload.streak));
+    if (payload.coins !== undefined) profileSheet.getRange(rowIdx, 6).setValue(Number(payload.coins));
+    profileSheet.getRange(rowIdx, 7).setValue(now);
+    if (payload.avatarKey) profileSheet.getRange(rowIdx, 8).setValue(String(payload.avatarKey));
+  } else {
+    profileSheet.appendRow([
+      userId,
+      payload.displayName || "Pelajar Sinau",
+      payload.activeTitle || "word_explorer",
+      payload.xp !== undefined ? Number(payload.xp) : 50,
+      payload.streak !== undefined ? Number(payload.streak) : 1,
+      payload.coins !== undefined ? Number(payload.coins) : 50,
+      now,
+      payload.avatarKey || "avatar_1"
+    ]);
+  }
+
+  // Update display_name in Users table as well
+  if (payload.displayName) {
+    const userSheet = ss.getSheetByName(SHEETS.USERS);
+    if (userSheet) {
+      const uData = userSheet.getDataRange().getValues();
+      for (let i = 1; i < uData.length; i++) {
+        if (uData[i][0] === userId) {
+          userSheet.getRange(i + 1, 3).setValue(String(payload.displayName).trim());
+          break;
+        }
+      }
+    }
+  }
+
+  return jsonResponse({
+    success: true,
+    message: "Profil berhasil diperbarui."
+  });
+}
+
+function handleGetUserTitles(ss, token) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const { titleSheet } = ensureProfilesAndTitlesSheets(ss);
+  const data = titleSheet.getDataRange().getValues();
+  const titles = [];
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === userId) {
+      titles.push({
+        titleId: data[i][1],
+        unlockedAt: data[i][2]
+      });
+    }
+  }
+
+  return jsonResponse({
+    success: true,
+    data: { titles: titles }
+  });
+}
+
+function handleUnlockTitle(ss, token, payload) {
+  const userId = validateSession(ss, token);
+  if (!userId) return jsonResponse({ success: false, error: "Sesi tidak valid." }, 401);
+
+  const titleId = payload.titleId;
+  if (!titleId) return jsonResponse({ success: false, error: "Title ID tidak valid." }, 400);
+
+  const { titleSheet } = ensureProfilesAndTitlesSheets(ss);
+  const data = titleSheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === userId && data[i][1] === titleId) {
+      return jsonResponse({ success: true, message: "Gelar sudah terbuka sebelumnya." });
+    }
+  }
+
+  const now = new Date().toISOString();
+  titleSheet.appendRow([userId, titleId, now]);
+
+  return jsonResponse({
+    success: true,
+    message: "Gelar berhasil dibuka!",
+    data: { titleId: titleId, unlockedAt: now }
+  });
+}
+
+/* ==========================================================================
    SECURITY & UTILITY FUNCTIONS
    ========================================================================== */
 
@@ -594,6 +832,16 @@ function setupDatabase() {
       name: "Settings",
       headers: ["user_id", "key", "value"],
       columnWidths: [180, 160, 240]
+    },
+    {
+      name: "Profiles",
+      headers: ["user_id", "display_name", "active_title", "xp", "streak", "coins", "last_active_date", "avatar_key"],
+      columnWidths: [180, 180, 200, 100, 80, 100, 200, 120]
+    },
+    {
+      name: "Titles",
+      headers: ["user_id", "title_id", "unlocked_at"],
+      columnWidths: [180, 180, 200]
     }
   ];
 

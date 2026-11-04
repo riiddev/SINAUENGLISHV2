@@ -170,6 +170,40 @@ function handleDevFallback(action, payload, token) {
     return { success: true, data: { settings: { dailyGoal: 10, theme: "light" } } };
   }
 
+  if (action === "getProfile") {
+    return {
+      success: true,
+      data: {
+        profile: {
+          userId: "u_dev_user",
+          displayName: "Pelajar Sinau",
+          activeTitle: "word_explorer",
+          xp: 250,
+          streak: 3,
+          coins: 75,
+          lastActiveDate: new Date().toISOString(),
+          avatarKey: "avatar_1"
+        },
+        unlockedTitles: [{ titleId: "word_explorer", unlockedAt: new Date().toISOString() }]
+      }
+    };
+  }
+
+  if (action === "updateProfile") {
+    return { success: true, message: "Profil tersimpan (Dev Preview)." };
+  }
+
+  if (action === "getUserTitles") {
+    return {
+      success: true,
+      data: { titles: [{ titleId: "word_explorer", unlockedAt: new Date().toISOString() }] }
+    };
+  }
+
+  if (action === "unlockTitle") {
+    return { success: true, message: "Gelar berhasil dibuka (Dev Preview)." };
+  }
+
   return { success: true, message: "Aksi berhasil (Dev Preview)." };
 }
 
@@ -235,6 +269,23 @@ export const api = {
 
   async updateSettings(settings = {}) {
     return request("updateSettings", { settings }, true);
+  },
+
+  // Profiles & Titles
+  async getProfile() {
+    return request("getProfile", {}, true);
+  },
+
+  async updateProfile(profileData = {}) {
+    return request("updateProfile", profileData, true);
+  },
+
+  async getUserTitles() {
+    return request("getUserTitles", {}, true);
+  },
+
+  async unlockTitle(titleId) {
+    return request("unlockTitle", { titleId }, true);
   },
 
   // One-time migration
